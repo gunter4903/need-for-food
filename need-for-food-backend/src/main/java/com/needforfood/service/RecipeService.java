@@ -9,6 +9,7 @@ import com.needforfood.model.entity.User;
 import com.needforfood.repository.sql.RecipeRepository;
 import com.needforfood.repository.sql.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.hibernate.Hibernate;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -37,13 +38,19 @@ public class RecipeService {
 
     @Transactional(readOnly = true)
     public Recipe getById(Long id) {
-        return recipeRepository.findById(id)
+        Recipe recipe = recipeRepository.findDetailedById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Recette introuvable: " + id));
+        // ingredients est chargé via JOIN FETCH ; steps est initialisé séparément car
+        // Hibernate ne permet pas de JOIN FETCH deux collections (bags) à la fois.
+        Hibernate.initialize(recipe.getSteps());
+        return recipe;
     }
 
     @Transactional(readOnly = true)
     public List<Recipe> getByUser(Long userId) {
-        return recipeRepository.findByUserId(userId);
+        List<Recipe> recipes = recipeRepository.findDetailedByUserId(userId);
+        recipes.forEach(recipe -> Hibernate.initialize(recipe.getSteps()));
+        return recipes;
     }
 
     @Transactional
@@ -57,11 +64,17 @@ public class RecipeService {
         recipe.setDiet(updates.getDiet());
         recipe.setPreparationTime(updates.getPreparationTime());
 
+        // On vide puis on force l'exécution des DELETE (flush) avant de recréer les lignes :
+        // dans un même flush, Hibernate exécute les INSERT/UPDATE avant les DELETE, ce qui viole
+        // la contrainte d'unicité (recipe_id, step_number) et déclenche le garde-fou "deleted
+        // object would be re-saved by cascade" sur les RecipeIngredient (clé composite @MapsId).
         recipe.getIngredients().clear();
+        recipe.getSteps().clear();
+        recipeRepository.flush();
+
         linkIngredients(recipe, updates.getIngredients());
         recipe.getIngredients().addAll(updates.getIngredients());
 
-        recipe.getSteps().clear();
         numberSteps(recipe, updates.getSteps());
         recipe.getSteps().addAll(updates.getSteps());
 

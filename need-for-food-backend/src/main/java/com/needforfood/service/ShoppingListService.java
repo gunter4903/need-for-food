@@ -44,7 +44,10 @@ public class ShoppingListService {
 
         Map<Long, ShoppingListItem> mergedByIngredientId = new LinkedHashMap<>();
         for (Long recipeId : recipeIds) {
-            Recipe recipe = recipeRepository.findById(recipeId)
+            // findDetailedById (pas findById) : charge pleinement l'Ingredient associé, pas juste
+            // un proxy paresseux, car il est copié tel quel dans le ShoppingListItem ci-dessous
+            // et sera lu (nom, unité) après la fin de cette transaction, lors du mappage en DTO.
+            Recipe recipe = recipeRepository.findDetailedById(recipeId)
                     .orElseThrow(() -> new ResourceNotFoundException("Recette introuvable: " + recipeId));
 
             recipe.getIngredients().forEach(recipeIngredient -> mergedByIngredientId.merge(
@@ -70,7 +73,7 @@ public class ShoppingListService {
 
     @Transactional(readOnly = true)
     public ShoppingList getById(Long id, Long requesterId) {
-        ShoppingList list = shoppingListRepository.findById(id)
+        ShoppingList list = shoppingListRepository.findDetailedById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Liste de courses introuvable: " + id));
         assertOwner(list, requesterId);
         return list;
@@ -78,7 +81,7 @@ public class ShoppingListService {
 
     @Transactional(readOnly = true)
     public List<ShoppingList> getByUser(Long userId) {
-        return shoppingListRepository.findByUserId(userId);
+        return shoppingListRepository.findDetailedByUserId(userId);
     }
 
     @Transactional
