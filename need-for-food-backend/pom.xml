@@ -37,6 +37,12 @@
             <artifactId>spring-boot-starter-data-jpa</artifactId>
         </dependency>
 
+        <!-- Accès aux données MongoDB (préférences, index de recherche, sessions, historique) -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-mongodb</artifactId>
+        </dependency>
+
         <!-- Sécurité (authentification, hachage des mots de passe) -->
         <dependency>
             <groupId>org.springframework.boot</groupId>

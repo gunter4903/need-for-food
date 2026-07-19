@@ -32,6 +32,20 @@ services:
     volumes:
       - pgadmin_data:/var/lib/pgadmin
 
+  mongodb:
+    image: mongo:7
+    container_name: need-for-food-mongodb
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_USERNAME:-need_for_food}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD:-need_for_food}
+      MONGO_INITDB_DATABASE: ${MONGO_DATABASE:-need_for_food}
+    ports:
+      - "${MONGO_PORT:-27017}:27017"
+    volumes:
+      - mongodb_data:/data/db
+
 volumes:
   postgres_data:
   pgadmin_data:
+  mongodb_data:

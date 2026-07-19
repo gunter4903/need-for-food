@@ -7,6 +7,10 @@ spring:
   jpa:
     show-sql: true
 
+  data:
+    mongodb:
+      uri: mongodb://${MONGO_USERNAME:need_for_food}:${MONGO_PASSWORD:need_for_food}@${MONGO_HOST:localhost}:${MONGO_PORT:27017}/${MONGO_DATABASE:need_for_food}?authSource=admin
+
 logging:
   level:
     org.hibernate.SQL: debug
