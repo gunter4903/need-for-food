@@ -18,3 +18,9 @@ spring:
 
 server:
   port: 8080
+
+app:
+  jwt:
+    # En production, JWT_SECRET doit être défini via variable d'environnement (256 bits minimum).
+    secret: ${JWT_SECRET:dev-only-secret-key-change-me-please-32-bytes-minimum}
+    expiration-ms: ${JWT_EXPIRATION_MS:86400000}
