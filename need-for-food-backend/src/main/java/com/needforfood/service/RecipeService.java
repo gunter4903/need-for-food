@@ -6,7 +6,6 @@ import com.needforfood.model.entity.PreparationStep;
 import com.needforfood.model.entity.Recipe;
 import com.needforfood.model.entity.RecipeIngredient;
 import com.needforfood.model.entity.User;
-import com.needforfood.repository.sql.IngredientRepository;
 import com.needforfood.repository.sql.RecipeRepository;
 import com.needforfood.repository.sql.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -21,7 +20,7 @@ import java.util.List;
 public class RecipeService {
 
     private final RecipeRepository recipeRepository;
-    private final IngredientRepository ingredientRepository;
+    private final IngredientService ingredientService;
     private final UserRepository userRepository;
 
     @Transactional
@@ -92,8 +91,7 @@ public class RecipeService {
     }
 
     private Ingredient resolveIngredient(Ingredient candidate) {
-        return ingredientRepository.findByNameIgnoreCase(candidate.getName())
-                .orElseGet(() -> ingredientRepository.save(candidate));
+        return ingredientService.findOrCreate(candidate.getName(), candidate.getUnit());
     }
 
     private void assertOwner(Recipe recipe, Long requesterId) {

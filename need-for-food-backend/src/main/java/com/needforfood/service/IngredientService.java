@@ -25,4 +25,10 @@ public class IngredientService {
         return ingredientRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Ingrédient introuvable: " + id));
     }
+
+    @Transactional
+    public Ingredient findOrCreate(String name, String unit) {
+        return ingredientRepository.findByNameIgnoreCase(name)
+                .orElseGet(() -> ingredientRepository.save(Ingredient.builder().name(name).unit(unit).build()));
+    }
 }
