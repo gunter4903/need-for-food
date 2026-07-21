@@ -1,0 +1,227 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="23d147eb-fe7c-4e75-9183-d618c3f3dcce" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/assets/images/google-icon.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/assets/images/logo.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/components/common/FormInput.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/components/common/OtpInput.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/constants/theme.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/navigation/AppNavigator.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/screens/auth/LoginScreen.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/screens/auth/SignupScreen.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/screens/auth/VerifyAccountScreen.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/screens/home/HomeScreen.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/claudeCodeEditorTabs.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.vscode/extensions.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.vscode/settings.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app.json" beforeDir="false" afterPath="$PROJECT_DIR$/app.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/expo.icon/Assets/expo-symbol 2.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/expo.icon/Assets/grid.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/expo.icon/icon.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/images/android-icon-background.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/images/android-icon-foreground.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/images/android-icon-monochrome.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/images/expo-badge-white.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/images/expo-badge.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/images/expo-logo.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/images/favicon.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/images/icon.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/images/logo-glow.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/images/react-logo.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/images/react-logo@2x.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/images/react-logo@3x.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/images/splash-icon.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/images/tabIcons/explore.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/images/tabIcons/explore@2x.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/images/tabIcons/explore@3x.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/images/tabIcons/home.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/images/tabIcons/home@2x.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/images/tabIcons/home@3x.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/images/tutorial-web.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/package-lock.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/reset-project.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/_layout.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/explore.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/index.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/animated-icon.module.css" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/animated-icon.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/animated-icon.web.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/app-tabs.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/app-tabs.web.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/external-link.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/hint-row.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/themed-text.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/themed-view.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/ui/collapsible.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/web-badge.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/constants/theme.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/global.css" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/hooks/use-color-scheme.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/hooks/use-color-scheme.web.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/hooks/use-theme.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tsconfig.json" beforeDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="ComposerSettings">
+    <execution>
+      <executable />
+    </execution>
+  </component>
+  <component name="EmbeddingIndexingInfo">
+    <option name="cachedIndexableFilesCount" value="17" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="JavaScript File" />
+      </list>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
+  </component>
+  <component name="GitHubPullRequestSearchHistory"><![CDATA[{
+  "lastFilter": {
+    "state": "OPEN",
+    "assignee": "gunter4903"
+  }
+}]]></component>
+  <component name="GithubPullRequestsUISettings"><![CDATA[{
+  "selectedUrlAndAccountId": {
+    "url": "https://github.com/gunter4903/need-for-food.git",
+    "accountId": "fd839cae-fed7-4d2f-a22e-e995ae1b910c"
+  }
+}]]></component>
+  <component name="McpProjectServerCommands">
+    <commands />
+    <urls />
+  </component>
+  <component name="NextEditCompletionFeaturesState">
+    <decayedCancelled>
+      <entry key="MS100" value="0.0" />
+      <entry key="MS500" value="0.0" />
+      <entry key="S2" value="7.94684052904937E-99" />
+      <entry key="S5" value="5.755431137280158E-40" />
+      <entry key="S10" value="2.399968592507311E-20" />
+      <entry key="S30" value="3.251177924464829E-7" />
+      <entry key="S60" value="0.0010388210355578925" />
+      <entry key="M2" value="0.10290166445218925" />
+      <entry key="M5" value="2.484302507483389" />
+      <entry key="M10" value="8.388334711741155" />
+      <entry key="M15" value="13.138805040051013" />
+      <entry key="M30" value="21.44442156547977" />
+      <entry key="H1" value="28.115270742097255" />
+      <entry key="H2" value="32.52899017153395" />
+      <entry key="H4" value="35.110144478805026" />
+      <entry key="D1" value="37.494614644751024" />
+      <entry key="W1" value="37.92718713489938" />
+    </decayedCancelled>
+    <decayedSelected>
+      <entry key="MS100" value="1.0" />
+      <entry key="MS500" value="1.0" />
+      <entry key="S2" value="1.0" />
+      <entry key="S5" value="1.0000000000113072" />
+      <entry key="S10" value="1.0000066035440514" />
+      <entry key="S30" value="1.0719618153659405" />
+      <entry key="S60" value="1.825183765910249" />
+      <entry key="M2" value="3.8918528722451553" />
+      <entry key="M5" value="7.821222735975319" />
+      <entry key="M10" value="11.422715491166702" />
+      <entry key="M15" value="13.894217576949668" />
+      <entry key="M30" value="18.263953424537807" />
+      <entry key="H1" value="21.829724868440195" />
+      <entry key="H2" value="24.16794757214316" />
+      <entry key="H4" value="25.515211547441197" />
+      <entry key="D1" value="26.742319071864213" />
+      <entry key="W1" value="26.96292905546454" />
+    </decayedSelected>
+    <decayedShown>
+      <entry key="MS100" value="0.01709833908219906" />
+      <entry key="MS500" value="0.44319084959743366" />
+      <entry key="S2" value="0.815920220743539" />
+      <entry key="S5" value="0.9218474920912438" />
+      <entry key="S10" value="0.9601351361281686" />
+      <entry key="S30" value="1.056967649666666" />
+      <entry key="S60" value="1.8103355015850224" />
+      <entry key="M2" value="3.974564937263552" />
+      <entry key="M5" value="10.284276841500338" />
+      <entry key="M10" value="19.789448257569887" />
+      <entry key="M15" value="27.011782517427736" />
+      <entry key="M30" value="39.69070366513176" />
+      <entry key="H1" value="49.93294796483067" />
+      <entry key="H2" value="56.689783469695904" />
+      <entry key="H4" value="60.62143855043637" />
+      <entry key="D1" value="64.2362275051014" />
+      <entry key="W1" value="64.8900139098016" />
+    </decayedShown>
+  </component>
+  <component name="ProjectColorInfo"><![CDATA[{
+  "associatedIndex": 7
+}]]></component>
+  <component name="ProjectId" id="3Gp73MCfjHnD3cV7svk9RKaCqLS" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "RunOnceActivity.MCP Project settings loaded": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "RunOnceActivity.typescript.service.memoryLimit.init": "true",
+    "codeWithMe.voiceChat.enabledByDefault": "false",
+    "git-widget-placeholder": "main",
+    "last_opened_file_path": "C:/Users/antoi/Documents/01. Bachelor Concepteur Developpeur d Applications/99. Projet Fil Rouge/need-for-food/need-for-food-mobile/assets/images",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.jshint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.jshint": "",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm"
+  }
+}]]></component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\antoi\Documents\01. Bachelor Concepteur Developpeur d Applications\99. Projet Fil Rouge\need-for-food\need-for-food-mobile\assets\images" />
+    </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\antoi\Documents\01. Bachelor Concepteur Developpeur d Applications\99. Projet Fil Rouge\need-for-food\need-for-food-mobile\src" />
+    </key>
+  </component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-js-predefined-d6986cc7102b-4abd2a77f808-JavaScript-PS-262.8665.265" />
+        <option value="bundled-php-predefined-a98d8de5180a-ff90ddd8021d-com.jetbrains.php.sharedIndexes-PS-262.8665.265" />
+      </set>
+    </attachedChunks>
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="23d147eb-fe7c-4e75-9183-d618c3f3dcce" name="Changes" comment="" />
+      <created>1784656457225</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1784656457225</updated>
+      <workItem from="1784656458434" duration="4468000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+</project>
