@@ -14,6 +14,12 @@ import HomeScreen from '../screens/home/HomeScreen';
 import ProfileScreen from '../screens/profile/ProfileScreen'
 import EditProfileScreen from '../screens/profile/EditProfileScreen'
 
+// Recettes
+import SearchRecipesScreen from '../screens/recipes/SearchRecipesScreen'
+import RecipeDetailScreen from '../screens/recipes/RecipeDetailScreen'
+import AddRecipeScreen from '../screens/recipes/AddRecipeScreen'
+import EditRecipeScreen from '../screens/recipes/EditRecipeScreen'
+
 const Stack = createNativeStackNavigator();
 
 export default function AppNavigator() {
@@ -30,10 +36,16 @@ export default function AppNavigator() {
 
                 {/* Onglets principaux */}
                 <Stack.Screen name="Accueil" component={HomeScreen} />
-                <Stack.Screen name="Profil" component={ProfileScreen}/>
+                <Stack.Screen name="ChercherRecettes" component={SearchRecipesScreen} />
+                <Stack.Screen name="Profil" component={ProfileScreen} />
 
                 {/* Profile */}
-                <Stack.Screen name="ModifierProfil" component={EditProfileScreen}/>
+                <Stack.Screen name="ModifierProfil" component={EditProfileScreen} />
+
+                {/* Recettes */}
+                <Stack.Screen name="DetailsRecette" component={RecipeDetailScreen} />
+                <Stack.Screen name="AjouterRecette" component={AddRecipeScreen} />
+                <Stack.Screen name="ModifierRecette" component={EditRecipeScreen} />
             </Stack.Navigator>
         </NavigationContainer>
     );
