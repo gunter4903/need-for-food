@@ -14,7 +14,7 @@ import { colors, spacing, typography, radius } from '../../constants/theme';
 import images from '../../../assets/images/temp/images';
 import CategoryChip from '../../components/home/CategoryChip';
 import FeaturedRecipeCard from '../../components/home/FeaturedRecipeCard';
-import RecipeCard from '../../components/home/RecipeCard';
+import RecipeCard from '../../components/common/RecipeCard';
 import NewsRow from '../../components/home/NewsRow';
 import BottomNav from '../../components/common/BottomNav';
 

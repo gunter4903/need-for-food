@@ -16,7 +16,7 @@ const images = {
     // Recipes
     bowlMediterraneen: require('./bowl-mediterraneen.png'),
     risottoChampignons: require('./risotto-champignons.png'),
-    cookieArtisanaux: require('./cookies-artisanaux.png'),
+    cookiesArtisanaux: require('./cookies-artisanaux.png'),
 
     // Search ingredients
     patesTomate: require('./pates-tomate.png'),

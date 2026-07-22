@@ -10,7 +10,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/Feather';
 import { colors, spacing, radius, typography } from '../../constants/theme';
-import OtpInput from '../../components/common/OtpInput';
+import OtpInput from '../../components/auth/OtpInput';
 
 export default function VerifyAccountScreen({ route, navigation }) {
     const [code, setCode] = useState('');

@@ -5,29 +5,17 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="23d147eb-fe7c-4e75-9183-d618c3f3dcce" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/assets/images/temp/avatar-julia-large.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/assets/images/temp/avatar-julia.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/assets/images/temp/bowl-fusion-placard.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/assets/images/temp/bowl-mediterraneen.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/assets/images/temp/buddha-bowl.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/assets/images/temp/cookies-artisanaux.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/assets/images/temp/curry-thai.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/assets/images/temp/images.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/assets/images/temp/pancakes.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/assets/images/temp/pasta-pomodoro.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/assets/images/temp/pates-au-pesto-edit.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/assets/images/temp/pates-au-pesto-hero.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/assets/images/temp/pates-tomate.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/assets/images/temp/poulet-tomates-roties.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/assets/images/temp/risotto-champignons.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/assets/images/temp/saumon-grille.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/components/common/BottomNav.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/components/home/CategoryChip.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/components/home/FeaturedRecipeCard.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/components/home/NewsRow.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/components/home/RecipeCard.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../need-for-food-backend/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/../need-for-food-backend/.gitignore" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/components/common/Header.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/components/profile/PreferenceTag.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/components/profile/SettingsRow.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/screens/profile/EditProfileScreen.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/screens/profile/ProfileScreen.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/images/temp/images.js" beforeDir="false" afterPath="$PROJECT_DIR$/assets/images/temp/images.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/common/OtpInput.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/auth/OtpInput.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/home/RecipeCard.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/common/RecipeCard.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/navigation/AppNavigator.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/navigation/AppNavigator.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/screens/auth/VerifyAccountScreen.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/screens/auth/VerifyAccountScreen.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/screens/home/HomeScreen.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/screens/home/HomeScreen.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -72,60 +60,60 @@
   <component name="NextEditCompletionFeaturesState">
     <decayedCancelled>
       <entry key="MS100" value="0.0" />
-      <entry key="MS500" value="3.942695675182322E-67" />
-      <entry key="S2" value="2.505848581626246E-17" />
-      <entry key="S5" value="2.3155611856971144E-7" />
-      <entry key="S10" value="5.308359359495441E-4" />
-      <entry key="S30" value="0.13210063406750538" />
-      <entry key="S60" value="0.713647220464518" />
-      <entry key="M2" value="2.974567878494274" />
-      <entry key="M5" value="21.02158731350582" />
-      <entry key="M10" value="49.646146089462306" />
-      <entry key="M15" value="67.13022230227344" />
-      <entry key="M30" value="91.34525906925593" />
-      <entry key="H1" value="106.78414169271879" />
-      <entry key="H2" value="115.53908063532775" />
-      <entry key="H4" value="121.88718669645407" />
-      <entry key="D1" value="184.5881539560516" />
-      <entry key="W1" value="236.00134262771874" />
+      <entry key="MS500" value="5.50281599729548E-90" />
+      <entry key="S2" value="1.1726719985825886E-22" />
+      <entry key="S5" value="4.311062765107229E-9" />
+      <entry key="S10" value="1.9412021090651336E-4" />
+      <entry key="S30" value="0.40119099469029623" />
+      <entry key="S60" value="3.1168862750576953" />
+      <entry key="M2" value="9.214642640849789" />
+      <entry key="M5" value="24.26030061860012" />
+      <entry key="M10" value="51.62575628076864" />
+      <entry key="M15" value="75.90902289602569" />
+      <entry key="M30" value="121.4128485827516" />
+      <entry key="H1" value="158.47579790879885" />
+      <entry key="H2" value="182.44557470838862" />
+      <entry key="H4" value="197.70487394418737" />
+      <entry key="D1" value="268.2275971114717" />
+      <entry key="W1" value="321.5893713273972" />
     </decayedCancelled>
     <decayedSelected>
-      <entry key="MS100" value="1.0" />
-      <entry key="MS500" value="1.0" />
-      <entry key="S2" value="1.0000000000000793" />
-      <entry key="S5" value="1.000005747460483" />
-      <entry key="S10" value="1.002422269089199" />
-      <entry key="S30" value="1.167394230253213" />
-      <entry key="S60" value="1.6237074519807133" />
-      <entry key="M2" value="2.8975985751374322" />
-      <entry key="M5" value="9.815582674332246" />
-      <entry key="M10" value="19.69449019269406" />
-      <entry key="M15" value="25.60488751481849" />
-      <entry key="M30" value="33.73740390472364" />
-      <entry key="H1" value="38.907105999716244" />
-      <entry key="H2" value="41.83280009992148" />
-      <entry key="H4" value="43.74394403333309" />
-      <entry key="D1" value="57.888057180878185" />
-      <entry key="W1" value="69.32683586758588" />
+      <entry key="MS100" value="1.0000114047946826" />
+      <entry key="MS500" value="1.1028038654752552" />
+      <entry key="S2" value="1.6784325295769549" />
+      <entry key="S5" value="2.313503405390205" />
+      <entry key="S10" value="2.8596283527263697" />
+      <entry key="S30" value="3.856461414691939" />
+      <entry key="S60" value="5.546898215628776" />
+      <entry key="M2" value="8.373232410282327" />
+      <entry key="M5" value="14.298845908804608" />
+      <entry key="M10" value="23.670399356025435" />
+      <entry key="M15" value="31.712109212506718" />
+      <entry key="M30" value="46.6551552358687" />
+      <entry key="H1" value="58.79671008088509" />
+      <entry key="H2" value="66.64420827390198" />
+      <entry key="H4" value="71.45339892399605" />
+      <entry key="D1" value="88.18625057538493" />
+      <entry key="W1" value="100.20985033695781" />
     </decayedSelected>
     <decayedShown>
-      <entry key="MS100" value="0.008257953441885782" />
-      <entry key="MS500" value="0.3831549900519458" />
-      <entry key="S2" value="0.7867624453536165" />
-      <entry key="S5" value="0.9085312044354309" />
-      <entry key="S10" value="0.9558905225866338" />
-      <entry key="S30" value="1.2775588742050612" />
-      <entry key="S60" value="2.3180874983980218" />
-      <entry key="M2" value="5.846981030505125" />
-      <entry key="M5" value="30.772007730111383" />
-      <entry key="M10" value="69.2622383024421" />
-      <entry key="M15" value="92.66374080630696" />
-      <entry key="M30" value="125.03355409966834" />
-      <entry key="H1" value="145.66236548182312" />
-      <entry key="H2" value="157.35620730020315" />
-      <entry key="H4" value="165.62291011235277" />
-      <entry key="D1" value="242.47445211511376" />
-      <entry key="W1" value="305.3278828610057" />
+      <entry key="MS100" value="0.006215185168765269" />
+      <entry key="MS500" value="0.39754812186106675" />
+      <entry key="S2" value="1.3017385268715331" />
+      <entry key="S5" value="2.0978475896402515" />
+      <entry key="S10" value="2.7278518480467238" />
+      <entry key="S30" value="4.190750974766247" />
+      <entry key="S60" value="8.58690218157987" />
+      <entry key="M2" value="17.50312190231447" />
+      <entry key="M5" value="38.48326714130491" />
+      <entry key="M10" value="75.2233298529772" />
+      <entry key="M15" value="107.55113955968142" />
+      <entry key="M30" value="168.01202474376908" />
+      <entry key="H1" value="217.23568266684228" />
+      <entry key="H2" value="249.06846465381" />
+      <entry key="H4" value="269.1467262258779" />
+      <entry key="D1" value="356.4114582376499" />
+      <entry key="W1" value="421.79883354670505" />
     </decayedShown>
   </component>
   <component name="ProjectColorInfo"><![CDATA[{
@@ -161,6 +149,8 @@
       <recent name="C:\Users\antoi\Documents\01. Bachelor Concepteur Developpeur d Applications\99. Projet Fil Rouge\need-for-food\need-for-food-mobile\assets\images" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\antoi\Documents\01. Bachelor Concepteur Developpeur d Applications\99. Projet Fil Rouge\need-for-food\need-for-food-mobile\src\components\auth" />
+      <recent name="C:\Users\antoi\Documents\01. Bachelor Concepteur Developpeur d Applications\99. Projet Fil Rouge\need-for-food\need-for-food-mobile\src\components\common" />
       <recent name="C:\Users\antoi\Documents\01. Bachelor Concepteur Developpeur d Applications\99. Projet Fil Rouge\need-for-food\need-for-food-mobile\src" />
     </key>
   </component>
@@ -179,7 +169,7 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1784656457225</updated>
-      <workItem from="1784656458434" duration="6658000" />
+      <workItem from="1784656458434" duration="7814000" />
     </task>
     <servers />
   </component>

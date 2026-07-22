@@ -7,8 +7,12 @@ import LoginScreen from '../screens/auth/LoginScreen';
 import SignupScreen from '../screens/auth/SignupScreen';
 import VerifyAccountScreen from '../screens/auth/VerifyAccountScreen';
 
-// Coeur de l'app
+// Home
 import HomeScreen from '../screens/home/HomeScreen';
+
+// Profile
+import ProfileScreen from '../screens/profile/ProfileScreen'
+import EditProfileScreen from '../screens/profile/EditProfileScreen'
 
 const Stack = createNativeStackNavigator();
 
@@ -26,6 +30,10 @@ export default function AppNavigator() {
 
                 {/* Onglets principaux */}
                 <Stack.Screen name="Accueil" component={HomeScreen} />
+                <Stack.Screen name="Profil" component={ProfileScreen}/>
+
+                {/* Profile */}
+                <Stack.Screen name="ModifierProfil" component={EditProfileScreen}/>
             </Stack.Navigator>
         </NavigationContainer>
     );
