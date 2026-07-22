@@ -5,69 +5,30 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="23d147eb-fe7c-4e75-9183-d618c3f3dcce" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/assets/images/google-icon.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/assets/images/logo.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/components/common/FormInput.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/components/common/OtpInput.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/constants/theme.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/navigation/AppNavigator.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/screens/auth/LoginScreen.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/screens/auth/SignupScreen.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/screens/auth/VerifyAccountScreen.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/screens/home/HomeScreen.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.gitignore" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/claudeCodeEditorTabs.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.vscode/extensions.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.vscode/settings.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/app.json" beforeDir="false" afterPath="$PROJECT_DIR$/app.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/expo.icon/Assets/expo-symbol 2.svg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/expo.icon/Assets/grid.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/expo.icon/icon.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/images/android-icon-background.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/images/android-icon-foreground.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/images/android-icon-monochrome.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/images/expo-badge-white.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/images/expo-badge.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/images/expo-logo.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/images/favicon.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/images/icon.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/images/logo-glow.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/images/react-logo.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/images/react-logo@2x.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/images/react-logo@3x.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/images/splash-icon.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/images/tabIcons/explore.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/images/tabIcons/explore@2x.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/images/tabIcons/explore@3x.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/images/tabIcons/home.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/images/tabIcons/home@2x.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/images/tabIcons/home@3x.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/images/tutorial-web.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/package-lock.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/scripts/reset-project.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/app/_layout.tsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/app/explore.tsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/app/index.tsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/animated-icon.module.css" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/animated-icon.tsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/animated-icon.web.tsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/app-tabs.tsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/app-tabs.web.tsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/external-link.tsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/hint-row.tsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/themed-text.tsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/themed-view.tsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/ui/collapsible.tsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/web-badge.tsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/constants/theme.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/global.css" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/hooks/use-color-scheme.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/hooks/use-color-scheme.web.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/hooks/use-theme.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/tsconfig.json" beforeDir="false" />
+      <change afterPath="$PROJECT_DIR$/assets/images/temp/avatar-julia-large.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/assets/images/temp/avatar-julia.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/assets/images/temp/bowl-fusion-placard.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/assets/images/temp/bowl-mediterraneen.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/assets/images/temp/buddha-bowl.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/assets/images/temp/cookies-artisanaux.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/assets/images/temp/curry-thai.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/assets/images/temp/images.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/assets/images/temp/pancakes.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/assets/images/temp/pasta-pomodoro.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/assets/images/temp/pates-au-pesto-edit.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/assets/images/temp/pates-au-pesto-hero.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/assets/images/temp/pates-tomate.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/assets/images/temp/poulet-tomates-roties.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/assets/images/temp/risotto-champignons.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/assets/images/temp/saumon-grille.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/components/common/BottomNav.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/components/home/CategoryChip.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/components/home/FeaturedRecipeCard.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/components/home/NewsRow.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/components/home/RecipeCard.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../need-for-food-backend/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/../need-for-food-backend/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/screens/home/HomeScreen.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/screens/home/HomeScreen.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -111,60 +72,60 @@
   <component name="NextEditCompletionFeaturesState">
     <decayedCancelled>
       <entry key="MS100" value="0.0" />
-      <entry key="MS500" value="0.0" />
-      <entry key="S2" value="7.94684052904937E-99" />
-      <entry key="S5" value="5.755431137280158E-40" />
-      <entry key="S10" value="2.399968592507311E-20" />
-      <entry key="S30" value="3.251177924464829E-7" />
-      <entry key="S60" value="0.0010388210355578925" />
-      <entry key="M2" value="0.10290166445218925" />
-      <entry key="M5" value="2.484302507483389" />
-      <entry key="M10" value="8.388334711741155" />
-      <entry key="M15" value="13.138805040051013" />
-      <entry key="M30" value="21.44442156547977" />
-      <entry key="H1" value="28.115270742097255" />
-      <entry key="H2" value="32.52899017153395" />
-      <entry key="H4" value="35.110144478805026" />
-      <entry key="D1" value="37.494614644751024" />
-      <entry key="W1" value="37.92718713489938" />
+      <entry key="MS500" value="3.942695675182322E-67" />
+      <entry key="S2" value="2.505848581626246E-17" />
+      <entry key="S5" value="2.3155611856971144E-7" />
+      <entry key="S10" value="5.308359359495441E-4" />
+      <entry key="S30" value="0.13210063406750538" />
+      <entry key="S60" value="0.713647220464518" />
+      <entry key="M2" value="2.974567878494274" />
+      <entry key="M5" value="21.02158731350582" />
+      <entry key="M10" value="49.646146089462306" />
+      <entry key="M15" value="67.13022230227344" />
+      <entry key="M30" value="91.34525906925593" />
+      <entry key="H1" value="106.78414169271879" />
+      <entry key="H2" value="115.53908063532775" />
+      <entry key="H4" value="121.88718669645407" />
+      <entry key="D1" value="184.5881539560516" />
+      <entry key="W1" value="236.00134262771874" />
     </decayedCancelled>
     <decayedSelected>
       <entry key="MS100" value="1.0" />
       <entry key="MS500" value="1.0" />
-      <entry key="S2" value="1.0" />
-      <entry key="S5" value="1.0000000000113072" />
-      <entry key="S10" value="1.0000066035440514" />
-      <entry key="S30" value="1.0719618153659405" />
-      <entry key="S60" value="1.825183765910249" />
-      <entry key="M2" value="3.8918528722451553" />
-      <entry key="M5" value="7.821222735975319" />
-      <entry key="M10" value="11.422715491166702" />
-      <entry key="M15" value="13.894217576949668" />
-      <entry key="M30" value="18.263953424537807" />
-      <entry key="H1" value="21.829724868440195" />
-      <entry key="H2" value="24.16794757214316" />
-      <entry key="H4" value="25.515211547441197" />
-      <entry key="D1" value="26.742319071864213" />
-      <entry key="W1" value="26.96292905546454" />
+      <entry key="S2" value="1.0000000000000793" />
+      <entry key="S5" value="1.000005747460483" />
+      <entry key="S10" value="1.002422269089199" />
+      <entry key="S30" value="1.167394230253213" />
+      <entry key="S60" value="1.6237074519807133" />
+      <entry key="M2" value="2.8975985751374322" />
+      <entry key="M5" value="9.815582674332246" />
+      <entry key="M10" value="19.69449019269406" />
+      <entry key="M15" value="25.60488751481849" />
+      <entry key="M30" value="33.73740390472364" />
+      <entry key="H1" value="38.907105999716244" />
+      <entry key="H2" value="41.83280009992148" />
+      <entry key="H4" value="43.74394403333309" />
+      <entry key="D1" value="57.888057180878185" />
+      <entry key="W1" value="69.32683586758588" />
     </decayedSelected>
     <decayedShown>
-      <entry key="MS100" value="0.01709833908219906" />
-      <entry key="MS500" value="0.44319084959743366" />
-      <entry key="S2" value="0.815920220743539" />
-      <entry key="S5" value="0.9218474920912438" />
-      <entry key="S10" value="0.9601351361281686" />
-      <entry key="S30" value="1.056967649666666" />
-      <entry key="S60" value="1.8103355015850224" />
-      <entry key="M2" value="3.974564937263552" />
-      <entry key="M5" value="10.284276841500338" />
-      <entry key="M10" value="19.789448257569887" />
-      <entry key="M15" value="27.011782517427736" />
-      <entry key="M30" value="39.69070366513176" />
-      <entry key="H1" value="49.93294796483067" />
-      <entry key="H2" value="56.689783469695904" />
-      <entry key="H4" value="60.62143855043637" />
-      <entry key="D1" value="64.2362275051014" />
-      <entry key="W1" value="64.8900139098016" />
+      <entry key="MS100" value="0.008257953441885782" />
+      <entry key="MS500" value="0.3831549900519458" />
+      <entry key="S2" value="0.7867624453536165" />
+      <entry key="S5" value="0.9085312044354309" />
+      <entry key="S10" value="0.9558905225866338" />
+      <entry key="S30" value="1.2775588742050612" />
+      <entry key="S60" value="2.3180874983980218" />
+      <entry key="M2" value="5.846981030505125" />
+      <entry key="M5" value="30.772007730111383" />
+      <entry key="M10" value="69.2622383024421" />
+      <entry key="M15" value="92.66374080630696" />
+      <entry key="M30" value="125.03355409966834" />
+      <entry key="H1" value="145.66236548182312" />
+      <entry key="H2" value="157.35620730020315" />
+      <entry key="H4" value="165.62291011235277" />
+      <entry key="D1" value="242.47445211511376" />
+      <entry key="W1" value="305.3278828610057" />
     </decayedShown>
   </component>
   <component name="ProjectColorInfo"><![CDATA[{
@@ -184,7 +145,7 @@
     "RunOnceActivity.typescript.service.memoryLimit.init": "true",
     "codeWithMe.voiceChat.enabledByDefault": "false",
     "git-widget-placeholder": "main",
-    "last_opened_file_path": "C:/Users/antoi/Documents/01. Bachelor Concepteur Developpeur d Applications/99. Projet Fil Rouge/need-for-food/need-for-food-mobile/assets/images",
+    "last_opened_file_path": "C:/Users/antoi/Documents/01. Bachelor Concepteur Developpeur d Applications/99. Projet Fil Rouge/need-for-food/need-for-food-mobile/assets/images/temp",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.jshint": "true",
     "node.js.detected.package.tslint": "true",
@@ -196,6 +157,7 @@
 }]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\antoi\Documents\01. Bachelor Concepteur Developpeur d Applications\99. Projet Fil Rouge\need-for-food\need-for-food-mobile\assets\images\temp" />
       <recent name="C:\Users\antoi\Documents\01. Bachelor Concepteur Developpeur d Applications\99. Projet Fil Rouge\need-for-food\need-for-food-mobile\assets\images" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
@@ -217,7 +179,7 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1784656457225</updated>
-      <workItem from="1784656458434" duration="4468000" />
+      <workItem from="1784656458434" duration="6658000" />
     </task>
     <servers />
   </component>
