@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import {
     ScrollView,
     View,
@@ -7,8 +7,10 @@ import {
     TextInput,
     TouchableOpacity,
     StyleSheet,
+    ActivityIndicator,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useFocusEffect } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/Feather';
 import { colors, spacing, typography, radius } from '../../constants/theme';
 import images from '../../../assets/images/temp/images';
@@ -18,6 +20,7 @@ import RecipeCard from '../../components/common/RecipeCard';
 import NewsRow from '../../components/home/NewsRow';
 import BottomNav from '../../components/common/BottomNav';
 import { useAuth } from '../../context/AuthContext';
+import * as recipeApi from '../../api/recipeApi';
 
 const CATEGORIES = [
     { key: 'populaire', label: 'Populaire', emoji: '🔥' },
@@ -25,50 +28,88 @@ const CATEGORIES = [
     { key: 'rapide', label: 'Rapide', emoji: '⏱️' },
 ];
 
-const FEATURED_RECIPE = {
-    id: 'pasta-pomodoro',
-    title: 'Pasta Pomodoro & Burrata',
-    time: '25 min',
-    difficulty: 'Facile',
-    badge: 'Coup de cœur',
-    image: images.pastaPomodoro,
-};
+function toCard(recipe) {
+    return {
+        id: recipe.id,
+        title: recipe.title,
+        time: recipe.preparationTime != null ? `${recipe.preparationTime} min` : '—',
+        difficulty: recipe.difficulty || '—',
+        diet: recipe.diet,
+        preparationTime: recipe.preparationTime,
+        badge: 'Suggestion pour vous',
+        image: recipe.imageUrl ? { uri: recipe.imageUrl } : images.imagePlaceholder,
+    };
+}
 
-const SUGGESTED_RECIPES = [
-    {
-        id: 'buddha-bowl',
-        title: 'Buddha Bowl...',
-        time: '15 min',
-        image: images.buddhaBowl,
-    },
-    {
-        id: 'saumon-grille',
-        title: 'Saumon Grillé au...',
-        time: '20 min',
-        image: images.saumonGrille,
-    },
-];
+function toNewsItem(recipe) {
+    const subtitle = [
+        recipe.preparationTime != null ? `${recipe.preparationTime} min` : null,
+        recipe.type,
+    ].filter(Boolean).join(' · ') || 'Nouvelle recette';
 
-const NEWS = [
-    {
-        id: 'pancakes',
-        title: 'Pancakes aux Myrtilles',
-        subtitle: 'Parfait pour le brunch',
-        image: images.pancakes,
-    },
-    {
-        id: 'curry-thai',
-        title: 'Curry Vert Thaï',
-        subtitle: 'Voyage culinaire intense',
-        image: images.curryThai,
-    },
-];
+    return {
+        id: recipe.id,
+        title: recipe.title,
+        subtitle,
+        image: recipe.imageUrl ? { uri: recipe.imageUrl } : images.imagePlaceholder,
+    };
+}
 
 export default function HomeScreen({ navigation }) {
-    const { user } = useAuth();
+    const { user, token } = useAuth();
     const [search, setSearch] = useState('');
     const [activeCategory, setActiveCategory] = useState('populaire');
+    const [suggestions, setSuggestions] = useState([]);
+    const [recent, setRecent] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState('');
     const firstName = user?.username?.split(' ')[0];
+
+    useFocusEffect(
+        useCallback(() => {
+            let cancelled = false;
+
+            (async () => {
+                setLoading(true);
+                try {
+                    const [suggested, all] = await Promise.all([
+                        recipeApi.getSuggestions(token),
+                        recipeApi.getAll(token),
+                    ]);
+                    if (cancelled) return;
+                    setSuggestions(suggested.map(toCard));
+                    setRecent(
+                        [...all]
+                            .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+                            .slice(0, 4)
+                            .map(toNewsItem)
+                    );
+                } catch (err) {
+                    if (!cancelled) setError(err.message || 'Impossible de charger les recettes.');
+                } finally {
+                    if (!cancelled) setLoading(false);
+                }
+            })();
+
+            return () => {
+                cancelled = true;
+            };
+        }, [token])
+    );
+
+    const filteredSuggestions = suggestions
+        .filter((recipe) => recipe.title.toLowerCase().includes(search.toLowerCase()))
+        .filter((recipe) => {
+            if (activeCategory === 'vegetarien') {
+                return (recipe.diet || '').toLowerCase() === 'végétarien';
+            }
+            if (activeCategory === 'rapide') {
+                return recipe.preparationTime != null && recipe.preparationTime <= 20;
+            }
+            return true;
+        });
+
+    const [featuredRecipe, ...otherSuggestions] = filteredSuggestions;
 
     return (
         <SafeAreaView style={styles.safeArea}>
@@ -99,7 +140,7 @@ export default function HomeScreen({ navigation }) {
                     <Icon name="search" size={18} color={colors.textSecondary} />
                     <TextInput
                         style={styles.searchInput}
-                        placeholder="Rechercher par nom ou ingrédient..."
+                        placeholder="Rechercher par nom..."
                         placeholderTextColor={colors.textSecondary}
                         value={search}
                         onChangeText={setSearch}
@@ -109,7 +150,7 @@ export default function HomeScreen({ navigation }) {
                 {/* Catégories */}
                 <View style={styles.sectionHeaderRow}>
                     <Text style={typography.h2}>Catégories</Text>
-                    <TouchableOpacity>
+                    <TouchableOpacity onPress={() => navigation?.navigate('ChercherRecettes')}>
                         <Text style={styles.linkText}>Voir tout</Text>
                     </TouchableOpacity>
                 </View>
@@ -129,32 +170,55 @@ export default function HomeScreen({ navigation }) {
                     ))}
                 </ScrollView>
 
+                {!!error && <Text style={styles.errorText}>{error}</Text>}
+
                 {/* Recettes suggérées */}
                 <Text style={[typography.h2, styles.sectionTitle]}>Recettes suggérées</Text>
-                <FeaturedRecipeCard
-                    recipe={FEATURED_RECIPE}
-                    onPress={() => navigation?.navigate('DetailsRecette', { id: FEATURED_RECIPE.id })}
-                />
-                <View style={styles.gridRow}>
-                    {SUGGESTED_RECIPES.map((recipe) => (
-                        <RecipeCard
-                            key={recipe.id}
-                            recipe={recipe}
-                            style={styles.gridItem}
-                            onPress={() => navigation?.navigate('DetailsRecette', { id: recipe.id })}
+                {loading ? (
+                    <ActivityIndicator color={colors.primary} style={{ marginBottom: spacing.lg }} />
+                ) : !featuredRecipe ? (
+                    <TouchableOpacity
+                        style={styles.emptyState}
+                        activeOpacity={0.8}
+                        onPress={() => navigation?.navigate('AjouterRecette')}
+                    >
+                        <Icon name="plus-circle" size={20} color={colors.primary} />
+                        <Text style={styles.emptyStateText}>
+                            Aucune recette ne correspond. Ajoutez-en une !
+                        </Text>
+                    </TouchableOpacity>
+                ) : (
+                    <>
+                        <FeaturedRecipeCard
+                            recipe={featuredRecipe}
+                            onPress={() => navigation?.navigate('DetailsRecette', { id: featuredRecipe.id })}
                         />
-                    ))}
-                </View>
+                        <View style={styles.gridRow}>
+                            {otherSuggestions.slice(0, 2).map((recipe) => (
+                                <RecipeCard
+                                    key={recipe.id}
+                                    recipe={recipe}
+                                    style={styles.gridItem}
+                                    onPress={() => navigation?.navigate('DetailsRecette', { id: recipe.id })}
+                                />
+                            ))}
+                        </View>
+                    </>
+                )}
 
                 {/* Nouveautés */}
                 <Text style={[typography.h2, styles.sectionTitle]}>Nouveautés</Text>
-                {NEWS.map((item) => (
-                    <NewsRow
-                        key={item.id}
-                        item={item}
-                        onPress={() => navigation?.navigate('DetailsRecette', { id: item.id })}
-                    />
-                ))}
+                {!loading && recent.length === 0 ? (
+                    <Text style={styles.emptyRecentText}>Aucune recette dans la communauté pour l'instant.</Text>
+                ) : (
+                    recent.map((item) => (
+                        <NewsRow
+                            key={item.id}
+                            item={item}
+                            onPress={() => navigation?.navigate('DetailsRecette', { id: item.id })}
+                        />
+                    ))
+                )}
             </ScrollView>
 
             {/* Bouton flottant d'ajout */}
@@ -245,8 +309,34 @@ const styles = StyleSheet.create({
     categoriesRow: {
         marginBottom: spacing.lg,
     },
+    errorText: {
+        color: colors.danger,
+        fontSize: 13,
+        marginBottom: spacing.md,
+    },
     sectionTitle: {
         marginBottom: spacing.sm,
+    },
+    emptyState: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        backgroundColor: colors.cardMuted,
+        borderRadius: radius.md,
+        paddingVertical: spacing.lg,
+        marginBottom: spacing.lg,
+    },
+    emptyStateText: {
+        fontSize: 14,
+        fontWeight: '600',
+        color: colors.primary,
+        marginLeft: spacing.sm,
+        flexShrink: 1,
+    },
+    emptyRecentText: {
+        fontSize: 13,
+        color: colors.textSecondary,
+        marginBottom: spacing.md,
     },
     gridRow: {
         flexDirection: 'row',
