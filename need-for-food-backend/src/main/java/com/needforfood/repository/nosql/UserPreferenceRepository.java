@@ -8,4 +8,6 @@ import java.util.Optional;
 public interface UserPreferenceRepository extends MongoRepository<UserPreference, String> {
 
     Optional<UserPreference> findByUserId(Long userId);
+
+    void deleteByUserId(Long userId);
 }

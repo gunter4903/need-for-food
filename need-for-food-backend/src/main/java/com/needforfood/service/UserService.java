@@ -4,6 +4,7 @@ import com.needforfood.exception.custom.DuplicateEmailException;
 import com.needforfood.exception.custom.InvalidPasswordException;
 import com.needforfood.exception.custom.ResourceNotFoundException;
 import com.needforfood.model.entity.User;
+import com.needforfood.repository.nosql.UserPreferenceRepository;
 import com.needforfood.repository.sql.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -15,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class UserService {
 
     private final UserRepository userRepository;
+    private final UserPreferenceRepository preferenceRepository;
     private final PasswordEncoder passwordEncoder;
 
     @Transactional
@@ -85,5 +87,6 @@ public class UserService {
             throw new ResourceNotFoundException("Utilisateur introuvable: " + id);
         }
         userRepository.deleteById(id);
+        preferenceRepository.deleteByUserId(id);
     }
 }

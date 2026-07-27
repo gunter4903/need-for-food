@@ -83,7 +83,7 @@ public class RecipeService {
                 .sorted(Comparator.comparingInt(RecipeMatch::matchedCount).reversed())
                 .toList();
     }
-    
+
     @Transactional(readOnly = true)
     public List<Recipe> getSuggestions(Long userId, List<String> excludedIngredients, Integer maxPreparationTime,
                                         List<String> preferredDiets, List<String> preferredTypes) {
