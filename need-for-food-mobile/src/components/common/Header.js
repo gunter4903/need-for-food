@@ -3,6 +3,7 @@ import { View, Text, Image, TouchableOpacity, StyleSheet } from 'react-native';
 import Icon from 'react-native-vector-icons/Feather';
 import { colors, spacing } from '../../constants/theme';
 import images from '../../../assets/images/temp/images';
+import {useAuth} from "../../context/AuthContext";
 
 export default function Header({
                                    onBack,
@@ -11,6 +12,7 @@ export default function Header({
                                    onAvatarPress,
                                    centered = false,
                                }) {
+    const { user } = useAuth();
     return (
         <View style={styles.container}>
             <View style={styles.side}>
@@ -29,7 +31,10 @@ export default function Header({
             <View style={[styles.side, styles.sideRight]}>
                 {showAvatar ? (
                     <TouchableOpacity onPress={onAvatarPress}>
-                        <Image source={avatarSource} style={styles.avatar} />
+                        <Image
+                            source={user?.avatarUrl ? { uri: user.avatarUrl } : images.avatar}
+                            style={styles.avatar}
+                        />
                     </TouchableOpacity>
                 ) : null}
             </View>

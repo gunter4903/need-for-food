@@ -137,6 +137,14 @@ export default function SearchRecipesScreen({ navigation }) {
                 ))}
             </ScrollView>
 
+            <TouchableOpacity
+                style={styles.fab}
+                activeOpacity={0.85}
+                onPress={() => navigation?.navigate('AjouterRecette')}
+            >
+                <Icon name="plus" size={26} color={colors.textOnDark} />
+            </TouchableOpacity>
+
             <BottomNav />
         </SafeAreaView>
     );
@@ -213,5 +221,21 @@ const styles = StyleSheet.create({
         fontSize: 13,
         fontWeight: '600',
         color: colors.primary,
+    },
+    fab: {
+        position: 'absolute',
+        right: spacing.lg,
+        bottom: 90,
+        width: 56,
+        height: 56,
+        borderRadius: 28,
+        backgroundColor: colors.primaryDark,
+        alignItems: 'center',
+        justifyContent: 'center',
+        shadowColor: '#000',
+        shadowOpacity: 0.2,
+        shadowRadius: 8,
+        shadowOffset: { width: 0, height: 4 },
+        elevation: 4,
     },
 });

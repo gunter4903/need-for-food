@@ -13,4 +13,6 @@ public class UserResponse {
     private String email;
     private String username;
     private LocalDateTime createdAt;
+    private String bio;
+    private String avatarUrl;
 }

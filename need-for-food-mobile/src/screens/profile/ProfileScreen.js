@@ -15,6 +15,7 @@ import PreferenceTag from '../../components/profile/PreferenceTag';
 import RecipeCard from '../../components/common/RecipeCard';
 import SettingsRow from '../../components/profile/SettingsRow';
 import BottomNav from '../../components/common/BottomNav';
+import { useAuth } from '../../context/AuthContext';
 
 const PREFERENCES = [
     { key: 'vegan', label: 'Vegan', icon: '🌱' },
@@ -44,10 +45,10 @@ const MY_RECIPES = [
 ];
 
 export default function ProfileScreen({ navigation }) {
+    const { user, logout } = useAuth();
 
     const handleLogout = () => {
-        // TODO: déconnexion
-        navigation?.navigate('Connexion');
+        logout();
     };
 
     return (
@@ -66,7 +67,7 @@ export default function ProfileScreen({ navigation }) {
                 <View style={styles.profileBlock}>
                     <View style={styles.avatarWrap}>
                         <Image
-                            source={images.avatarLarge}
+                            source={user?.avatarUrl ? { uri: user.avatarUrl } : images.avatar}
                             style={styles.avatar}
                         />
                         <TouchableOpacity
@@ -77,8 +78,8 @@ export default function ProfileScreen({ navigation }) {
                             <Icon name="edit-2" size={13} color={colors.textOnDark} />
                         </TouchableOpacity>
                     </View>
-                    <Text style={styles.name}>Julia Martin</Text>
-                    <Text style={styles.bio}>Passionné de cuisine française & créative</Text>
+                    <Text style={styles.name}>{user?.username}</Text>
+                    <Text style={styles.bio}>{user?.bio || 'Ajoutez une bio depuis votre profil'}</Text>
                 </View>
 
                 {/* Préférences alimentaires */}

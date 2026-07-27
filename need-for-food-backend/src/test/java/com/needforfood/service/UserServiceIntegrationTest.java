@@ -44,7 +44,7 @@ class UserServiceIntegrationTest {
     void updatesProfileUsername() {
         User user = userService.register("profile@needforfood.dev", "old-name", "pwd");
 
-        User updated = userService.updateProfile(user.getId(), "new-name", null);
+        User updated = userService.updateProfile(user.getId(), "new-name", null, null, null);
 
         assertThat(updated.getUsername()).isEqualTo("new-name");
         assertThat(updated.getEmail()).isEqualTo("profile@needforfood.dev");

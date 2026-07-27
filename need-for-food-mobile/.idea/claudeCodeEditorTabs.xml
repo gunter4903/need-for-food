@@ -1,20 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ClaudeCodeEditorTabs">
-    <option name="activeSessionId" value="b22815c4-831d-497c-a1ca-6dc4ef2cafaf" />
+    <option name="activeSessionId" value="52c37b16-21db-493b-8175-fb1885b6708d" />
     <option name="openSessionIds">
       <list>
-        <option value="b22815c4-831d-497c-a1ca-6dc4ef2cafaf" />
+        <option value="52c37b16-21db-493b-8175-fb1885b6708d" />
       </list>
     </option>
     <option name="sessionPaths">
       <map>
-        <entry key="b22815c4-831d-497c-a1ca-6dc4ef2cafaf" value="/sessions/new" />
+        <entry key="52c37b16-21db-493b-8175-fb1885b6708d" value="/sessions/05f237d3-fea9-4a50-96a5-14af38a2db00" />
       </map>
     </option>
     <option name="sessionTitles">
       <map>
-        <entry key="b22815c4-831d-497c-a1ca-6dc4ef2cafaf" value="Claude Code" />
+        <entry key="52c37b16-21db-493b-8175-fb1885b6708d" value="Peux tu gérer l'authentification avec mon API ? (C" />
       </map>
     </option>
   </component>

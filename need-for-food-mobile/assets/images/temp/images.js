@@ -3,8 +3,7 @@ const images = {
     appIcon : require('./../logo.png'),
 
     // Avatar
-    avatar: require('./avatar-julia.png'),
-    avatarLarge: require('./avatar-julia-large.png'),
+    avatar: require('./avatar-julia-large.png'),
 
     // Home
     pastaPomodoro: require('./pasta-pomodoro.png'),

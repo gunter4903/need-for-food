@@ -9,19 +9,35 @@ import {
     TouchableOpacity,
     Platform,
     StyleSheet,
+    ActivityIndicator,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/Feather';
 import { colors, spacing, radius, typography } from '../../constants/theme';
+import { useAuth } from '../../context/AuthContext';
 
 export default function LoginScreen({ navigation }) {
+    const { login } = useAuth();
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
+    const [error, setError] = useState('');
+    const [loading, setLoading] = useState(false);
 
-    const handleLogin = () => {
-        // TODO: authentification
-        navigation?.navigate('Accueil');
+    const handleLogin = async () => {
+        if (!email || !password) {
+            setError('Veuillez renseigner votre e-mail et votre mot de passe.');
+            return;
+        }
+        setError('');
+        setLoading(true);
+        try {
+            await login(email, password);
+        } catch (err) {
+            setError(err.message || 'Impossible de se connecter.');
+        } finally {
+            setLoading(false);
+        }
     };
 
     return (
@@ -86,8 +102,19 @@ export default function LoginScreen({ navigation }) {
                             </TouchableOpacity>
                         </View>
 
-                        <TouchableOpacity style={styles.loginButton} activeOpacity={0.85} onPress={handleLogin}>
-                            <Text style={typography.button}>Se connecter</Text>
+                        {!!error && <Text style={styles.errorText}>{error}</Text>}
+
+                        <TouchableOpacity
+                            style={[styles.loginButton, loading && styles.buttonDisabled]}
+                            activeOpacity={0.85}
+                            onPress={handleLogin}
+                            disabled={loading}
+                        >
+                            {loading ? (
+                                <ActivityIndicator color={colors.textOnDark} />
+                            ) : (
+                                <Text style={typography.button}>Se connecter</Text>
+                            )}
                         </TouchableOpacity>
 
                         <View style={styles.dividerRow}>
@@ -194,6 +221,11 @@ const styles = StyleSheet.create({
         fontSize: 15,
         color: colors.textPrimary,
     },
+    errorText: {
+        color: colors.danger,
+        fontSize: 13,
+        marginTop: spacing.md,
+    },
     loginButton: {
         backgroundColor: colors.primary,
         borderRadius: radius.pill,
@@ -201,6 +233,9 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
         marginTop: spacing.lg,
+    },
+    buttonDisabled: {
+        opacity: 0.7,
     },
     dividerRow: {
         flexDirection: 'row',

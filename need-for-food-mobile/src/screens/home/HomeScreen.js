@@ -17,6 +17,7 @@ import FeaturedRecipeCard from '../../components/home/FeaturedRecipeCard';
 import RecipeCard from '../../components/common/RecipeCard';
 import NewsRow from '../../components/home/NewsRow';
 import BottomNav from '../../components/common/BottomNav';
+import { useAuth } from '../../context/AuthContext';
 
 const CATEGORIES = [
     { key: 'populaire', label: 'Populaire', emoji: '🔥' },
@@ -64,8 +65,10 @@ const NEWS = [
 ];
 
 export default function HomeScreen({ navigation }) {
+    const { user } = useAuth();
     const [search, setSearch] = useState('');
     const [activeCategory, setActiveCategory] = useState('populaire');
+    const firstName = user?.username?.split(' ')[0];
 
     return (
         <SafeAreaView style={styles.safeArea}>
@@ -81,7 +84,7 @@ export default function HomeScreen({ navigation }) {
                     </View>
                     <TouchableOpacity onPress={() => navigation?.navigate('Profil')}>
                         <Image
-                            source={images.avatar}
+                            source={user?.avatarUrl ? { uri: user.avatarUrl } : images.avatar}
                             style={styles.avatar}
                         />
                     </TouchableOpacity>
@@ -89,7 +92,7 @@ export default function HomeScreen({ navigation }) {
 
                 {/* Salutation */}
                 <Text style={styles.eyebrow}>Bon appétit !</Text>
-                <Text style={styles.greeting}>Bonjour, Chef Julia</Text>
+                <Text style={styles.greeting}>Bonjour, {firstName}</Text>
 
                 {/* Recherche */}
                 <View style={styles.searchBar}>

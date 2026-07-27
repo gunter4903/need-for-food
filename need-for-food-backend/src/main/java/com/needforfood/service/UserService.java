@@ -1,6 +1,7 @@
 package com.needforfood.service;
 
 import com.needforfood.exception.custom.DuplicateEmailException;
+import com.needforfood.exception.custom.InvalidPasswordException;
 import com.needforfood.exception.custom.ResourceNotFoundException;
 import com.needforfood.model.entity.User;
 import com.needforfood.repository.sql.UserRepository;
@@ -44,7 +45,7 @@ public class UserService {
     }
 
     @Transactional
-    public User updateProfile(Long id, String username, String email) {
+    public User updateProfile(Long id, String username, String email, String bio, String avatarUrl) {
         User user = getById(id);
 
         if (email != null && !email.equalsIgnoreCase(user.getEmail()) && userRepository.existsByEmail(email)) {
@@ -57,8 +58,25 @@ public class UserService {
         if (email != null) {
             user.setEmail(email);
         }
+        if (bio != null) {
+            user.setBio(bio);
+        }
+        if (avatarUrl != null) {
+            user.setAvatarUrl(avatarUrl.isBlank() ? null : avatarUrl);
+        }
 
         return user;
+    }
+
+    @Transactional
+    public void changePassword(Long id, String currentPassword, String newPassword) {
+        User user = getById(id);
+
+        if (!passwordEncoder.matches(currentPassword, user.getPasswordHash())) {
+            throw new InvalidPasswordException("Mot de passe actuel incorrect");
+        }
+
+        user.setPasswordHash(passwordEncoder.encode(newPassword));
     }
 
     @Transactional

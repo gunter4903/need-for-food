@@ -15,6 +15,7 @@ import StatBox from '../../components/recipe/StatBox';
 import CheckboxRow from '../../components/common/CheckboxRow';
 import StepTimelineItem from '../../components/recipe/StepTimelineItem';
 import BottomNav from '../../components/common/BottomNav';
+import {useAuth} from "../../context/AuthContext";
 
 const RECIPE = {
     id: 'pates-au-pesto',
@@ -40,6 +41,7 @@ const RECIPE = {
 };
 
 export default function RecipeDetailScreen({ navigation }) {
+    const { user } = useAuth();
     const [checked, setChecked] = useState({});
 
     const toggleIngredient = (id) => {
@@ -64,7 +66,7 @@ export default function RecipeDetailScreen({ navigation }) {
                             onPress={() => navigation?.navigate('Profil')}
                         >
                             <Image
-                                source={images.avatar}
+                                source={user?.avatarUrl ? { uri: user.avatarUrl } : images.avatar}
                                 style={styles.avatar}
                             />
                         </TouchableOpacity>

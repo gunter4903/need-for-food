@@ -8,12 +8,15 @@ import {
     TouchableOpacity,
     Platform,
     StyleSheet,
+    ActivityIndicator,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { colors, spacing, radius, typography } from '../../constants/theme';
 import FormInput from '../../components/common/FormInput';
+import { useAuth } from '../../context/AuthContext';
 
 export default function SignupScreen({ navigation }) {
+    const { register } = useAuth();
     const [firstName, setFirstName] = useState('');
     const [lastName, setLastName] = useState('');
     const [email, setEmail] = useState('');
@@ -21,10 +24,34 @@ export default function SignupScreen({ navigation }) {
     const [confirmPassword, setConfirmPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+    const [error, setError] = useState('');
+    const [loading, setLoading] = useState(false);
 
-    const handleSignup = () => {
-        // TODO: inscription
-        navigation?.navigate('VerificationCompte', { email });
+    const handleSignup = async () => {
+        const username = `${firstName} ${lastName}`.trim();
+
+        if (!username || !email || !password) {
+            setError('Veuillez remplir tous les champs.');
+            return;
+        }
+        if (password.length < 8) {
+            setError('Le mot de passe doit contenir au moins 8 caractères.');
+            return;
+        }
+        if (password !== confirmPassword) {
+            setError('Les mots de passe ne correspondent pas.');
+            return;
+        }
+
+        setError('');
+        setLoading(true);
+        try {
+            await register(email, username, password);
+        } catch (err) {
+            setError(err.message || 'Impossible de créer le compte.');
+        } finally {
+            setLoading(false);
+        }
     };
 
     return (
@@ -97,9 +124,22 @@ export default function SignupScreen({ navigation }) {
                             onChangeText={setConfirmPassword}
                         />
 
-                        <TouchableOpacity style={styles.submitButton} activeOpacity={0.85} onPress={handleSignup}>
-                            <Text style={typography.button}>Créer un compte</Text>
-                            <Text style={styles.arrow}>→</Text>
+                        {!!error && <Text style={styles.errorText}>{error}</Text>}
+
+                        <TouchableOpacity
+                            style={[styles.submitButton, loading && styles.buttonDisabled]}
+                            activeOpacity={0.85}
+                            onPress={handleSignup}
+                            disabled={loading}
+                        >
+                            {loading ? (
+                                <ActivityIndicator color={colors.textOnDark} />
+                            ) : (
+                                <>
+                                    <Text style={typography.button}>Créer un compte</Text>
+                                    <Text style={styles.arrow}>→</Text>
+                                </>
+                            )}
                         </TouchableOpacity>
 
                         <View style={styles.dividerRow}>
@@ -177,6 +217,11 @@ const styles = StyleSheet.create({
     halfField: {
         flex: 1,
     },
+    errorText: {
+        color: colors.danger,
+        fontSize: 13,
+        marginTop: spacing.sm,
+    },
     submitButton: {
         flexDirection: 'row',
         alignItems: 'center',
@@ -185,6 +230,9 @@ const styles = StyleSheet.create({
         borderRadius: radius.pill,
         height: 52,
         marginTop: spacing.sm,
+    },
+    buttonDisabled: {
+        opacity: 0.7,
     },
     arrow: {
         color: colors.textOnDark,
