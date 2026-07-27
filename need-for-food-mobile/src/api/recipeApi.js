@@ -17,6 +17,10 @@ export function search(token, ingredientNames) {
     return apiFetch(`/recipes/search?ingredients=${query}`, { token });
 }
 
+export function getSuggestions(token) {
+    return apiFetch('/recipes/suggestions', { token });
+}
+
 export function create(token, recipe) {
     return apiFetch('/recipes', { method: 'POST', token, body: recipe });
 }

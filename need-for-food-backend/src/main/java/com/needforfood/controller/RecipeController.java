@@ -4,7 +4,9 @@ import com.needforfood.dto.request.RecipeRequest;
 import com.needforfood.dto.response.RecipeMatchResponse;
 import com.needforfood.dto.response.RecipeResponse;
 import com.needforfood.mapper.RecipeMapper;
+import com.needforfood.model.document.UserPreference;
 import com.needforfood.model.entity.Recipe;
+import com.needforfood.service.PreferenceService;
 import com.needforfood.service.RecipeService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -21,6 +23,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -29,6 +32,7 @@ import java.util.List;
 public class RecipeController {
 
     private final RecipeService recipeService;
+    private final PreferenceService preferenceService;
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
@@ -44,9 +48,37 @@ public class RecipeController {
 
     @GetMapping("/search")
     public List<RecipeMatchResponse> search(@AuthenticationPrincipal Long userId, @RequestParam List<String> ingredients) {
-        return recipeService.searchByIngredientNames(userId, ingredients).stream()
+        UserPreference preference = preferenceService.getByUserId(userId);
+        return recipeService.searchByIngredientNames(
+                        userId, ingredients, excludedIngredients(preference), preference.getMaxPreparationTime())
+                .stream()
                 .map(RecipeMapper::toMatchResponse)
                 .toList();
+    }
+
+    @GetMapping("/suggestions")
+    public List<RecipeResponse> suggestions(@AuthenticationPrincipal Long userId) {
+        UserPreference preference = preferenceService.getByUserId(userId);
+        return recipeService.getSuggestions(
+                        userId,
+                        excludedIngredients(preference),
+                        preference.getMaxPreparationTime(),
+                        preference.getDiet(),
+                        preference.getFavoriteRecipeTypes())
+                .stream()
+                .map(RecipeMapper::toResponse)
+                .toList();
+    }
+
+    private List<String> excludedIngredients(UserPreference preference) {
+        List<String> excluded = new ArrayList<>();
+        if (preference.getAllergies() != null) {
+            excluded.addAll(preference.getAllergies());
+        }
+        if (preference.getDislikedIngredients() != null) {
+            excluded.addAll(preference.getDislikedIngredients());
+        }
+        return excluded;
     }
 
     @GetMapping("/{id}")

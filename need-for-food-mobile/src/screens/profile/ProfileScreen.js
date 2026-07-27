@@ -19,11 +19,7 @@ import SettingsRow from '../../components/profile/SettingsRow';
 import BottomNav from '../../components/common/BottomNav';
 import { useAuth } from '../../context/AuthContext';
 import * as recipeApi from '../../api/recipeApi';
-
-const PREFERENCES = [
-    { key: 'vegan', label: 'Vegan', icon: '🌱' },
-    { key: 'gluten-free', label: 'Gluten-free', icon: '🌾' },
-];
+import * as preferenceApi from '../../api/preferenceApi';
 
 function toCard(recipe) {
     return {
@@ -39,6 +35,9 @@ export default function ProfileScreen({ navigation }) {
     const [myRecipes, setMyRecipes] = useState([]);
     const [loadingRecipes, setLoadingRecipes] = useState(true);
 
+    const [preferences, setPreferences] = useState(null);
+    const [loadingPreferences, setLoadingPreferences] = useState(true);
+
     useFocusEffect(
         useCallback(() => {
             let cancelled = false;
@@ -51,6 +50,27 @@ export default function ProfileScreen({ navigation }) {
                     // silencieux : la section "Mes Recettes" reste vide en cas d'erreur
                 } finally {
                     if (!cancelled) setLoadingRecipes(false);
+                }
+            })();
+
+            return () => {
+                cancelled = true;
+            };
+        }, [token])
+    );
+
+    useFocusEffect(
+        useCallback(() => {
+            let cancelled = false;
+
+            (async () => {
+                try {
+                    const data = await preferenceApi.getMine(token);
+                    if (!cancelled) setPreferences(data);
+                } catch {
+                    // silencieux : la section "Préférences" reste vide en cas d'erreur
+                } finally {
+                    if (!cancelled) setLoadingPreferences(false);
                 }
             })();
 
@@ -98,19 +118,30 @@ export default function ProfileScreen({ navigation }) {
                 {/* Préférences alimentaires */}
                 <View style={styles.sectionHeaderRow}>
                     <Text style={typography.h2}>Préférences alimentaires</Text>
-                    <TouchableOpacity style={styles.settingsIconButton}>
+                    <TouchableOpacity
+                        style={styles.settingsIconButton}
+                        onPress={() => navigation?.navigate('Preferences')}
+                    >
                         <Icon name="settings" size={18} color={colors.textPrimary} />
                     </TouchableOpacity>
                 </View>
-                <View style={styles.preferencesRow}>
-                    {PREFERENCES.map((pref) => (
-                        <PreferenceTag key={pref.key} label={pref.label} icon={pref.icon} />
-                    ))}
-                    <TouchableOpacity style={styles.addTag} activeOpacity={0.8}>
-                        <Icon name="plus" size={13} color={colors.textPrimary} />
-                        <Text style={styles.addTagLabel}>Ajouter</Text>
-                    </TouchableOpacity>
-                </View>
+                {loadingPreferences ? (
+                    <ActivityIndicator color={colors.primary} style={{ marginBottom: spacing.lg }} />
+                ) : (
+                    <View style={styles.preferencesRow}>
+                        {(preferences?.diet || []).map((label) => (
+                            <PreferenceTag key={label} label={label} />
+                        ))}
+                        <TouchableOpacity
+                            style={styles.addTag}
+                            activeOpacity={0.8}
+                            onPress={() => navigation?.navigate('Preferences')}
+                        >
+                            <Icon name="plus" size={13} color={colors.textPrimary} />
+                            <Text style={styles.addTagLabel}>Ajouter</Text>
+                        </TouchableOpacity>
+                    </View>
+                )}
 
                 {/* Mes recettes */}
                 <View style={styles.sectionHeaderRow}>

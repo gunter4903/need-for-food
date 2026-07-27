@@ -16,6 +16,7 @@ import HomeScreen from '../screens/home/HomeScreen';
 // Profile
 import ProfileScreen from '../screens/profile/ProfileScreen';
 import EditProfileScreen from '../screens/profile/EditProfileScreen';
+import PreferencesScreen from '../screens/profile/PreferencesScreen';
 
 // Recettes
 import SearchRecipesScreen from '../screens/recipes/SearchRecipesScreen';
@@ -54,6 +55,7 @@ export default function AppNavigator() {
 
                         {/* Profile */}
                         <Stack.Screen name="ModifierProfil" component={EditProfileScreen} />
+                        <Stack.Screen name="Preferences" component={PreferencesScreen} />
 
                         {/* Recettes */}
                         <Stack.Screen name="DetailsRecette" component={RecipeDetailScreen} />

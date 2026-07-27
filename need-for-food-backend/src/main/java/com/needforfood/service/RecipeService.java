@@ -64,12 +64,14 @@ public class RecipeService {
     }
 
     @Transactional(readOnly = true)
-    public List<RecipeMatch> searchByIngredientNames(Long userId, List<String> ingredientNames) {
+    public List<RecipeMatch> searchByIngredientNames(Long userId, List<String> ingredientNames,
+                                                       List<String> excludedIngredients, Integer maxPreparationTime) {
         Set<String> normalized = ingredientNames.stream()
                 .map(String::toLowerCase)
                 .collect(Collectors.toSet());
 
         return getByUser(userId).stream()
+                .filter(recipe -> respectsConstraints(recipe, excludedIngredients, maxPreparationTime))
                 .map(recipe -> {
                     int total = recipe.getIngredients().size();
                     int matched = (int) recipe.getIngredients().stream()
@@ -80,6 +82,40 @@ public class RecipeService {
                 .filter(match -> match.matchedCount() > 0)
                 .sorted(Comparator.comparingInt(RecipeMatch::matchedCount).reversed())
                 .toList();
+    }
+    
+    @Transactional(readOnly = true)
+    public List<Recipe> getSuggestions(Long userId, List<String> excludedIngredients, Integer maxPreparationTime,
+                                        List<String> preferredDiets, List<String> preferredTypes) {
+        List<Recipe> recipes = getByUser(userId).stream()
+                .filter(recipe -> respectsConstraints(recipe, excludedIngredients, maxPreparationTime))
+                .collect(Collectors.toList());
+
+        recipes.sort(Comparator.comparingInt(
+                recipe -> matchesPreference(recipe, preferredDiets, preferredTypes) ? 0 : 1));
+
+        return recipes;
+    }
+
+    private boolean respectsConstraints(Recipe recipe, List<String> excludedIngredients, Integer maxPreparationTime) {
+        if (maxPreparationTime != null && recipe.getPreparationTime() != null
+                && recipe.getPreparationTime() > maxPreparationTime) {
+            return false;
+        }
+        if (excludedIngredients == null || excludedIngredients.isEmpty()) {
+            return true;
+        }
+        Set<String> excluded = excludedIngredients.stream().map(String::toLowerCase).collect(Collectors.toSet());
+        return recipe.getIngredients().stream()
+                .noneMatch(ri -> excluded.contains(ri.getIngredient().getName().toLowerCase()));
+    }
+
+    private boolean matchesPreference(Recipe recipe, List<String> preferredDiets, List<String> preferredTypes) {
+        boolean dietMatch = preferredDiets != null && recipe.getDiet() != null
+                && preferredDiets.stream().anyMatch(diet -> diet.equalsIgnoreCase(recipe.getDiet()));
+        boolean typeMatch = preferredTypes != null && recipe.getType() != null
+                && preferredTypes.stream().anyMatch(type -> type.equalsIgnoreCase(recipe.getType()));
+        return dietMatch || typeMatch;
     }
 
     @Transactional

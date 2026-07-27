@@ -53,7 +53,7 @@ export default function SearchRecipesScreen({ navigation }) {
                 try {
                     const [ingredients, recipes] = await Promise.all([
                         ingredientApi.getAll(token),
-                        recipeApi.getMine(token),
+                        recipeApi.getSuggestions(token),
                     ]);
                     if (cancelled) return;
                     setPantryIngredients(ingredients.map((i) => i.name));
@@ -119,6 +119,11 @@ export default function SearchRecipesScreen({ navigation }) {
                 <Text style={styles.subtitle}>
                     Sélectionnez les ingrédients que vous avez pour trouver la recette parfaite.
                 </Text>
+                <TouchableOpacity onPress={() => navigation?.navigate('Preferences')}>
+                    <Text style={styles.preferencesHint}>
+                        Recettes filtrées selon vos préférences · Modifier
+                    </Text>
+                </TouchableOpacity>
 
                 <View style={styles.searchBar}>
                     <Icon name="search" size={18} color={colors.textSecondary} />
@@ -222,6 +227,12 @@ const styles = StyleSheet.create({
         ...typography.body,
         color: colors.textSecondary,
         marginTop: spacing.xs,
+        marginBottom: spacing.md,
+    },
+    preferencesHint: {
+        fontSize: 12,
+        fontWeight: '600',
+        color: colors.primary,
         marginBottom: spacing.md,
     },
     searchBar: {
