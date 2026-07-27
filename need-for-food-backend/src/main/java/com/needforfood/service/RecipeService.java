@@ -14,7 +14,10 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Comparator;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -53,6 +56,32 @@ public class RecipeService {
         return recipes;
     }
 
+    @Transactional(readOnly = true)
+    public List<Recipe> getAll() {
+        List<Recipe> recipes = recipeRepository.findAllDetailed();
+        recipes.forEach(recipe -> Hibernate.initialize(recipe.getSteps()));
+        return recipes;
+    }
+
+    @Transactional(readOnly = true)
+    public List<RecipeMatch> searchByIngredientNames(Long userId, List<String> ingredientNames) {
+        Set<String> normalized = ingredientNames.stream()
+                .map(String::toLowerCase)
+                .collect(Collectors.toSet());
+
+        return getByUser(userId).stream()
+                .map(recipe -> {
+                    int total = recipe.getIngredients().size();
+                    int matched = (int) recipe.getIngredients().stream()
+                            .filter(ri -> normalized.contains(ri.getIngredient().getName().toLowerCase()))
+                            .count();
+                    return new RecipeMatch(recipe, matched, total);
+                })
+                .filter(match -> match.matchedCount() > 0)
+                .sorted(Comparator.comparingInt(RecipeMatch::matchedCount).reversed())
+                .toList();
+    }
+
     @Transactional
     public Recipe updateRecipe(Long recipeId, Long requesterId, Recipe updates) {
         Recipe recipe = getById(recipeId);
@@ -62,6 +91,8 @@ public class RecipeService {
         recipe.setDescription(updates.getDescription());
         recipe.setType(updates.getType());
         recipe.setDiet(updates.getDiet());
+        recipe.setDifficulty(updates.getDifficulty());
+        recipe.setImageUrl(updates.getImageUrl());
         recipe.setPreparationTime(updates.getPreparationTime());
 
         // On vide puis on force l'exécution des DELETE (flush) avant de recréer les lignes :

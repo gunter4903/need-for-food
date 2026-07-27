@@ -20,4 +20,7 @@ public interface RecipeRepository extends JpaRepository<Recipe, Long> {
 
     @Query("SELECT DISTINCT r FROM Recipe r LEFT JOIN FETCH r.ingredients ri LEFT JOIN FETCH ri.ingredient WHERE r.user.id = :userId")
     List<Recipe> findDetailedByUserId(@Param("userId") Long userId);
+
+    @Query("SELECT DISTINCT r FROM Recipe r LEFT JOIN FETCH r.ingredients ri LEFT JOIN FETCH ri.ingredient")
+    List<Recipe> findAllDetailed();
 }

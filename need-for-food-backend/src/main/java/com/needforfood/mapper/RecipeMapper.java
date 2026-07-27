@@ -2,11 +2,13 @@ package com.needforfood.mapper;
 
 import com.needforfood.dto.request.RecipeRequest;
 import com.needforfood.dto.response.RecipeIngredientResponse;
+import com.needforfood.dto.response.RecipeMatchResponse;
 import com.needforfood.dto.response.RecipeResponse;
 import com.needforfood.model.entity.Ingredient;
 import com.needforfood.model.entity.PreparationStep;
 import com.needforfood.model.entity.Recipe;
 import com.needforfood.model.entity.RecipeIngredient;
+import com.needforfood.service.RecipeMatch;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -40,6 +42,8 @@ public final class RecipeMapper {
                 .description(request.getDescription())
                 .type(request.getType())
                 .diet(request.getDiet())
+                .difficulty(request.getDifficulty())
+                .imageUrl(request.getImageUrl())
                 .preparationTime(request.getPreparationTime())
                 .ingredients(ingredients)
                 .steps(steps)
@@ -66,10 +70,16 @@ public final class RecipeMapper {
                 recipe.getDescription(),
                 recipe.getType(),
                 recipe.getDiet(),
+                recipe.getDifficulty(),
+                recipe.getImageUrl(),
                 recipe.getPreparationTime(),
                 recipe.getCreatedAt(),
                 recipe.getUser().getId(),
                 ingredients,
                 steps);
+    }
+
+    public static RecipeMatchResponse toMatchResponse(RecipeMatch match) {
+        return new RecipeMatchResponse(toResponse(match.recipe()), match.matchedCount(), match.totalCount());
     }
 }

@@ -5,30 +5,34 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="23d147eb-fe7c-4e75-9183-d618c3f3dcce" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/../need-for-food-backend/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/../need-for-food-backend/.gitignore" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../need-for-food-backend/src/main/java/com/needforfood/controller/UserController.java" beforeDir="false" afterPath="$PROJECT_DIR$/../need-for-food-backend/src/main/java/com/needforfood/controller/UserController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../need-for-food-backend/src/main/java/com/needforfood/dto/response/UserResponse.java" beforeDir="false" afterPath="$PROJECT_DIR$/../need-for-food-backend/src/main/java/com/needforfood/dto/response/UserResponse.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../need-for-food-backend/src/main/java/com/needforfood/exception/GlobalExceptionHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/../need-for-food-backend/src/main/java/com/needforfood/exception/GlobalExceptionHandler.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../need-for-food-backend/src/main/java/com/needforfood/mapper/UserMapper.java" beforeDir="false" afterPath="$PROJECT_DIR$/../need-for-food-backend/src/main/java/com/needforfood/mapper/UserMapper.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../need-for-food-backend/src/main/java/com/needforfood/model/entity/User.java" beforeDir="false" afterPath="$PROJECT_DIR$/../need-for-food-backend/src/main/java/com/needforfood/model/entity/User.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../need-for-food-backend/src/main/java/com/needforfood/service/UserService.java" beforeDir="false" afterPath="$PROJECT_DIR$/../need-for-food-backend/src/main/java/com/needforfood/service/UserService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../need-for-food-backend/src/test/java/com/needforfood/service/UserServiceIntegrationTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/../need-for-food-backend/src/test/java/com/needforfood/service/UserServiceIntegrationTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../need-for-food-backend/src/main/java/com/needforfood/controller/RecipeController.java" beforeDir="false" afterPath="$PROJECT_DIR$/../need-for-food-backend/src/main/java/com/needforfood/controller/RecipeController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../need-for-food-backend/src/main/java/com/needforfood/dto/request/RecipeRequest.java" beforeDir="false" afterPath="$PROJECT_DIR$/../need-for-food-backend/src/main/java/com/needforfood/dto/request/RecipeRequest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../need-for-food-backend/src/main/java/com/needforfood/dto/response/RecipeResponse.java" beforeDir="false" afterPath="$PROJECT_DIR$/../need-for-food-backend/src/main/java/com/needforfood/dto/response/RecipeResponse.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../need-for-food-backend/src/main/java/com/needforfood/mapper/RecipeMapper.java" beforeDir="false" afterPath="$PROJECT_DIR$/../need-for-food-backend/src/main/java/com/needforfood/mapper/RecipeMapper.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../need-for-food-backend/src/main/java/com/needforfood/model/entity/Recipe.java" beforeDir="false" afterPath="$PROJECT_DIR$/../need-for-food-backend/src/main/java/com/needforfood/model/entity/Recipe.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../need-for-food-backend/src/main/java/com/needforfood/repository/sql/RecipeRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/../need-for-food-backend/src/main/java/com/needforfood/repository/sql/RecipeRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../need-for-food-backend/src/main/java/com/needforfood/service/AuthService.java" beforeDir="false" afterPath="$PROJECT_DIR$/../need-for-food-backend/src/main/java/com/needforfood/service/AuthService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../need-for-food-backend/src/main/java/com/needforfood/service/RecipeService.java" beforeDir="false" afterPath="$PROJECT_DIR$/../need-for-food-backend/src/main/java/com/needforfood/service/RecipeService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../need-for-food-backend/src/test/java/com/needforfood/controller/RecipeFlowIntegrationTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/../need-for-food-backend/src/test/java/com/needforfood/controller/RecipeFlowIntegrationTest.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/claudeCodeEditorTabs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/claudeCodeEditorTabs.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/icon.png" beforeDir="false" afterPath="$PROJECT_DIR$/assets/icon.png" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/assets/images/temp/images.js" beforeDir="false" afterPath="$PROJECT_DIR$/assets/images/temp/images.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/package-lock.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/App.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/App.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/common/Header.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/common/Header.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/navigation/AppNavigator.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/navigation/AppNavigator.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/recipe/EditableListRow.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/recipe/EditableListRow.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/recipe/IngredientInputRow.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/recipe/IngredientInputRow.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/recipe/SelectField.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/recipe/SelectField.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/shoppingList/CategorySectionHeader.js" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/src/screens/auth/LoginScreen.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/screens/auth/LoginScreen.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/screens/auth/SignupScreen.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/screens/auth/SignupScreen.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/screens/home/HomeScreen.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/screens/home/HomeScreen.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/screens/profile/EditProfileScreen.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/screens/profile/EditProfileScreen.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/screens/auth/VerifyAccountScreen.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/screens/auth/VerifyAccountScreen.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/screens/profile/ProfileScreen.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/screens/profile/ProfileScreen.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/screens/recipes/AddRecipeScreen.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/screens/recipes/AddRecipeScreen.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/screens/recipes/EditRecipeScreen.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/screens/recipes/EditRecipeScreen.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/screens/recipes/RecipeDetailScreen.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/screens/recipes/RecipeDetailScreen.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/screens/recipes/SearchRecipesScreen.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/screens/recipes/SearchRecipesScreen.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/screens/shoppingList/CreateShoppingListScreen.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/screens/shoppingList/CreateShoppingListScreen.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/screens/shoppingList/ShopingListsOverviewScreen.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/screens/shoppingList/ShopingListsOverviewScreen.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/screens/shoppingList/ShoppingListScreen.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/screens/shoppingList/ShoppingListScreen.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -71,61 +75,61 @@
   </component>
   <component name="NextEditCompletionFeaturesState">
     <decayedCancelled>
-      <entry key="MS100" value="0.0" />
-      <entry key="MS500" value="1.705983581477011E-270" />
-      <entry key="S2" value="3.970477053175988E-68" />
-      <entry key="S5" value="1.687077454646296E-27" />
-      <entry key="S10" value="6.802990608900838E-14" />
-      <entry key="S30" value="8.40991994683698E-5" />
-      <entry key="S60" value="0.015865449991257993" />
-      <entry key="M2" value="0.2181034862571283" />
-      <entry key="M5" value="1.0512553779865708" />
-      <entry key="M10" value="1.7759338722803375" />
-      <entry key="M15" value="2.1248772778909157" />
-      <entry key="M30" value="4.267595245655884" />
-      <entry key="H1" value="29.54936647425413" />
-      <entry key="H2" value="112.56384643867455" />
-      <entry key="H4" value="228.2059070027022" />
-      <entry key="D1" value="466.0706426158" />
-      <entry key="W1" value="567.0845027859411" />
+      <entry key="MS100" value="3.062072677278216E-132" />
+      <entry key="MS500" value="4.979699073652902E-27" />
+      <entry key="S2" value="2.6564446707232755E-7" />
+      <entry key="S5" value="0.0023427195938787886" />
+      <entry key="S10" value="0.04840164866901529" />
+      <entry key="S30" value="0.3644349831018366" />
+      <entry key="S60" value="0.6037986117316587" />
+      <entry key="M2" value="0.7920783547986864" />
+      <entry key="M5" value="1.1873143445632115" />
+      <entry key="M10" value="1.7037497014987881" />
+      <entry key="M15" value="2.015423212667306" />
+      <entry key="M30" value="2.613732058238028" />
+      <entry key="H1" value="4.615383191542689" />
+      <entry key="H2" value="21.994416747661045" />
+      <entry key="H4" value="95.19309886598155" />
+      <entry key="D1" value="433.458733256272" />
+      <entry key="W1" value="607.4954030038444" />
     </decayedCancelled>
     <decayedSelected>
-      <entry key="MS100" value="1.0" />
-      <entry key="MS500" value="1.0" />
-      <entry key="S2" value="1.0" />
-      <entry key="S5" value="1.0" />
-      <entry key="S10" value="1.000000000000101" />
-      <entry key="S30" value="1.0000678282470281" />
-      <entry key="S60" value="1.0114997914072055" />
-      <entry key="M2" value="1.1511631372816207" />
-      <entry key="M5" value="1.711303524771859" />
-      <entry key="M10" value="2.1925907697682945" />
-      <entry key="M15" value="2.4193572856902676" />
-      <entry key="M30" value="3.170083264759597" />
-      <entry key="H1" value="10.583700403440421" />
-      <entry key="H2" value="35.14857887211476" />
-      <entry key="H4" value="69.57472451244634" />
-      <entry key="D1" value="136.6390792223313" />
-      <entry key="W1" value="162.5173050475774" />
+      <entry key="MS100" value="1.0000031417504016" />
+      <entry key="MS500" value="1.0793325661729656" />
+      <entry key="S2" value="1.5881617880605057" />
+      <entry key="S5" value="2.253167998942792" />
+      <entry key="S10" value="2.9590473141804043" />
+      <entry key="S30" value="4.287556098379211" />
+      <entry key="S60" value="4.982649293073355" />
+      <entry key="M2" value="5.462900172035325" />
+      <entry key="M5" value="6.180835625147041" />
+      <entry key="M10" value="6.998816506536322" />
+      <entry key="M15" value="7.476246963368324" />
+      <entry key="M30" value="8.197959682224651" />
+      <entry key="H1" value="9.306117089043862" />
+      <entry key="H2" value="14.802598917456717" />
+      <entry key="H4" value="36.12152883182706" />
+      <entry key="D1" value="131.51179862469223" />
+      <entry key="W1" value="177.9347088315054" />
     </decayedSelected>
     <decayedShown>
-      <entry key="MS100" value="9.644058982707244E-5" />
-      <entry key="MS500" value="0.15734464668810721" />
-      <entry key="S2" value="0.6298149899736997" />
-      <entry key="S5" value="0.8311610769987625" />
-      <entry key="S10" value="0.9116803590069295" />
-      <entry key="S30" value="0.9697908257688888" />
-      <entry key="S60" value="1.0112789824029538" />
-      <entry key="M2" value="1.3563909249839767" />
-      <entry key="M5" value="2.7497289872170714" />
-      <entry key="M10" value="3.958821372885786" />
-      <entry key="M15" value="4.536741206639704" />
-      <entry key="M30" value="7.432885384109392" />
-      <entry key="H1" value="40.126916393058785" />
-      <entry key="H2" value="147.70291983823392" />
-      <entry key="H4" value="297.77123229470936" />
-      <entry key="D1" value="602.7065728593061" />
-      <entry key="W1" value="729.601265577668" />
+      <entry key="MS100" value="0.001521835829263347" />
+      <entry key="MS500" value="0.30448847443104116" />
+      <entry key="S2" value="1.1839218514651026" />
+      <entry key="S5" value="2.002976539847204" />
+      <entry key="S10" value="2.822508245383443" />
+      <entry key="S30" value="4.534006801805149" />
+      <entry key="S60" value="5.509413746573433" />
+      <entry key="M2" value="6.210033547756312" />
+      <entry key="M5" value="7.347524759324733" />
+      <entry key="M10" value="8.691190055203782" />
+      <entry key="M15" value="9.483696394154503" />
+      <entry key="M30" value="10.80727689267074" />
+      <entry key="H1" value="13.918614095497725" />
+      <entry key="H2" value="36.793950151314725" />
+      <entry key="H4" value="131.31013965580925" />
+      <entry key="D1" value="564.9675586349912" />
+      <entry key="W1" value="785.4295267509301" />
     </decayedShown>
   </component>
   <component name="ProjectColorInfo">{
@@ -136,28 +140,29 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.MCP Project settings loaded&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.typescript.service.memoryLimit.init&quot;: &quot;true&quot;,
-    &quot;codeWithMe.voiceChat.enabledByDefault&quot;: &quot;false&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
-    &quot;last_opened_file_path&quot;: &quot;C:/Users/antoi/Documents/01. Bachelor Concepteur Developpeur d Applications/99. Projet Fil Rouge/need-for-food/need-for-food-mobile/assets/images/temp&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.jshint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.jshint&quot;: &quot;&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;ts.external.directory.path&quot;: &quot;C:\\Program Files\\JetBrains\\PhpStorm 2025.2.3\\plugins\\javascript-plugin\\jsLanguageServicesImpl\\external&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "RunOnceActivity.MCP Project settings loaded": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "RunOnceActivity.typescript.service.memoryLimit.init": "true",
+    "codeWithMe.voiceChat.enabledByDefault": "false",
+    "git-widget-placeholder": "main",
+    "last_opened_file_path": "C:/Users/antoi/Documents/01. Bachelor Concepteur Developpeur d Applications/99. Projet Fil Rouge/need-for-food/need-for-food-mobile/assets",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.jshint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.jshint": "",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "ts.external.directory.path": "C:\\Program Files\\JetBrains\\PhpStorm 2025.2.3\\plugins\\javascript-plugin\\jsLanguageServicesImpl\\external"
   }
-}</component>
+}]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\antoi\Documents\01. Bachelor Concepteur Developpeur d Applications\99. Projet Fil Rouge\need-for-food\need-for-food-mobile\assets" />
       <recent name="C:\Users\antoi\Documents\01. Bachelor Concepteur Developpeur d Applications\99. Projet Fil Rouge\need-for-food\need-for-food-mobile\assets\images\temp" />
       <recent name="C:\Users\antoi\Documents\01. Bachelor Concepteur Developpeur d Applications\99. Projet Fil Rouge\need-for-food\need-for-food-mobile\assets\images" />
     </key>
@@ -184,7 +189,7 @@
       <updated>1784656457225</updated>
       <workItem from="1784656458434" duration="13515000" />
       <workItem from="1785139683525" duration="108000" />
-      <workItem from="1785139852619" duration="5349000" />
+      <workItem from="1785139852619" duration="20377000" />
     </task>
     <servers />
   </component>

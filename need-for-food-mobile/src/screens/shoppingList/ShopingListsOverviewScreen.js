@@ -1,58 +1,86 @@
-import React, { useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import {
     ScrollView,
     View,
     Text,
     TouchableOpacity,
     StyleSheet,
+    ActivityIndicator,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useFocusEffect } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/Feather';
 import { colors, spacing, radius, typography } from '../../constants/theme';
 import Header from '../../components/common/Header';
 import FilterTabBar from '../../components/shoppingList/FilterTabBar';
 import ShoppingListCard from '../../components/shoppingList/ShoppingListCard';
 import BottomNav from '../../components/common/BottomNav';
+import { useAuth } from '../../context/AuthContext';
+import * as shoppingListApi from '../../api/shoppingListApi';
 
 const TABS = ['Toutes', 'Récentes', 'En cours', 'Terminées'];
+const RECENT_THRESHOLD_MS = 7 * 24 * 60 * 60 * 1000;
 
-const LISTS = [
-    {
-        id: 'courses-hebdo',
-        title: 'Courses Hebdo',
-        subtitle: 'Modifiée il y a 2h',
-        emoji: '📅',
-        itemsLabel: '12 / 20 articles',
-        completed: 60,
-    },
-    {
-        id: 'soiree-pizza',
-        title: 'Soirée Pizza',
-        subtitle: 'Modifiée hier',
-        emoji: '🍕',
-        itemsLabel: '8 / 8 articles',
-        completed: 100,
-    },
-    {
-        id: 'barbecue-dimanche',
-        title: 'Barbecue Dimanche',
-        subtitle: 'Créée le 12 Mai',
-        emoji: '🍖',
-        itemsLabel: '3 / 15 articles',
-        completed: 20,
-    },
-    {
-        id: 'fond-de-placard',
-        title: 'Fond de Placard',
-        subtitle: 'Modifiée il y a 3 jours',
-        emoji: '🗄️',
-        itemsLabel: '2 / 12 articles',
-        completed: 16,
-    },
-];
+function toCard(list) {
+    const total = list.items.length;
+    const checkedCount = list.items.filter((i) => i.checked).length;
+    const completed = total > 0 ? Math.round((checkedCount / total) * 100) : 0;
+    const createdAt = new Date(list.createdAt);
+
+    return {
+        id: list.id,
+        title: list.name,
+        subtitle: `Créée le ${createdAt.toLocaleDateString('fr-FR')}`,
+        emoji: '🛒',
+        itemsLabel: `${checkedCount} / ${total} articles`,
+        completed,
+        createdAt,
+    };
+}
+
+function matchesTab(list, tab) {
+    switch (tab) {
+        case 'Récentes':
+            return Date.now() - list.createdAt.getTime() < RECENT_THRESHOLD_MS;
+        case 'En cours':
+            return list.completed < 100;
+        case 'Terminées':
+            return list.completed === 100;
+        default:
+            return true;
+    }
+}
 
 export default function ShoppingListsOverviewScreen({ navigation }) {
+    const { token } = useAuth();
     const [activeFilter, setActiveFilter] = useState('Toutes');
+    const [lists, setLists] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState('');
+
+    useFocusEffect(
+        useCallback(() => {
+            let cancelled = false;
+
+            (async () => {
+                setLoading(true);
+                try {
+                    const data = await shoppingListApi.getMine(token);
+                    if (!cancelled) setLists(data.map(toCard));
+                } catch (err) {
+                    if (!cancelled) setError(err.message || 'Impossible de charger vos listes.');
+                } finally {
+                    if (!cancelled) setLoading(false);
+                }
+            })();
+
+            return () => {
+                cancelled = true;
+            };
+        }, [token])
+    );
+
+    const filteredLists = lists.filter((list) => matchesTab(list, activeFilter));
 
     return (
         <SafeAreaView style={styles.safeArea}>
@@ -76,18 +104,24 @@ export default function ShoppingListsOverviewScreen({ navigation }) {
 
                 <FilterTabBar tabs={TABS} active={activeFilter} onChange={setActiveFilter} />
 
-                {LISTS.map((list) => (
-                    <ShoppingListCard
-                        key={list.id}
-                        list={list}
-                        onPress={() => navigation?.navigate('ListeCourses', { id: list.id })}
-                    />
-                ))}
+                {!!error && <Text style={styles.errorText}>{error}</Text>}
 
-                <TouchableOpacity style={styles.reuseButton} activeOpacity={0.8}>
-                    <Icon name="rotate-ccw" size={16} color={colors.textPrimary} style={{ marginRight: 8 }} />
-                    <Text style={styles.reuseLabel}>Réutiliser</Text>
-                </TouchableOpacity>
+                {loading ? (
+                    <ActivityIndicator color={colors.primary} style={{ marginTop: spacing.lg }} />
+                ) : filteredLists.length === 0 ? (
+                    <View style={styles.emptyState}>
+                        <Icon name="shopping-bag" size={22} color={colors.textSecondary} />
+                        <Text style={styles.emptyStateText}>Aucune liste pour le moment.</Text>
+                    </View>
+                ) : (
+                    filteredLists.map((list) => (
+                        <ShoppingListCard
+                            key={list.id}
+                            list={list}
+                            onPress={() => navigation?.navigate('ListeCourses', { id: list.id })}
+                        />
+                    ))
+                )}
             </ScrollView>
 
             <BottomNav />
@@ -133,18 +167,23 @@ const styles = StyleSheet.create({
         fontWeight: '700',
         color: colors.textOnDark,
     },
-    reuseButton: {
-        flexDirection: 'row',
+    errorText: {
+        color: colors.danger,
+        fontSize: 13,
+        marginBottom: spacing.sm,
+    },
+    emptyState: {
         alignItems: 'center',
         justifyContent: 'center',
         backgroundColor: colors.cardMuted,
-        borderRadius: radius.pill,
-        height: 50,
-        marginTop: spacing.xs,
+        borderRadius: radius.md,
+        paddingVertical: spacing.xl,
+        marginTop: spacing.sm,
     },
-    reuseLabel: {
+    emptyStateText: {
         fontSize: 14,
-        fontWeight: '700',
-        color: colors.textPrimary,
+        fontWeight: '600',
+        color: colors.textSecondary,
+        marginTop: spacing.sm,
     },
 });

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback, useState } from 'react';
 import {
     ScrollView,
     View,
@@ -6,8 +6,10 @@ import {
     Text,
     TouchableOpacity,
     StyleSheet,
+    ActivityIndicator,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useFocusEffect } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/Feather';
 import { colors, spacing, typography, radius } from '../../constants/theme';
 import images from '../../../assets/images/temp/images';
@@ -16,36 +18,47 @@ import RecipeCard from '../../components/common/RecipeCard';
 import SettingsRow from '../../components/profile/SettingsRow';
 import BottomNav from '../../components/common/BottomNav';
 import { useAuth } from '../../context/AuthContext';
+import * as recipeApi from '../../api/recipeApi';
 
 const PREFERENCES = [
     { key: 'vegan', label: 'Vegan', icon: '🌱' },
     { key: 'gluten-free', label: 'Gluten-free', icon: '🌾' },
 ];
 
-const MY_RECIPES = [
-    {
-        id: 'bowl-mediterraneen',
-        title: 'Bowl Méditerranéen',
-        time: '',
-        image: images.bowlMediterraneen,
-        saved: true,
-    },
-    {
-        id: 'risotto-champignons',
-        title: 'Risotto Champignons',
-        time: '',
-        image: images.risottoChampignons,
-    },
-    {
-        id: 'cookies-artisanaux',
-        title: 'Cookies Artisanaux',
-        time: '',
-        image: images.cookiesArtisanaux,
-    },
-];
+function toCard(recipe) {
+    return {
+        id: recipe.id,
+        title: recipe.title,
+        time: recipe.preparationTime != null ? `${recipe.preparationTime} min` : '—',
+        image: recipe.imageUrl ? { uri: recipe.imageUrl } : images.imagePlaceholder,
+    };
+}
 
 export default function ProfileScreen({ navigation }) {
-    const { user, logout } = useAuth();
+    const { user, token, logout } = useAuth();
+    const [myRecipes, setMyRecipes] = useState([]);
+    const [loadingRecipes, setLoadingRecipes] = useState(true);
+
+    useFocusEffect(
+        useCallback(() => {
+            let cancelled = false;
+
+            (async () => {
+                try {
+                    const recipes = await recipeApi.getMine(token);
+                    if (!cancelled) setMyRecipes(recipes.map(toCard));
+                } catch {
+                    // silencieux : la section "Mes Recettes" reste vide en cas d'erreur
+                } finally {
+                    if (!cancelled) setLoadingRecipes(false);
+                }
+            })();
+
+            return () => {
+                cancelled = true;
+            };
+        }, [token])
+    );
 
     const handleLogout = () => {
         logout();
@@ -107,25 +120,38 @@ export default function ProfileScreen({ navigation }) {
                               onPress={()=> navigation?.navigate('ChercherRecettes')}>Voir tout</Text>
                     </TouchableOpacity>
                 </View>
-                <View style={styles.recipesGrid}>
-                    <RecipeCard
-                        recipe={MY_RECIPES[0]}
-                        style={styles.bigRecipeCard}
-                        onPress={() => navigation?.navigate('DetailsRecette', { id: MY_RECIPES[0].id })}
-                    />
-                    <View style={styles.recipesColumn}>
+                {loadingRecipes ? (
+                    <ActivityIndicator color={colors.primary} style={{ marginBottom: spacing.lg }} />
+                ) : myRecipes.length === 0 ? (
+                    <TouchableOpacity
+                        style={styles.emptyRecipes}
+                        activeOpacity={0.8}
+                        onPress={() => navigation?.navigate('AjouterRecette')}
+                    >
+                        <Icon name="plus-circle" size={20} color={colors.primary} />
+                        <Text style={styles.emptyRecipesText}>Ajoutez votre première recette</Text>
+                    </TouchableOpacity>
+                ) : (
+                    <View style={styles.recipesGrid}>
                         <RecipeCard
-                            recipe={MY_RECIPES[1]}
-                            style={styles.smallRecipeCard}
-                            onPress={() => navigation?.navigate('DetailsRecette', { id: MY_RECIPES[1].id })}
+                            recipe={myRecipes[0]}
+                            style={styles.bigRecipeCard}
+                            onPress={() => navigation?.navigate('DetailsRecette', { id: myRecipes[0].id })}
                         />
-                        <RecipeCard
-                            recipe={MY_RECIPES[2]}
-                            style={styles.smallRecipeCard}
-                            onPress={() => navigation?.navigate('DetailsRecette', { id: MY_RECIPES[2].id })}
-                        />
+                        {myRecipes.length > 1 ? (
+                            <View style={styles.recipesColumn}>
+                                {myRecipes.slice(1, 3).map((recipe) => (
+                                    <RecipeCard
+                                        key={recipe.id}
+                                        recipe={recipe}
+                                        style={styles.smallRecipeCard}
+                                        onPress={() => navigation?.navigate('DetailsRecette', { id: recipe.id })}
+                                    />
+                                ))}
+                            </View>
+                        ) : null}
                     </View>
-                </View>
+                )}
 
                 {/* Paramètres */}
                 <Text style={[typography.h2, styles.sectionTitle]}>Paramètres</Text>
@@ -250,6 +276,21 @@ const styles = StyleSheet.create({
         fontWeight: '600',
         color: colors.textPrimary,
         marginLeft: 4,
+    },
+    emptyRecipes: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        backgroundColor: colors.cardMuted,
+        borderRadius: radius.md,
+        paddingVertical: spacing.lg,
+        marginBottom: spacing.lg,
+    },
+    emptyRecipesText: {
+        fontSize: 14,
+        fontWeight: '600',
+        color: colors.primary,
+        marginLeft: spacing.sm,
     },
     recipesGrid: {
         flexDirection: 'row',

@@ -15,6 +15,8 @@ public class RecipeResponse {
     private String description;
     private String type;
     private String diet;
+    private String difficulty;
+    private String imageUrl;
     private Integer preparationTime;
     private LocalDateTime createdAt;
     private Long userId;

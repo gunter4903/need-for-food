@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import {
     ScrollView,
     View,
@@ -6,8 +6,10 @@ import {
     TextInput,
     TouchableOpacity,
     StyleSheet,
+    ActivityIndicator,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useFocusEffect } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/Feather';
 import { colors, spacing, radius, typography } from '../../constants/theme';
 import images from '../../../assets/images/temp/images';
@@ -15,45 +17,61 @@ import Header from '../../components/common/Header';
 import { IngredientFilterChip, SelectionTag } from '../../components/recipe/IngredientFilterChip';
 import RecipeMatchCard from '../../components/recipe/RecipeMatchCard';
 import BottomNav from '../../components/common/BottomNav';
+import { useAuth } from '../../context/AuthContext';
+import * as recipeApi from '../../api/recipeApi';
+import * as ingredientApi from '../../api/ingredientApi';
 
-const PANTRY_INGREDIENTS = [
-    'Tomate', 'Pâtes', 'Poulet', 'Oignon', 'Œufs', 'Ail', 'Basilic', 'Fromage',
-];
-
-const RESULTS = [
-    {
-        id: 'pates-tomate',
-        title: 'Pâtes à la Tomate',
-        time: '20 min',
-        difficulty: 'Facile',
-        matchLabel: '2/3 correspondants',
-        image: images.patesTomate,
-        favorite: true,
-    },
-    {
-        id: 'poulet-tomates-roties',
-        title: 'Poulet aux Tomates Rôties',
-        time: '45 min',
-        difficulty: 'Moyen',
-        matchLabel: '3/4 correspondants',
-        image: images.pouletTomatesRoties,
+function toCard(recipe, matchLabel) {
+    return {
+        id: recipe.id,
+        title: recipe.title,
+        time: recipe.preparationTime != null ? `${recipe.preparationTime} min` : '—',
+        difficulty: recipe.difficulty || '—',
+        matchLabel,
+        image: recipe.imageUrl ? { uri: recipe.imageUrl } : images.imagePlaceholder,
         favorite: false,
-    },
-    {
-        id: 'bowl-fusion-placard',
-        title: 'Bowl Fusion du Placard',
-        time: '15 min',
-        difficulty: 'Très facile',
-        matchLabel: '4/4 correspondants',
-        image: images.bowlFusionPlacard,
-        favorite: false,
-    },
-];
+    };
+}
 
 export default function SearchRecipesScreen({ navigation }) {
+    const { token } = useAuth();
     const [search, setSearch] = useState('');
-    const [selected, setSelected] = useState(['Tomate', 'Poulet']);
-    const [results, setResults] = useState(RESULTS);
+    const [pantryIngredients, setPantryIngredients] = useState([]);
+    const [selected, setSelected] = useState([]);
+    const [results, setResults] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [searching, setSearching] = useState(false);
+    const [error, setError] = useState('');
+    const [hasSearched, setHasSearched] = useState(false);
+
+    useFocusEffect(
+        useCallback(() => {
+            let cancelled = false;
+
+            (async () => {
+                setLoading(true);
+                try {
+                    const [ingredients, recipes] = await Promise.all([
+                        ingredientApi.getAll(token),
+                        recipeApi.getMine(token),
+                    ]);
+                    if (cancelled) return;
+                    setPantryIngredients(ingredients.map((i) => i.name));
+                    if (!hasSearched) {
+                        setResults(recipes.map((r) => toCard(r, null)));
+                    }
+                } catch (err) {
+                    if (!cancelled) setError(err.message || 'Impossible de charger les recettes.');
+                } finally {
+                    if (!cancelled) setLoading(false);
+                }
+            })();
+
+            return () => {
+                cancelled = true;
+            };
+        }, [token, hasSearched])
+    );
 
     const toggleIngredient = (name) => {
         setSelected((prev) =>
@@ -65,6 +83,28 @@ export default function SearchRecipesScreen({ navigation }) {
         setResults((prev) =>
             prev.map((r) => (r.id === id ? { ...r, favorite: !r.favorite } : r))
         );
+    };
+
+    const filteredChips = pantryIngredients.filter((name) =>
+        name.toLowerCase().includes(search.toLowerCase())
+    );
+
+    const handleFindRecipes = async () => {
+        if (selected.length === 0) {
+            setError('Sélectionnez au moins un ingrédient.');
+            return;
+        }
+        setError('');
+        setSearching(true);
+        setHasSearched(true);
+        try {
+            const matches = await recipeApi.search(token, selected);
+            setResults(matches.map((m) => toCard(m.recipe, `${m.matchedCount}/${m.totalCount} correspondants`)));
+        } catch (err) {
+            setError(err.message || 'Impossible de rechercher des recettes.');
+        } finally {
+            setSearching(false);
+        }
     };
 
     return (
@@ -91,16 +131,20 @@ export default function SearchRecipesScreen({ navigation }) {
                     />
                 </View>
 
-                <View style={styles.chipsWrap}>
-                    {PANTRY_INGREDIENTS.map((ingredient) => (
-                        <IngredientFilterChip
-                            key={ingredient}
-                            label={ingredient}
-                            active={selected.includes(ingredient)}
-                            onPress={() => toggleIngredient(ingredient)}
-                        />
-                    ))}
-                </View>
+                {loading ? (
+                    <ActivityIndicator color={colors.primary} style={{ marginVertical: spacing.md }} />
+                ) : (
+                    <View style={styles.chipsWrap}>
+                        {filteredChips.map((ingredient) => (
+                            <IngredientFilterChip
+                                key={ingredient}
+                                label={ingredient}
+                                active={selected.includes(ingredient)}
+                                onPress={() => toggleIngredient(ingredient)}
+                            />
+                        ))}
+                    </View>
+                )}
 
                 {selected.length > 0 ? (
                     <View style={styles.selectionBlock}>
@@ -117,13 +161,28 @@ export default function SearchRecipesScreen({ navigation }) {
                     </View>
                 ) : null}
 
-                <TouchableOpacity style={styles.findButton} activeOpacity={0.85}>
-                    <Icon name="star" size={16} color={colors.textOnDark} style={{ marginRight: 8 }} />
-                    <Text style={typography.button}>Trouver des recettes</Text>
+                {!!error && <Text style={styles.errorText}>{error}</Text>}
+
+                <TouchableOpacity
+                    style={[styles.findButton, searching && styles.buttonDisabled]}
+                    activeOpacity={0.85}
+                    onPress={handleFindRecipes}
+                    disabled={searching}
+                >
+                    {searching ? (
+                        <ActivityIndicator color={colors.textOnDark} />
+                    ) : (
+                        <>
+                            <Icon name="star" size={16} color={colors.textOnDark} style={{ marginRight: 8 }} />
+                            <Text style={typography.button}>Trouver des recettes</Text>
+                        </>
+                    )}
                 </TouchableOpacity>
 
                 <View style={styles.sectionHeaderRow}>
-                    <Text style={typography.h2}>Suggestions pour vous</Text>
+                    <Text style={typography.h2}>
+                        {hasSearched ? 'Résultats de la recherche' : 'Suggestions pour vous'}
+                    </Text>
                     <Text style={styles.resultsCount}>{results.length} résultats</Text>
                 </View>
 
@@ -202,6 +261,11 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         flexWrap: 'wrap',
     },
+    errorText: {
+        color: colors.danger,
+        fontSize: 13,
+        marginBottom: spacing.sm,
+    },
     findButton: {
         flexDirection: 'row',
         alignItems: 'center',
@@ -210,6 +274,9 @@ const styles = StyleSheet.create({
         borderRadius: radius.pill,
         height: 52,
         marginBottom: spacing.lg,
+    },
+    buttonDisabled: {
+        opacity: 0.7,
     },
     sectionHeaderRow: {
         flexDirection: 'row',

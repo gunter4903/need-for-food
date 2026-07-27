@@ -1,13 +1,18 @@
-import React, { useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import {
     ScrollView,
     ImageBackground,
     View,
     Text,
+    TextInput,
     TouchableOpacity,
-    StyleSheet, Image,
+    StyleSheet,
+    Image,
+    Modal,
+    ActivityIndicator,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useFocusEffect } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/Feather';
 import { colors, spacing, radius, typography } from '../../constants/theme';
 import images from '../../../assets/images/temp/images';
@@ -15,44 +20,140 @@ import StatBox from '../../components/recipe/StatBox';
 import CheckboxRow from '../../components/common/CheckboxRow';
 import StepTimelineItem from '../../components/recipe/StepTimelineItem';
 import BottomNav from '../../components/common/BottomNav';
-import {useAuth} from "../../context/AuthContext";
+import { useAuth } from '../../context/AuthContext';
+import * as recipeApi from '../../api/recipeApi';
+import * as shoppingListApi from '../../api/shoppingListApi';
 
-const RECIPE = {
-    id: 'pates-au-pesto',
-    title: 'Pâtes au Pesto',
-    tag: 'Végétarien',
-    image: images.patesAuPestoHero,
-    time: '20 min',
-    difficulty: 'Facile',
-    calories: '450 kcal',
-    servings: 4,
-    ingredients: [
-        { id: 'i1', label: '400g de Spaghetti de blé dur', tag: 'Indispensable' },
-        { id: 'i2', label: '2 bouquets de Basilic frais', tag: 'Frais' },
-        { id: 'i3', label: '50g de Pignons de pin', tag: 'Torréfiés' },
-        { id: 'i4', label: '60g de Parmesan râpé', tag: 'AOC' },
-        { id: 'i5', label: "15cl d'Huile d'olive extra vierge", tag: 'Bio' },
-    ],
-    steps: [
-        "Portez une grande casserole d'eau salée à ébullition. Plongez les pâtes et faites-les cuire selon le temps indiqué sur le paquet pour une cuisson al dente.",
-        "Pendant ce temps, lavez le basilic et séchez-le. Mixez-le avec les pignons de pin, l'ail (optionnel) et le parmesan. Ajoutez l'huile d'olive en filet jusqu'à obtenir une texture onctueuse.",
-        "Égouttez les pâtes en réservant une petite louche d'eau de cuisson. Mélangez les pâtes au pesto dans un grand plat, en ajoutant un peu d'eau de cuisson pour détendre la sauce.",
-    ],
-};
+export default function RecipeDetailScreen({ route, navigation }) {
+    const { user, token } = useAuth();
+    const recipeId = route?.params?.id;
 
-export default function RecipeDetailScreen({ navigation }) {
-    const { user } = useAuth();
+    const [recipe, setRecipe] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState('');
     const [checked, setChecked] = useState({});
+    const [addingToList, setAddingToList] = useState(false);
+    const [listError, setListError] = useState('');
+    const [pickerVisible, setPickerVisible] = useState(false);
+    const [myLists, setMyLists] = useState([]);
+    const [loadingLists, setLoadingLists] = useState(false);
+    const [newListName, setNewListName] = useState('');
+
+    useFocusEffect(
+        useCallback(() => {
+            let cancelled = false;
+
+            (async () => {
+                setLoading(true);
+                try {
+                    const data = await recipeApi.getById(token, recipeId);
+                    if (!cancelled) setRecipe(data);
+                } catch (err) {
+                    if (!cancelled) setError(err.message || 'Impossible de charger la recette.');
+                } finally {
+                    if (!cancelled) setLoading(false);
+                }
+            })();
+
+            return () => {
+                cancelled = true;
+            };
+        }, [recipeId, token])
+    );
 
     const toggleIngredient = (id) => {
         setChecked((prev) => ({ ...prev, [id]: !prev[id] }));
     };
 
+    const handleOpenListPicker = async () => {
+        setListError('');
+        setPickerVisible(true);
+        setLoadingLists(true);
+        try {
+            const lists = await shoppingListApi.getMine(token);
+            setMyLists(lists);
+        } catch (err) {
+            setListError(err.message || 'Impossible de charger vos listes.');
+        } finally {
+            setLoadingLists(false);
+        }
+    };
+
+    const closeListPicker = () => {
+        if (addingToList) return;
+        setPickerVisible(false);
+        setNewListName('');
+    };
+
+    const handleSelectExistingList = async (list) => {
+        setListError('');
+        setAddingToList(true);
+        try {
+            for (const ingredient of recipe.ingredients) {
+                await shoppingListApi.addItem(token, list.id, {
+                    ingredientName: ingredient.name,
+                    unit: ingredient.unit,
+                    quantity: ingredient.quantity,
+                });
+            }
+            setPickerVisible(false);
+            navigation?.navigate('ListeCourses', { id: list.id });
+        } catch (err) {
+            setListError(err.message || "Impossible d'ajouter à cette liste.");
+        } finally {
+            setAddingToList(false);
+        }
+    };
+
+    const handleCreateNewList = async () => {
+        if (!newListName.trim()) {
+            setListError('Donnez un nom à la nouvelle liste.');
+            return;
+        }
+        setListError('');
+        setAddingToList(true);
+        try {
+            const list = await shoppingListApi.generate(token, newListName.trim(), [recipe.id]);
+            setPickerVisible(false);
+            setNewListName('');
+            navigation?.navigate('ListeCourses', { id: list.id });
+        } catch (err) {
+            setListError(err.message || 'Impossible de créer la liste.');
+        } finally {
+            setAddingToList(false);
+        }
+    };
+
+    if (loading) {
+        return (
+            <SafeAreaView style={styles.safeArea}>
+                <View style={styles.centered}>
+                    <ActivityIndicator size="large" color={colors.primary} />
+                </View>
+            </SafeAreaView>
+        );
+    }
+
+    if (error || !recipe) {
+        return (
+            <SafeAreaView style={styles.safeArea}>
+                <View style={styles.centered}>
+                    <Text style={styles.errorText}>{error || 'Recette introuvable.'}</Text>
+                </View>
+            </SafeAreaView>
+        );
+    }
+
+    const tag = recipe.diet || recipe.type;
+
     return (
         <SafeAreaView style={styles.safeArea}>
             <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
                 {/* Hero */}
-                <ImageBackground source={RECIPE.image} style={styles.hero}>
+                <ImageBackground
+                    source={recipe.imageUrl ? { uri: recipe.imageUrl } : images.imagePlaceholder}
+                    style={styles.hero}
+                >
                     <View style={styles.heroHeader}>
                         <TouchableOpacity
                             style={styles.heroIconButton}
@@ -74,56 +175,120 @@ export default function RecipeDetailScreen({ navigation }) {
                 </ImageBackground>
 
                 <View style={styles.contentBlock}>
-                    <View style={styles.tagBadge}>
-                        <Text style={styles.tagBadgeText}>{RECIPE.tag}</Text>
-                    </View>
-                    <Text style={styles.title}>{RECIPE.title}</Text>
+                    {tag ? (
+                        <View style={styles.tagBadge}>
+                            <Text style={styles.tagBadgeText}>{tag}</Text>
+                        </View>
+                    ) : null}
+                    <Text style={styles.title}>{recipe.title}</Text>
 
                     <View style={styles.statsCard}>
-                        <StatBox icon="clock" label="TEMPS" value={RECIPE.time} />
-                        <StatBox icon="bar-chart-2" label="DIFFICULTÉ" value={RECIPE.difficulty} />
-                        <StatBox icon="zap" label="CALORIES" value={RECIPE.calories} isLast />
+                        <StatBox
+                            icon="clock"
+                            label="TEMPS"
+                            value={recipe.preparationTime != null ? `${recipe.preparationTime} min` : '—'}
+                        />
+                        <StatBox icon="bar-chart-2" label="DIFFICULTÉ" value={recipe.difficulty || '—'} />
+                        <StatBox icon="list" label="INGRÉDIENTS" value={String(recipe.ingredients.length)} isLast />
                     </View>
 
                     <View style={styles.sectionHeaderRow}>
                         <Text style={typography.h2}>Ingrédients</Text>
-                        <Text style={styles.servings}>{RECIPE.servings} personnes</Text>
                     </View>
-                    {RECIPE.ingredients.map((ingredient) => (
+                    {recipe.ingredients.map((ingredient) => (
                         <CheckboxRow
-                            key={ingredient.id}
-                            label={ingredient.label}
-                            tag={ingredient.tag}
-                            checked={!!checked[ingredient.id]}
-                            onToggle={() => toggleIngredient(ingredient.id)}
+                            key={ingredient.ingredientId}
+                            label={`${ingredient.quantity}${ingredient.unit} de ${ingredient.name}`}
+                            checked={!!checked[ingredient.ingredientId]}
+                            onToggle={() => toggleIngredient(ingredient.ingredientId)}
                         />
                     ))}
 
-                    <TouchableOpacity style={styles.addToListButton} activeOpacity={0.85}>
+                    <TouchableOpacity
+                        style={styles.addToListButton}
+                        activeOpacity={0.85}
+                        onPress={handleOpenListPicker}
+                    >
                         <Icon name="shopping-cart" size={16} color={colors.textOnDark} style={{ marginRight: 8 }} />
                         <Text style={typography.button}>Ajouter à la liste de courses</Text>
                     </TouchableOpacity>
 
                     <Text style={[typography.h2, styles.stepsTitle]}>Étapes de préparation</Text>
-                    {RECIPE.steps.map((step, index) => (
+                    {recipe.steps.map((step, index) => (
                         <StepTimelineItem
                             key={index}
                             number={index + 1}
                             content={step}
-                            isLast={index === RECIPE.steps.length - 1}
+                            isLast={index === recipe.steps.length - 1}
                         />
                     ))}
 
-                    <TouchableOpacity
-                        style={styles.editButton}
-                        activeOpacity={0.85}
-                        onPress={() => navigation?.navigate('ModifierRecette', { id: RECIPE.id })}
-                    >
-                        <Icon name="edit-2" size={16} color={colors.textOnDark} style={{ marginRight: 8 }} />
-                        <Text style={typography.button}>Modifier cette recette</Text>
-                    </TouchableOpacity>
+                    {recipe.userId === user?.id ? (
+                        <TouchableOpacity
+                            style={styles.editButton}
+                            activeOpacity={0.85}
+                            onPress={() => navigation?.navigate('ModifierRecette', { id: recipe.id })}
+                        >
+                            <Icon name="edit-2" size={16} color={colors.textOnDark} style={{ marginRight: 8 }} />
+                            <Text style={typography.button}>Modifier cette recette</Text>
+                        </TouchableOpacity>
+                    ) : null}
                 </View>
             </ScrollView>
+
+            <Modal visible={pickerVisible} transparent animationType="fade" onRequestClose={closeListPicker}>
+                <TouchableOpacity style={styles.overlay} activeOpacity={1} onPress={closeListPicker}>
+                    <TouchableOpacity activeOpacity={1} style={styles.pickerCard} onPress={() => {}}>
+                        <Text style={styles.pickerTitle}>Ajouter à une liste</Text>
+
+                        {loadingLists ? (
+                            <ActivityIndicator color={colors.primary} style={{ marginVertical: spacing.md }} />
+                        ) : myLists.length > 0 ? (
+                            <ScrollView style={styles.pickerListScroll}>
+                                {myLists.map((list) => (
+                                    <TouchableOpacity
+                                        key={list.id}
+                                        style={styles.pickerListRow}
+                                        activeOpacity={0.7}
+                                        onPress={() => handleSelectExistingList(list)}
+                                        disabled={addingToList}
+                                    >
+                                        <Icon name="shopping-cart" size={16} color={colors.primary} />
+                                        <Text style={styles.pickerListName} numberOfLines={1}>{list.name}</Text>
+                                        <Text style={styles.pickerListCount}>{list.items.length} art.</Text>
+                                    </TouchableOpacity>
+                                ))}
+                            </ScrollView>
+                        ) : (
+                            <Text style={styles.pickerEmptyText}>Vous n'avez pas encore de liste.</Text>
+                        )}
+
+                        <View style={styles.pickerDivider} />
+
+                        <Text style={styles.pickerSubtitle}>Ou créer une nouvelle liste</Text>
+                        <View style={styles.pickerNewRow}>
+                            <TextInput
+                                style={styles.pickerInput}
+                                placeholder="Nom de la liste"
+                                placeholderTextColor={colors.textSecondary}
+                                value={newListName}
+                                onChangeText={setNewListName}
+                            />
+                            <TouchableOpacity
+                                style={styles.pickerCreateButton}
+                                activeOpacity={0.85}
+                                onPress={handleCreateNewList}
+                                disabled={addingToList}
+                            >
+                                <Icon name="plus" size={16} color={colors.textOnDark} />
+                            </TouchableOpacity>
+                        </View>
+
+                        {!!listError && <Text style={styles.pickerError}>{listError}</Text>}
+                        {addingToList ? <ActivityIndicator color={colors.primary} style={{ marginTop: spacing.sm }} /> : null}
+                    </TouchableOpacity>
+                </TouchableOpacity>
+            </Modal>
 
             <BottomNav />
         </SafeAreaView>
@@ -134,6 +299,17 @@ const styles = StyleSheet.create({
     safeArea: {
         flex: 1,
         backgroundColor: colors.background,
+    },
+    centered: {
+        flex: 1,
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    errorText: {
+        color: colors.danger,
+        fontSize: 14,
+        textAlign: 'center',
+        paddingHorizontal: spacing.lg,
     },
     scrollContent: {
         paddingBottom: spacing.xl,
@@ -221,11 +397,6 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         marginBottom: spacing.sm,
     },
-    servings: {
-        fontSize: 13,
-        fontWeight: '600',
-        color: colors.textSecondary,
-    },
     addToListButton: {
         flexDirection: 'row',
         alignItems: 'center',
@@ -235,6 +406,89 @@ const styles = StyleSheet.create({
         height: 50,
         marginTop: spacing.xs,
         marginBottom: spacing.lg,
+    },
+    overlay: {
+        flex: 1,
+        backgroundColor: 'rgba(0,0,0,0.35)',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: spacing.lg,
+    },
+    pickerCard: {
+        width: '100%',
+        maxWidth: 360,
+        maxHeight: '80%',
+        backgroundColor: colors.card,
+        borderRadius: radius.lg,
+        padding: spacing.lg,
+    },
+    pickerTitle: {
+        ...typography.h2,
+        marginBottom: spacing.sm,
+    },
+    pickerListScroll: {
+        maxHeight: 200,
+    },
+    pickerListRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        paddingVertical: spacing.sm,
+        borderBottomWidth: 1,
+        borderBottomColor: colors.border,
+    },
+    pickerListName: {
+        flex: 1,
+        fontSize: 14,
+        fontWeight: '600',
+        color: colors.textPrimary,
+        marginLeft: spacing.sm,
+    },
+    pickerListCount: {
+        fontSize: 12,
+        color: colors.textSecondary,
+    },
+    pickerEmptyText: {
+        fontSize: 13,
+        color: colors.textSecondary,
+        marginBottom: spacing.sm,
+    },
+    pickerDivider: {
+        height: 1,
+        backgroundColor: colors.border,
+        marginVertical: spacing.md,
+    },
+    pickerSubtitle: {
+        fontSize: 13,
+        fontWeight: '700',
+        color: colors.textSecondary,
+        marginBottom: spacing.sm,
+    },
+    pickerNewRow: {
+        flexDirection: 'row',
+        gap: spacing.sm,
+    },
+    pickerInput: {
+        flex: 1,
+        height: 46,
+        borderWidth: 1,
+        borderColor: colors.border,
+        borderRadius: radius.md,
+        paddingHorizontal: spacing.md,
+        fontSize: 14,
+        color: colors.textPrimary,
+    },
+    pickerCreateButton: {
+        width: 46,
+        height: 46,
+        alignItems: 'center',
+        justifyContent: 'center',
+        backgroundColor: colors.primary,
+        borderRadius: radius.md,
+    },
+    pickerError: {
+        color: colors.danger,
+        fontSize: 13,
+        marginTop: spacing.sm,
     },
     stepsTitle: {
         marginBottom: spacing.md,

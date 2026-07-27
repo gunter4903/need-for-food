@@ -14,3 +14,8 @@ spring:
 logging:
   level:
     org.hibernate.SQL: debug
+
+app:
+  # IP locale utilisée pour tester depuis un téléphone physique sur le même réseau Wi-Fi
+  # (doit correspondre à EXPO_PUBLIC_API_URL dans need-for-food-mobile/.env, sans /api).
+  base-url: ${APP_BASE_URL:http://192.168.1.60:8080}

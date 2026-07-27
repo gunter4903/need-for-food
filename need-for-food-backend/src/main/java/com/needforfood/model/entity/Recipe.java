@@ -51,6 +51,11 @@ public class Recipe {
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
+    private String difficulty;
+
+    @Column(name = "image_url", columnDefinition = "TEXT")
+    private String imageUrl;
+
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;

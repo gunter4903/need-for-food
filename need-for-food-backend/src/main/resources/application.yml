@@ -24,3 +24,7 @@ app:
     # En production, JWT_SECRET doit être défini via variable d'environnement (256 bits minimum).
     secret: ${JWT_SECRET:dev-only-secret-key-change-me-please-32-bytes-minimum}
     expiration-ms: ${JWT_EXPIRATION_MS:86400000}
+  # URL publique de base de l'API, utilisée pour construire les URLs des images statiques
+  # (ex: photo de la recette de bienvenue). Doit correspondre à l'hôte joignable par le client
+  # mobile (EXPO_PUBLIC_API_URL sans le suffixe /api) — voir need-for-food-mobile/.env.
+  base-url: ${APP_BASE_URL:http://localhost:8080}

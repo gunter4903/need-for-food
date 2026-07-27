@@ -1,6 +1,7 @@
 package com.needforfood.controller;
 
 import com.needforfood.dto.request.RecipeRequest;
+import com.needforfood.dto.response.RecipeMatchResponse;
 import com.needforfood.dto.response.RecipeResponse;
 import com.needforfood.mapper.RecipeMapper;
 import com.needforfood.model.entity.Recipe;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -33,6 +35,18 @@ public class RecipeController {
     public RecipeResponse create(@AuthenticationPrincipal Long userId, @Valid @RequestBody RecipeRequest request) {
         Recipe recipe = recipeService.createRecipe(userId, RecipeMapper.toEntity(request));
         return RecipeMapper.toResponse(recipe);
+    }
+
+    @GetMapping
+    public List<RecipeResponse> getAll() {
+        return recipeService.getAll().stream().map(RecipeMapper::toResponse).toList();
+    }
+
+    @GetMapping("/search")
+    public List<RecipeMatchResponse> search(@AuthenticationPrincipal Long userId, @RequestParam List<String> ingredients) {
+        return recipeService.searchByIngredientNames(userId, ingredients).stream()
+                .map(RecipeMapper::toMatchResponse)
+                .toList();
     }
 
     @GetMapping("/{id}")

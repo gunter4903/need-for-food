@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
     KeyboardAvoidingView,
     ScrollView,
@@ -8,6 +8,7 @@ import {
     TouchableOpacity,
     Platform,
     StyleSheet,
+    ActivityIndicator,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/Feather';
@@ -15,23 +16,73 @@ import { colors, spacing, radius, typography } from '../../constants/theme';
 import Header from '../../components/common/Header';
 import FormInput from '../../components/common/FormInput';
 import CheckboxRow from '../../components/common/CheckboxRow';
+import RecipePickRow from '../../components/shoppingList/RecipePickRow';
 import BottomNav from '../../components/common/BottomNav';
+import { useAuth } from '../../context/AuthContext';
+import * as shoppingListApi from '../../api/shoppingListApi';
+import * as recipeApi from '../../api/recipeApi';
 
 let nextId = 1;
 
 export default function CreateShoppingListScreen({ navigation }) {
+    const { token } = useAuth();
     const [listName, setListName] = useState('');
-    const [itemDraft, setItemDraft] = useState('');
-    const [items, setItems] = useState([
-        { id: 'seed-1', label: 'Lait', checked: false },
-        { id: 'seed-2', label: 'Œufs', checked: false },
-    ]);
+    const [draftName, setDraftName] = useState('');
+    const [draftQuantity, setDraftQuantity] = useState('');
+    const [draftUnit, setDraftUnit] = useState('');
+    const [items, setItems] = useState([]);
+    const [error, setError] = useState('');
+    const [saving, setSaving] = useState(false);
+
+    const [recipeSearch, setRecipeSearch] = useState('');
+    const [myRecipes, setMyRecipes] = useState([]);
+    const [loadingRecipes, setLoadingRecipes] = useState(true);
+    const [selectedRecipeIds, setSelectedRecipeIds] = useState([]);
+
+    useEffect(() => {
+        let cancelled = false;
+
+        (async () => {
+            try {
+                const recipes = await recipeApi.getMine(token);
+                if (!cancelled) setMyRecipes(recipes);
+            } catch {
+                // silencieux : la section recettes reste vide en cas d'erreur
+            } finally {
+                if (!cancelled) setLoadingRecipes(false);
+            }
+        })();
+
+        return () => {
+            cancelled = true;
+        };
+    }, [token]);
+
+    const filteredRecipes = myRecipes.filter((recipe) =>
+        recipe.title.toLowerCase().includes(recipeSearch.toLowerCase())
+    );
+
+    const toggleRecipeSelection = (recipeId) => {
+        setSelectedRecipeIds((prev) =>
+            prev.includes(recipeId) ? prev.filter((id) => id !== recipeId) : [...prev, recipeId]
+        );
+    };
 
     const handleAddItem = () => {
-        const trimmed = itemDraft.trim();
-        if (!trimmed) return;
-        setItems((prev) => [...prev, { id: `item-${nextId++}`, label: trimmed, checked: false }]);
-        setItemDraft('');
+        const trimmedName = draftName.trim();
+        const trimmedUnit = draftUnit.trim();
+        if (!trimmedName || !trimmedUnit || !(parseFloat(draftQuantity) > 0)) {
+            setError('Renseignez un nom, une quantité et une unité valides pour l\'article.');
+            return;
+        }
+        setError('');
+        setItems((prev) => [
+            ...prev,
+            { id: `item-${nextId++}`, name: trimmedName, quantity: draftQuantity, unit: trimmedUnit, checked: false },
+        ]);
+        setDraftName('');
+        setDraftQuantity('');
+        setDraftUnit('');
     };
 
     const toggleItem = (id) =>
@@ -39,9 +90,31 @@ export default function CreateShoppingListScreen({ navigation }) {
 
     const removeItem = (id) => setItems((prev) => prev.filter((i) => i.id !== id));
 
-    const handleCreate = () => {
-        // TODO: enregistrer la liste (listName, items)
-        navigation?.navigate('MesListesCourses');
+    const handleCreate = async () => {
+        if (!listName.trim()) {
+            setError('Le nom de la liste est obligatoire.');
+            return;
+        }
+        setError('');
+        setSaving(true);
+        try {
+            const list = selectedRecipeIds.length > 0
+                ? await shoppingListApi.generate(token, listName.trim(), selectedRecipeIds)
+                : await shoppingListApi.create(token, listName.trim());
+
+            for (const item of items) {
+                await shoppingListApi.addItem(token, list.id, {
+                    ingredientName: item.name,
+                    unit: item.unit,
+                    quantity: parseFloat(item.quantity),
+                });
+            }
+            navigation?.navigate('MesListesCourses');
+        } catch (err) {
+            setError(err.message || 'Impossible de créer la liste.');
+        } finally {
+            setSaving(false);
+        }
     };
 
     return (
@@ -62,26 +135,74 @@ export default function CreateShoppingListScreen({ navigation }) {
                         onChangeText={setListName}
                     />
 
-                    <Text style={styles.sectionTitle}>Articles / Recettes</Text>
+                    <Text style={styles.sectionTitle}>Ajouter depuis vos recettes</Text>
+                    <View style={styles.searchBar}>
+                        <Icon name="search" size={16} color={colors.textSecondary} />
+                        <TextInput
+                            style={styles.searchInput}
+                            placeholder="Rechercher une recette par son nom..."
+                            placeholderTextColor={colors.textSecondary}
+                            value={recipeSearch}
+                            onChangeText={setRecipeSearch}
+                        />
+                    </View>
+
+                    {loadingRecipes ? (
+                        <ActivityIndicator color={colors.primary} style={{ marginBottom: spacing.md }} />
+                    ) : filteredRecipes.length === 0 ? (
+                        <Text style={styles.emptyRecipesText}>Aucune recette trouvée.</Text>
+                    ) : (
+                        <ScrollView
+                            style={styles.recipesList}
+                            nestedScrollEnabled
+                            showsVerticalScrollIndicator={false}
+                        >
+                            {filteredRecipes.map((recipe) => (
+                                <RecipePickRow
+                                    key={recipe.id}
+                                    recipe={recipe}
+                                    selected={selectedRecipeIds.includes(recipe.id)}
+                                    onPress={() => toggleRecipeSelection(recipe.id)}
+                                />
+                            ))}
+                        </ScrollView>
+                    )}
+
+                    <Text style={styles.sectionTitle}>Ajouter un article manuellement</Text>
+
+                    <FormInput
+                        placeholder="Nom de l'article (ex: Farine)"
+                        value={draftName}
+                        onChangeText={setDraftName}
+                        containerStyle={styles.draftNameField}
+                    />
                     <View style={styles.addRow}>
                         <TextInput
-                            style={styles.addInput}
-                            placeholder="Ex: Farine, Sucre..."
+                            style={styles.quantityInput}
+                            placeholder="Quantité"
                             placeholderTextColor={colors.textSecondary}
-                            value={itemDraft}
-                            onChangeText={setItemDraft}
-                            onSubmitEditing={handleAddItem}
+                            keyboardType="numeric"
+                            value={draftQuantity}
+                            onChangeText={setDraftQuantity}
+                        />
+                        <TextInput
+                            style={styles.unitInput}
+                            placeholder="Unité (g, ml, pièce...)"
+                            placeholderTextColor={colors.textSecondary}
+                            value={draftUnit}
+                            onChangeText={setDraftUnit}
                         />
                         <TouchableOpacity style={styles.addButton} activeOpacity={0.85} onPress={handleAddItem}>
                             <Icon name="plus" size={16} color={colors.textOnDark} />
-                            <Text style={styles.addButtonLabel}>Ajouter</Text>
                         </TouchableOpacity>
                     </View>
+
+                    {!!error && <Text style={styles.errorText}>{error}</Text>}
 
                     {items.map((item) => (
                         <CheckboxRow
                             key={item.id}
-                            label={item.label}
+                            label={`${item.quantity}${item.unit} ${item.name}`}
                             checked={item.checked}
                             onToggle={() => toggleItem(item.id)}
                             onDelete={() => removeItem(item.id)}
@@ -90,9 +211,20 @@ export default function CreateShoppingListScreen({ navigation }) {
                 </ScrollView>
 
                 <View style={styles.footer}>
-                    <TouchableOpacity style={styles.createButton} activeOpacity={0.85} onPress={handleCreate}>
-                        <Icon name="check-circle" size={18} color={colors.textOnDark} style={{ marginRight: 8 }} />
-                        <Text style={typography.button}>Créer la liste</Text>
+                    <TouchableOpacity
+                        style={[styles.createButton, saving && styles.buttonDisabled]}
+                        activeOpacity={0.85}
+                        onPress={handleCreate}
+                        disabled={saving}
+                    >
+                        {saving ? (
+                            <ActivityIndicator color={colors.textOnDark} />
+                        ) : (
+                            <>
+                                <Icon name="check-circle" size={18} color={colors.textOnDark} style={{ marginRight: 8 }} />
+                                <Text style={typography.button}>Créer la liste</Text>
+                            </>
+                        )}
                     </TouchableOpacity>
                 </View>
             </KeyboardAvoidingView>
@@ -121,6 +253,36 @@ const styles = StyleSheet.create({
         fontSize: 16,
         fontWeight: '700',
         color: colors.textPrimary,
+        marginTop: spacing.md,
+        marginBottom: spacing.sm,
+    },
+    searchBar: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        backgroundColor: colors.card,
+        borderWidth: 1,
+        borderColor: colors.border,
+        borderRadius: radius.md,
+        paddingHorizontal: spacing.md,
+        height: 46,
+        marginBottom: spacing.sm,
+    },
+    searchInput: {
+        flex: 1,
+        marginLeft: spacing.sm,
+        fontSize: 14,
+        color: colors.textPrimary,
+    },
+    emptyRecipesText: {
+        fontSize: 13,
+        color: colors.textSecondary,
+        marginBottom: spacing.sm,
+    },
+    recipesList: {
+        maxHeight: 170,
+        marginBottom: spacing.sm,
+    },
+    draftNameField: {
         marginBottom: spacing.sm,
     },
     addRow: {
@@ -128,30 +290,40 @@ const styles = StyleSheet.create({
         gap: spacing.sm,
         marginBottom: spacing.md,
     },
-    addInput: {
+    quantityInput: {
+        width: 90,
+        height: 48,
+        borderWidth: 1,
+        borderColor: colors.border,
+        borderRadius: radius.md,
+        paddingHorizontal: spacing.sm,
+        backgroundColor: colors.card,
+        fontSize: 14,
+        color: colors.textPrimary,
+    },
+    unitInput: {
         flex: 1,
         height: 48,
         borderWidth: 1,
         borderColor: colors.border,
         borderRadius: radius.md,
-        paddingHorizontal: spacing.md,
+        paddingHorizontal: spacing.sm,
         backgroundColor: colors.card,
         fontSize: 14,
         color: colors.textPrimary,
     },
     addButton: {
-        flexDirection: 'row',
+        width: 48,
+        height: 48,
         alignItems: 'center',
         justifyContent: 'center',
         backgroundColor: colors.primary,
         borderRadius: radius.md,
-        paddingHorizontal: spacing.md,
     },
-    addButtonLabel: {
-        color: colors.textOnDark,
-        fontSize: 14,
-        fontWeight: '700',
-        marginLeft: 6,
+    errorText: {
+        color: colors.danger,
+        fontSize: 13,
+        marginBottom: spacing.sm,
     },
     footer: {
         paddingHorizontal: spacing.lg,
@@ -164,5 +336,8 @@ const styles = StyleSheet.create({
         backgroundColor: colors.primaryDark,
         borderRadius: radius.pill,
         height: 54,
+    },
+    buttonDisabled: {
+        opacity: 0.7,
     },
 });

@@ -101,7 +101,7 @@ class RecipeFlowIntegrationTest {
         mockMvc.perform(get("/api/recipes/mine")
                         .header("Authorization", "Bearer " + token))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].id").value(recipeId));
+                .andExpect(jsonPath("$[?(@.id == " + recipeId + ")]").isNotEmpty());
 
         RecipeRequest updateBody = samplePestoRecipe();
         updateBody.setTitle("Pâtes au pesto (v2)");

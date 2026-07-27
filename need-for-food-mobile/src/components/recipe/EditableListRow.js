@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
 import Icon from 'react-native-vector-icons/Feather';
 import { colors, spacing, radius } from '../../constants/theme';
 
@@ -19,7 +19,7 @@ export function EditableListRow({ label, onDelete, draggable = true }) {
     );
 }
 
-export function EditableStepRow({ number, content, isLast }) {
+export function EditableStepRow({ number, content, onChangeText, onDelete, isLast }) {
     return (
         <View style={styles.stepRow}>
             <View style={styles.stepMarkerColumn}>
@@ -29,8 +29,28 @@ export function EditableStepRow({ number, content, isLast }) {
                 {!isLast ? <View style={styles.stepLine} /> : null}
             </View>
             <View style={styles.stepTextCard}>
-                <Text style={styles.stepText}>{content}</Text>
+                {onChangeText ? (
+                    <TextInput
+                        style={styles.stepInput}
+                        value={content}
+                        onChangeText={onChangeText}
+                        multiline
+                        placeholder="Décrivez cette étape de préparation..."
+                        placeholderTextColor={colors.textSecondary}
+                    />
+                ) : (
+                    <Text style={styles.stepText}>{content}</Text>
+                )}
             </View>
+            {onDelete ? (
+                <TouchableOpacity
+                    onPress={onDelete}
+                    hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+                    style={styles.stepDelete}
+                >
+                    <Icon name="x" size={16} color={colors.textSecondary} />
+                </TouchableOpacity>
+            ) : null}
         </View>
     );
 }
@@ -94,5 +114,16 @@ const styles = StyleSheet.create({
         fontSize: 13,
         color: colors.textPrimary,
         lineHeight: 19,
+    },
+    stepInput: {
+        fontSize: 13,
+        color: colors.textPrimary,
+        lineHeight: 19,
+        minHeight: 40,
+        textAlignVertical: 'top',
+    },
+    stepDelete: {
+        marginLeft: spacing.xs,
+        marginTop: 2,
     },
 });

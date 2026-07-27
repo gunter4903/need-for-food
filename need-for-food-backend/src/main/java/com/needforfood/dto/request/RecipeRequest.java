@@ -22,6 +22,10 @@ public class RecipeRequest {
 
     private String diet;
 
+    private String difficulty;
+
+    private String imageUrl;
+
     @PositiveOrZero
     private Integer preparationTime;
 
