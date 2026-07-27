@@ -44,6 +44,38 @@ services:
       - "${MONGO_PORT:-27017}:27017"
     volumes:
       - mongodb_data:/data/db
+    healthcheck:
+      test: echo 'db.runCommand("ping").ok' | mongosh localhost:27017/test --quiet
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: need-for-food-backend
+    restart: unless-stopped
+    environment:
+      SPRING_PROFILES_ACTIVE: dev
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: ${DB_NAME:-need_for_food}
+      DB_USERNAME: ${DB_USERNAME:-need_for_food}
+      DB_PASSWORD: ${DB_PASSWORD:-need_for_food}
+      MONGO_HOST: mongodb
+      MONGO_PORT: 27017
+      MONGO_DATABASE: ${MONGO_DATABASE:-need_for_food}
+      MONGO_USERNAME: ${MONGO_USERNAME:-need_for_food}
+      MONGO_PASSWORD: ${MONGO_PASSWORD:-need_for_food}
+      JWT_SECRET: ${JWT_SECRET:-dev-only-secret-key-change-me-please-32-bytes-minimum}
+    ports:
+      - "8080:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      mongodb:
+        condition: service_healthy
 
 volumes:
   postgres_data:

@@ -5,13 +5,11 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="23d147eb-fe7c-4e75-9183-d618c3f3dcce" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/src/components/shoppingList/CategorySectionHeader.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/components/shoppingList/ShoppingListCard.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/screens/shoppingList/CreateShoppingListScreen.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/screens/shoppingList/ShopingListsOverviewScreen.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/screens/shoppingList/ShoppingListScreen.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/navigation/AppNavigator.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/navigation/AppNavigator.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/package-lock.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/structure sugérée.txt" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -24,7 +22,7 @@
     </execution>
   </component>
   <component name="EmbeddingIndexingInfo">
-    <option name="cachedIndexableFilesCount" value="17" />
+    <option name="cachedIndexableFilesCount" value="83" />
   </component>
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
@@ -36,109 +34,109 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
   </component>
-  <component name="GitHubPullRequestSearchHistory"><![CDATA[{
-  "lastFilter": {
-    "state": "OPEN",
-    "assignee": "gunter4903"
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;gunter4903&quot;
   }
-}]]></component>
-  <component name="GithubPullRequestsUISettings"><![CDATA[{
-  "selectedUrlAndAccountId": {
-    "url": "https://github.com/gunter4903/need-for-food.git",
-    "accountId": "fd839cae-fed7-4d2f-a22e-e995ae1b910c"
+}</component>
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/gunter4903/need-for-food.git&quot;,
+    &quot;accountId&quot;: &quot;fd839cae-fed7-4d2f-a22e-e995ae1b910c&quot;
   }
-}]]></component>
+}</component>
   <component name="McpProjectServerCommands">
     <commands />
     <urls />
   </component>
   <component name="NextEditCompletionFeaturesState">
     <decayedCancelled>
-      <entry key="MS100" value="0.0" />
-      <entry key="MS500" value="2.67250791070519E-192" />
-      <entry key="S2" value="1.2785854359036987E-48" />
-      <entry key="S5" value="6.965268530037253E-20" />
-      <entry key="S10" value="2.7012609940398046E-10" />
-      <entry key="S30" value="9.568391041399683E-4" />
-      <entry key="S60" value="0.11958052104062947" />
-      <entry key="M2" value="2.758382218019127" />
-      <entry key="M5" value="23.673073721714996" />
-      <entry key="M10" value="56.43007826325841" />
-      <entry key="M15" value="85.780600078451" />
-      <entry key="M30" value="161.6449949497011" />
-      <entry key="H1" value="253.74683717726322" />
-      <entry key="H2" value="331.31987856145867" />
-      <entry key="H4" value="384.01019056192825" />
-      <entry key="D1" value="492.0132474026665" />
-      <entry key="W1" value="553.9191266063967" />
+      <entry key="MS100" value="1.054688954157153" />
+      <entry key="MS500" value="2.371162773532166" />
+      <entry key="S2" value="6.046938423190745" />
+      <entry key="S5" value="9.527208680006947" />
+      <entry key="S10" value="11.453981804108981" />
+      <entry key="S30" value="13.070416811379525" />
+      <entry key="S60" value="13.584808519423174" />
+      <entry key="M2" value="15.725421130948272" />
+      <entry key="M5" value="34.578031886632324" />
+      <entry key="M10" value="66.68730065030326" />
+      <entry key="M15" value="95.96236565380671" />
+      <entry key="M30" value="172.02153695232406" />
+      <entry key="H1" value="264.8914711003175" />
+      <entry key="H2" value="343.451734446249" />
+      <entry key="H4" value="396.926370519646" />
+      <entry key="D1" value="505.7816301071508" />
+      <entry key="W1" value="567.8818738009355" />
     </decayedCancelled>
     <decayedSelected>
-      <entry key="MS100" value="1.0" />
-      <entry key="MS500" value="1.0" />
-      <entry key="S2" value="1.0" />
-      <entry key="S5" value="1.0000000000009255" />
-      <entry key="S10" value="1.0000011218777995" />
-      <entry key="S30" value="1.0157443500962093" />
-      <entry key="S60" value="1.2146507879937123" />
-      <entry key="M2" value="2.1900731040287864" />
-      <entry key="M5" value="6.835341323455122" />
-      <entry key="M10" value="15.652648680996213" />
-      <entry key="M15" value="24.572146268316327" />
-      <entry key="M30" value="48.065134382723265" />
-      <entry key="H1" value="76.60262555963526" />
-      <entry key="H2" value="100.6637397045049" />
-      <entry key="H4" value="116.89125223951129" />
-      <entry key="D1" value="145.19214751963003" />
-      <entry key="W1" value="159.73363009204735" />
+      <entry key="MS100" value="3.761407976633023E-177" />
+      <entry key="MS500" value="5.188837717842355E-36" />
+      <entry key="S2" value="1.5092720242137803E-9" />
+      <entry key="S5" value="2.96146775840462E-4" />
+      <entry key="S10" value="0.01720893489794028" />
+      <entry key="S30" value="0.2622420010360786" />
+      <entry key="S60" value="0.6171778819025684" />
+      <entry key="M2" value="1.561126408363714" />
+      <entry key="M5" value="5.969692889696997" />
+      <entry key="M10" value="14.627958834218834" />
+      <entry key="M15" value="23.487692526692896" />
+      <entry key="M30" value="46.9925261157136" />
+      <entry key="H1" value="75.74308164777035" />
+      <entry key="H2" value="100.09738185872936" />
+      <entry key="H4" value="116.56195959516177" />
+      <entry key="D1" value="145.1238975841805" />
+      <entry key="W1" value="159.7229014453007" />
     </decayedSelected>
     <decayedShown>
-      <entry key="MS100" value="3.841230583407282E-6" />
-      <entry key="MS500" value="0.08258365035364156" />
-      <entry key="S2" value="0.5360724876438533" />
-      <entry key="S5" value="0.7792726022950897" />
-      <entry key="S10" value="0.882765276597599" />
-      <entry key="S30" value="0.9757743978322594" />
-      <entry key="S60" value="1.3111985992941553" />
-      <entry key="M2" value="4.927384513193164" />
-      <entry key="M5" value="30.47760568979225" />
-      <entry key="M10" value="72.04662683837321" />
-      <entry key="M15" value="110.31377105094191" />
-      <entry key="M30" value="209.66772138047622" />
-      <entry key="H1" value="330.31244394219016" />
-      <entry key="H2" value="431.95800497608667" />
-      <entry key="H4" value="500.8861659840449" />
-      <entry key="D1" value="637.2021074114748" />
-      <entry key="W1" value="713.6522314425533" />
+      <entry key="MS100" value="1.0121051211781684" />
+      <entry key="MS500" value="2.352411953291172" />
+      <entry key="S2" value="6.029005008137621" />
+      <entry key="S5" value="9.511645685742474" />
+      <entry key="S10" value="11.458401645383473" />
+      <entry key="S30" value="13.31762902243194" />
+      <entry key="S60" value="14.18792390651737" />
+      <entry key="M2" value="17.27031474263445" />
+      <entry key="M5" value="40.52032372628406" />
+      <entry key="M10" value="81.28127451383168" />
+      <entry key="M15" value="119.41263726659322" />
+      <entry key="M30" value="218.97251845842246" />
+      <entry key="H1" value="340.59790778458915" />
+      <entry key="H2" value="443.5236263368197" />
+      <entry key="H4" value="513.4730859387429" />
+      <entry key="D1" value="650.9022399930574" />
+      <entry key="W1" value="727.6042497780732" />
     </decayedShown>
   </component>
-  <component name="ProjectColorInfo"><![CDATA[{
-  "associatedIndex": 7
-}]]></component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 7
+}</component>
   <component name="ProjectId" id="3Gp73MCfjHnD3cV7svk9RKaCqLS" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "ModuleVcsDetector.initialDetectionPerformed": "true",
-    "RunOnceActivity.MCP Project settings loaded": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "RunOnceActivity.typescript.service.memoryLimit.init": "true",
-    "codeWithMe.voiceChat.enabledByDefault": "false",
-    "git-widget-placeholder": "main",
-    "last_opened_file_path": "C:/Users/antoi/Documents/01. Bachelor Concepteur Developpeur d Applications/99. Projet Fil Rouge/need-for-food/need-for-food-mobile/assets/images/temp",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.jshint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.jshint": "",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "ts.external.directory.path": "C:\\Program Files\\JetBrains\\PhpStorm 2025.2.3\\plugins\\javascript-plugin\\jsLanguageServicesImpl\\external"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.MCP Project settings loaded&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.typescript.service.memoryLimit.init&quot;: &quot;true&quot;,
+    &quot;codeWithMe.voiceChat.enabledByDefault&quot;: &quot;false&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/antoi/Documents/01. Bachelor Concepteur Developpeur d Applications/99. Projet Fil Rouge/need-for-food/need-for-food-mobile/assets/images/temp&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.jshint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.jshint&quot;: &quot;&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;ts.external.directory.path&quot;: &quot;C:\\Program Files\\JetBrains\\PhpStorm 2025.2.3\\plugins\\javascript-plugin\\jsLanguageServicesImpl\\external&quot;
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="C:\Users\antoi\Documents\01. Bachelor Concepteur Developpeur d Applications\99. Projet Fil Rouge\need-for-food\need-for-food-mobile\assets\images\temp" />
@@ -153,8 +151,8 @@
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-js-predefined-d6986cc7102b-4abd2a77f808-JavaScript-PS-262.8665.265" />
-        <option value="bundled-php-predefined-a98d8de5180a-ff90ddd8021d-com.jetbrains.php.sharedIndexes-PS-262.8665.265" />
+        <option value="bundled-js-predefined-d6986cc7102b-4abd2a77f808-JavaScript-PS-262.8665.325" />
+        <option value="bundled-php-predefined-a98d8de5180a-ff90ddd8021d-com.jetbrains.php.sharedIndexes-PS-262.8665.325" />
       </set>
     </attachedChunks>
   </component>
@@ -165,7 +163,9 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1784656457225</updated>
-      <workItem from="1784656458434" duration="11019000" />
+      <workItem from="1784656458434" duration="13515000" />
+      <workItem from="1785139683525" duration="108000" />
+      <workItem from="1785139852619" duration="890000" />
     </task>
     <servers />
   </component>
