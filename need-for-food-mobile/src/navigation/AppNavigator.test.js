@@ -45,7 +45,7 @@ describe('AppNavigator', () => {
 
     it('switches to the authenticated Home screen after a successful login', async () => {
         authApi.login.mockResolvedValue({ token: 'new-token' });
-        authApi.getMe.mockResolvedValue({ id: 1, username: 'Julia Martin' });
+        authApi.getMe.mockResolvedValue({ id: 1, username: 'Julia Martin', verified: true });
 
         const { findByPlaceholderText, getByText, findByText } = await renderApp();
 
@@ -65,7 +65,7 @@ describe('AppNavigator', () => {
 
     it('returns to the login screen after logging out from the profile tab', async () => {
         authApi.login.mockResolvedValue({ token: 'new-token' });
-        authApi.getMe.mockResolvedValue({ id: 1, username: 'Julia Martin' });
+        authApi.getMe.mockResolvedValue({ id: 1, username: 'Julia Martin', verified: true });
 
         const { findByPlaceholderText, getByText, findByText } = await renderApp();
 
@@ -84,6 +84,48 @@ describe('AppNavigator', () => {
         await waitFor(() => expect(preferenceApi.getMine).toHaveBeenCalled());
 
         fireEvent.press(await findByText('Déconnexion'));
+
+        expect(await findByPlaceholderText('votre@email.com')).toBeTruthy();
+    });
+
+    it('redirects to the verification screen when logging in with an unverified account', async () => {
+        authApi.login.mockResolvedValue({ token: 'new-token' });
+        authApi.getMe.mockResolvedValue({ id: 1, email: 'julia@needforfood.dev', username: 'Julia Martin', verified: false });
+
+        const { findByPlaceholderText, getByText, findByText, queryByText } = await renderApp();
+
+        const emailInput = await findByPlaceholderText('votre@email.com');
+        fireEvent.changeText(emailInput, 'julia@needforfood.dev');
+        await waitFor(() => expect(emailInput.props.value).toBe('julia@needforfood.dev'));
+
+        const passwordInput = await findByPlaceholderText('••••••••');
+        fireEvent.changeText(passwordInput, 's3cret-pwd');
+        await waitFor(() => expect(passwordInput.props.value).toBe('s3cret-pwd'));
+
+        fireEvent.press(getByText('Se connecter'));
+
+        expect(await findByText('Vérification de compte')).toBeTruthy();
+        expect(queryByText('Bonjour, Julia')).toBeNull();
+    });
+
+    it('returns to the login screen when logging out from the verification screen reached via login', async () => {
+        authApi.login.mockResolvedValue({ token: 'new-token' });
+        authApi.getMe.mockResolvedValue({ id: 1, email: 'julia@needforfood.dev', username: 'Julia Martin', verified: false });
+
+        const { findByPlaceholderText, getByText, findByText } = await renderApp();
+
+        const emailInput = await findByPlaceholderText('votre@email.com');
+        fireEvent.changeText(emailInput, 'julia@needforfood.dev');
+        await waitFor(() => expect(emailInput.props.value).toBe('julia@needforfood.dev'));
+
+        const passwordInput = await findByPlaceholderText('••••••••');
+        fireEvent.changeText(passwordInput, 's3cret-pwd');
+        await waitFor(() => expect(passwordInput.props.value).toBe('s3cret-pwd'));
+
+        fireEvent.press(getByText('Se connecter'));
+        await findByText('Vérification de compte');
+
+        fireEvent.press(getByText('Se déconnecter'));
 
         expect(await findByPlaceholderText('votre@email.com')).toBeTruthy();
     });

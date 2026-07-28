@@ -26,6 +26,7 @@ public class AuthService {
     private final UserService userService;
     private final RecipeService recipeService;
     private final ShoppingListService shoppingListService;
+    private final EmailService emailService;
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenProvider jwtTokenProvider;
     private final String baseUrl;
@@ -34,6 +35,7 @@ public class AuthService {
                         UserService userService,
                         RecipeService recipeService,
                         ShoppingListService shoppingListService,
+                        EmailService emailService,
                         PasswordEncoder passwordEncoder,
                         JwtTokenProvider jwtTokenProvider,
                         @Value("${app.base-url}") String baseUrl) {
@@ -41,6 +43,7 @@ public class AuthService {
         this.userService = userService;
         this.recipeService = recipeService;
         this.shoppingListService = shoppingListService;
+        this.emailService = emailService;
         this.passwordEncoder = passwordEncoder;
         this.jwtTokenProvider = jwtTokenProvider;
         this.baseUrl = baseUrl;
@@ -53,7 +56,25 @@ public class AuthService {
         Recipe welcomeRecipe = recipeService.createRecipe(user.getId(), welcomeRecipe());
         shoppingListService.generateFromRecipes(user.getId(), "Liste de bienvenue", List.of(welcomeRecipe.getId()));
 
+        emailService.sendVerificationCode(user.getEmail(), user.getUsername(), user.getVerificationCode());
+
         return user;
+    }
+
+    @Transactional
+    public String verifyAccount(String email, String code) {
+        User user = userService.verifyAccount(email, code);
+        return jwtTokenProvider.generateToken(user.getId(), user.getEmail());
+    }
+
+    @Transactional
+    public void resendVerificationCode(String email) {
+        User user = userService.getByEmail(email);
+        if (user.isVerified()) {
+            return;
+        }
+        String code = userService.regenerateVerificationCode(email);
+        emailService.sendVerificationCode(user.getEmail(), user.getUsername(), code);
     }
 
     private Recipe welcomeRecipe() {

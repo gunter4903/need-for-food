@@ -2,6 +2,8 @@ package com.needforfood.controller;
 
 import com.needforfood.dto.request.LoginRequest;
 import com.needforfood.dto.request.RegisterRequest;
+import com.needforfood.dto.request.ResendVerificationRequest;
+import com.needforfood.dto.request.VerifyAccountRequest;
 import com.needforfood.dto.response.AuthResponse;
 import com.needforfood.dto.response.UserResponse;
 import com.needforfood.mapper.UserMapper;
@@ -34,5 +36,17 @@ public class AuthController {
     public AuthResponse login(@Valid @RequestBody LoginRequest request) {
         String token = authService.login(request.getEmail(), request.getPassword());
         return new AuthResponse(token);
+    }
+
+    @PostMapping("/verify")
+    public AuthResponse verify(@Valid @RequestBody VerifyAccountRequest request) {
+        String token = authService.verifyAccount(request.getEmail(), request.getCode());
+        return new AuthResponse(token);
+    }
+
+    @PostMapping("/resend-verification")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void resendVerification(@Valid @RequestBody ResendVerificationRequest request) {
+        authService.resendVerificationCode(request.getEmail());
     }
 }

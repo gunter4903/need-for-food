@@ -67,10 +67,8 @@ describe('AuthContext', () => {
         expect(await AsyncStorage.getItem('auth_token')).toBe('new-token');
     });
 
-    it('register creates the account then logs in with the same credentials', async () => {
+    it('register creates the account without logging the user in (verification required first)', async () => {
         authApi.register.mockResolvedValue({ id: 3, username: 'nouveau' });
-        authApi.login.mockResolvedValue({ token: 'fresh-token' });
-        authApi.getMe.mockResolvedValue({ id: 3, username: 'nouveau' });
 
         const { result } = await renderHook(() => useAuth(), { wrapper });
         await waitFor(() => expect(result.current.initializing).toBe(false));
@@ -80,8 +78,39 @@ describe('AuthContext', () => {
         });
 
         expect(authApi.register).toHaveBeenCalledWith('nouveau@needforfood.dev', 'nouveau', 's3cret-pwd');
-        expect(authApi.login).toHaveBeenCalledWith('nouveau@needforfood.dev', 's3cret-pwd');
+        expect(authApi.login).not.toHaveBeenCalled();
+        expect(result.current.user).toBeNull();
+        expect(result.current.token).toBeNull();
+    });
+
+    it('verifyAccount logs the user in once the code is accepted', async () => {
+        authApi.verifyAccount.mockResolvedValue({ token: 'verified-token' });
+        authApi.getMe.mockResolvedValue({ id: 3, username: 'nouveau' });
+
+        const { result } = await renderHook(() => useAuth(), { wrapper });
+        await waitFor(() => expect(result.current.initializing).toBe(false));
+
+        await act(async () => {
+            await result.current.verifyAccount('nouveau@needforfood.dev', '123456');
+        });
+
+        expect(authApi.verifyAccount).toHaveBeenCalledWith('nouveau@needforfood.dev', '123456');
+        expect(result.current.token).toBe('verified-token');
         expect(result.current.user).toEqual({ id: 3, username: 'nouveau' });
+        expect(await AsyncStorage.getItem('auth_token')).toBe('verified-token');
+    });
+
+    it('resendVerificationCode delegates to the API with the given email', async () => {
+        authApi.resendVerification.mockResolvedValue(undefined);
+
+        const { result } = await renderHook(() => useAuth(), { wrapper });
+        await waitFor(() => expect(result.current.initializing).toBe(false));
+
+        await act(async () => {
+            await result.current.resendVerificationCode('nouveau@needforfood.dev');
+        });
+
+        expect(authApi.resendVerification).toHaveBeenCalledWith('nouveau@needforfood.dev');
     });
 
     it('logout clears the stored token and resets the session', async () => {

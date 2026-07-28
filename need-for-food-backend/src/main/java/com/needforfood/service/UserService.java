@@ -2,22 +2,32 @@ package com.needforfood.service;
 
 import com.needforfood.exception.custom.DuplicateEmailException;
 import com.needforfood.exception.custom.InvalidPasswordException;
+import com.needforfood.exception.custom.InvalidVerificationCodeException;
 import com.needforfood.exception.custom.ResourceNotFoundException;
 import com.needforfood.model.entity.User;
 import com.needforfood.repository.nosql.UserPreferenceRepository;
 import com.needforfood.repository.sql.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.security.SecureRandom;
+import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
 public class UserService {
 
+    private static final SecureRandom RANDOM = new SecureRandom();
+
     private final UserRepository userRepository;
     private final UserPreferenceRepository preferenceRepository;
     private final PasswordEncoder passwordEncoder;
+
+    @Value("${app.mail.verification-code-expiration-minutes}")
+    private long verificationCodeExpirationMinutes;
 
     @Transactional
     public User register(String email, String username, String rawPassword) {
@@ -29,9 +39,47 @@ public class UserService {
                 .email(email)
                 .username(username)
                 .passwordHash(passwordEncoder.encode(rawPassword))
+                .verified(false)
+                .verificationCode(generateVerificationCode())
+                .verificationCodeExpiresAt(LocalDateTime.now().plusMinutes(verificationCodeExpirationMinutes))
                 .build();
 
         return userRepository.save(user);
+    }
+
+    @Transactional
+    public User verifyAccount(String email, String code) {
+        User user = getByEmail(email);
+
+        if (user.isVerified()) {
+            return user;
+        }
+
+        boolean codeMatches = user.getVerificationCode() != null && user.getVerificationCode().equals(code);
+        boolean notExpired = user.getVerificationCodeExpiresAt() != null
+                && user.getVerificationCodeExpiresAt().isAfter(LocalDateTime.now());
+
+        if (!codeMatches || !notExpired) {
+            throw new InvalidVerificationCodeException();
+        }
+
+        user.setVerified(true);
+        user.setVerificationCode(null);
+        user.setVerificationCodeExpiresAt(null);
+        return user;
+    }
+
+    @Transactional
+    public String regenerateVerificationCode(String email) {
+        User user = getByEmail(email);
+        String code = generateVerificationCode();
+        user.setVerificationCode(code);
+        user.setVerificationCodeExpiresAt(LocalDateTime.now().plusMinutes(verificationCodeExpirationMinutes));
+        return code;
+    }
+
+    private String generateVerificationCode() {
+        return String.format("%06d", RANDOM.nextInt(1_000_000));
     }
 
     @Transactional(readOnly = true)

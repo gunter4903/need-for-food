@@ -47,6 +47,7 @@ export default function SignupScreen({ navigation }) {
         setLoading(true);
         try {
             await register(email, username, password);
+            navigation?.navigate('VerificationCompte', { email });
         } catch (err) {
             setError(err.message || 'Impossible de créer le compte.');
         } finally {

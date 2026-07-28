@@ -37,8 +37,19 @@ export function AuthProvider({ children }) {
 
     const register = useCallback(async (email, username, password) => {
         await authApi.register(email, username, password);
-        await login(email, password);
-    }, [login]);
+    }, []);
+
+    const verifyAccount = useCallback(async (email, code) => {
+        const { token: newToken } = await authApi.verifyAccount(email, code);
+        const me = await authApi.getMe(newToken);
+        await AsyncStorage.setItem(TOKEN_KEY, newToken);
+        setToken(newToken);
+        setUser(me);
+    }, []);
+
+    const resendVerificationCode = useCallback((email) => {
+        return authApi.resendVerification(email);
+    }, []);
 
     const logout = useCallback(async () => {
         await AsyncStorage.removeItem(TOKEN_KEY);
@@ -62,7 +73,7 @@ export function AuthProvider({ children }) {
     }, [token]);
 
     return (
-        <AuthContext.Provider value={{ token, user, initializing, login, register, logout, updateProfile, deleteAccount, changePassword }}>
+        <AuthContext.Provider value={{ token, user, initializing, login, register, verifyAccount, resendVerificationCode, logout, updateProfile, deleteAccount, changePassword }}>
             {children}
         </AuthContext.Provider>
     );

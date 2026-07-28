@@ -43,10 +43,17 @@ export default function AppNavigator() {
         );
     }
 
+    const authMode = !user ? 'guest' : !user.verified ? 'unverified' : 'authenticated';
+
     return (
         <NavigationContainer>
-            <Stack.Navigator screenOptions={{ headerShown: false }}>
-                {user ? (
+            <Stack.Navigator key={authMode} screenOptions={{ headerShown: false }}>
+                {user && !user.verified ? (
+                    <>
+                        {/* Compte connecté mais non vérifié */}
+                        <Stack.Screen name="VerificationRequise" component={VerifyAccountScreen} />
+                    </>
+                ) : user ? (
                     <>
                         {/* Onglets principaux */}
                         <Stack.Screen name="Accueil" component={HomeScreen} />

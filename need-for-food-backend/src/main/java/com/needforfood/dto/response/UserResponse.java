@@ -15,4 +15,5 @@ public class UserResponse {
     private LocalDateTime createdAt;
     private String bio;
     private String avatarUrl;
+    private boolean verified;
 }

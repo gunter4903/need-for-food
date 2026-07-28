@@ -69,6 +69,13 @@ services:
       MONGO_USERNAME: ${MONGO_USERNAME:-need_for_food}
       MONGO_PASSWORD: ${MONGO_PASSWORD:-need_for_food}
       JWT_SECRET: ${JWT_SECRET:-dev-only-secret-key-change-me-please-32-bytes-minimum}
+      MAIL_HOST: ${MAIL_HOST:-localhost}
+      MAIL_PORT: ${MAIL_PORT:-1025}
+      MAIL_USERNAME: ${MAIL_USERNAME:-}
+      MAIL_PASSWORD: ${MAIL_PASSWORD:-}
+      MAIL_SMTP_AUTH: ${MAIL_SMTP_AUTH:-false}
+      MAIL_SMTP_STARTTLS: ${MAIL_SMTP_STARTTLS:-false}
+      MAIL_FROM: ${MAIL_FROM:-no-reply@needforfood.dev}
     ports:
       - "8080:8080"
     depends_on:
