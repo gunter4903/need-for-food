@@ -8,6 +8,8 @@ import com.needforfood.dto.request.RegisterRequest;
 import com.needforfood.dto.request.ShoppingListGenerateRequest;
 import com.needforfood.dto.request.ShoppingListItemCheckRequest;
 import com.needforfood.dto.request.ShoppingListItemRequest;
+import com.needforfood.repository.nosql.ShoppingListHistoryRepository;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -37,6 +39,14 @@ class ShoppingListFlowIntegrationTest {
 
     @Autowired
     private ObjectMapper objectMapper;
+
+        @Autowired
+    private ShoppingListHistoryRepository shoppingListHistoryRepository;
+
+    @AfterEach
+    void cleanUpMongo() {
+        shoppingListHistoryRepository.deleteAll();
+    }
 
     private String registerAndLogin(String emailPrefix) throws Exception {
         RegisterRequest register = new RegisterRequest();
@@ -201,5 +211,30 @@ class ShoppingListFlowIntegrationTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(generate)))
                 .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void generatingFromRecipesRecordsShoppingListHistoryEntry() throws Exception {
+        String token = registerAndLogin("history-shopper");
+
+        long recipeId = createRecipe(token, "Tarte aux pommes", ingredient("Pomme", "unité", 4f));
+
+        ShoppingListGenerateRequest generate = new ShoppingListGenerateRequest();
+        generate.setName("Liste avec historique");
+        generate.setRecipeIds(List.of(recipeId));
+
+        mockMvc.perform(post("/api/shopping-lists/generate")
+                        .header("Authorization", "Bearer " + token)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(generate)))
+                .andExpect(status().isCreated());
+
+        mockMvc.perform(get("/api/shopping-lists/history/mine")
+                        .header("Authorization", "Bearer " + token))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()").value(1))
+                .andExpect(jsonPath("$[0].recipes[0]").value(recipeId))
+                .andExpect(jsonPath("$[0].missingIngredients[0].name").value("Pomme"))
+                .andExpect(jsonPath("$[0].missingIngredients[0].quantity").value(4.0));
     }
 }

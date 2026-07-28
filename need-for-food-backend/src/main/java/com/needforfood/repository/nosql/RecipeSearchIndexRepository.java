@@ -13,4 +13,6 @@ public interface RecipeSearchIndexRepository extends MongoRepository<RecipeSearc
     List<RecipeSearchIndex> findByTypeIgnoreCase(String type);
 
     List<RecipeSearchIndex> findByDietIgnoreCase(String diet);
+
+    void deleteByRecipeId(Long recipeId);
 }

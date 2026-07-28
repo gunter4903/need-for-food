@@ -1,11 +1,13 @@
 package com.needforfood.service;
 
 import com.needforfood.exception.custom.ResourceNotFoundException;
+import com.needforfood.model.document.RecipeSearchIndex;
 import com.needforfood.model.entity.Ingredient;
 import com.needforfood.model.entity.PreparationStep;
 import com.needforfood.model.entity.Recipe;
 import com.needforfood.model.entity.RecipeIngredient;
 import com.needforfood.model.entity.User;
+import com.needforfood.repository.nosql.RecipeSearchIndexRepository;
 import com.needforfood.repository.sql.RecipeRepository;
 import com.needforfood.repository.sql.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -14,6 +16,7 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
@@ -26,6 +29,7 @@ public class RecipeService {
     private final RecipeRepository recipeRepository;
     private final IngredientService ingredientService;
     private final UserRepository userRepository;
+    private final RecipeSearchIndexRepository recipeSearchIndexRepository;
 
     @Transactional
     public Recipe createRecipe(Long userId, Recipe recipe) {
@@ -36,7 +40,9 @@ public class RecipeService {
         linkIngredients(recipe, recipe.getIngredients());
         numberSteps(recipe, recipe.getSteps());
 
-        return recipeRepository.save(recipe);
+        Recipe saved = recipeRepository.save(recipe);
+        syncSearchIndex(saved);
+        return saved;
     }
 
     @Transactional(readOnly = true)
@@ -145,6 +151,7 @@ public class RecipeService {
         numberSteps(recipe, updates.getSteps());
         recipe.getSteps().addAll(updates.getSteps());
 
+        syncSearchIndex(recipe);
         return recipe;
     }
 
@@ -153,6 +160,34 @@ public class RecipeService {
         Recipe recipe = getById(recipeId);
         assertOwner(recipe, requesterId);
         recipeRepository.delete(recipe);
+        recipeSearchIndexRepository.deleteByRecipeId(recipeId);
+    }
+
+    /**
+     * Maintient recipe_search_index (Mongo) à jour à partir de l'entité PostgreSQL (fonctionnalité
+     * 7.2.2 du dossier) — dénormalisation, pas encore consommée par une recherche réelle (voir
+     * AVANCEMENT.md).
+     */
+    private void syncSearchIndex(Recipe recipe) {
+        List<String> ingredientNames = recipe.getIngredients().stream()
+                .map(ri -> ri.getIngredient().getName())
+                .toList();
+
+        RecipeSearchIndex index = recipeSearchIndexRepository.findByRecipeId(recipe.getId())
+                .orElseGet(() -> RecipeSearchIndex.builder()
+                        .recipeId(recipe.getId())
+                        .popularityScore(0)
+                        .createdAt(LocalDateTime.now())
+                        .build());
+
+        index.setTitle(recipe.getTitle());
+        index.setType(recipe.getType());
+        index.setDiet(recipe.getDiet());
+        index.setPreparationTime(recipe.getPreparationTime());
+        index.setIngredients(ingredientNames);
+        index.setUpdatedAt(LocalDateTime.now());
+
+        recipeSearchIndexRepository.save(index);
     }
 
     private void linkIngredients(Recipe recipe, List<RecipeIngredient> ingredients) {

@@ -1,11 +1,14 @@
 package com.needforfood.service;
 
 import com.needforfood.exception.custom.ResourceNotFoundException;
+import com.needforfood.model.document.IngredientQuantity;
+import com.needforfood.model.document.ShoppingListHistory;
 import com.needforfood.model.entity.Ingredient;
 import com.needforfood.model.entity.Recipe;
 import com.needforfood.model.entity.ShoppingList;
 import com.needforfood.model.entity.ShoppingListItem;
 import com.needforfood.model.entity.User;
+import com.needforfood.repository.nosql.ShoppingListHistoryRepository;
 import com.needforfood.repository.sql.RecipeRepository;
 import com.needforfood.repository.sql.ShoppingListRepository;
 import com.needforfood.repository.sql.UserRepository;
@@ -14,6 +17,9 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
+import java.util.Collection;
+import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -26,6 +32,7 @@ public class ShoppingListService {
     private final UserRepository userRepository;
     private final RecipeRepository recipeRepository;
     private final IngredientService ingredientService;
+    private final ShoppingListHistoryRepository shoppingListHistoryRepository;
 
     @Transactional
     public ShoppingList createList(Long userId, String name) {
@@ -68,7 +75,32 @@ public class ShoppingListService {
             list.getItems().add(item);
         });
 
-        return shoppingListRepository.save(list);
+        ShoppingList saved = shoppingListRepository.save(list);
+        recordHistory(userId, recipeIds, mergedByIngredientId.values());
+        return saved;
+    }
+
+    private void recordHistory(Long userId, List<Long> recipeIds, Collection<ShoppingListItem> items) {
+        List<IngredientQuantity> missingIngredients = items.stream()
+                .map(item -> IngredientQuantity.builder()
+                        .name(item.getIngredient().getName())
+                        .quantity(item.getQuantity())
+                        .unit(item.getIngredient().getUnit())
+                        .build())
+                .toList();
+
+        shoppingListHistoryRepository.save(ShoppingListHistory.builder()
+                .userId(userId)
+                .recipes(recipeIds)
+                .missingIngredients(missingIngredients)
+                .generatedAt(LocalDateTime.now())
+                .build());
+    }
+
+    public List<ShoppingListHistory> getHistory(Long userId) {
+        return shoppingListHistoryRepository.findByUserId(userId).stream()
+                .sorted(Comparator.comparing(ShoppingListHistory::getGeneratedAt).reversed())
+                .toList();
     }
 
     @Transactional(readOnly = true)

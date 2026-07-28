@@ -4,7 +4,9 @@ import com.needforfood.dto.request.ShoppingListCreateRequest;
 import com.needforfood.dto.request.ShoppingListGenerateRequest;
 import com.needforfood.dto.request.ShoppingListItemCheckRequest;
 import com.needforfood.dto.request.ShoppingListItemRequest;
+import com.needforfood.dto.response.ShoppingListHistoryResponse;
 import com.needforfood.dto.response.ShoppingListResponse;
+import com.needforfood.mapper.ShoppingListHistoryMapper;
 import com.needforfood.mapper.ShoppingListMapper;
 import com.needforfood.model.entity.ShoppingList;
 import com.needforfood.service.ShoppingListService;
@@ -49,6 +51,11 @@ public class ShoppingListController {
     @GetMapping("/mine")
     public List<ShoppingListResponse> getMine(@AuthenticationPrincipal Long userId) {
         return shoppingListService.getByUser(userId).stream().map(ShoppingListMapper::toResponse).toList();
+    }
+
+    @GetMapping("/history/mine")
+    public List<ShoppingListHistoryResponse> getHistory(@AuthenticationPrincipal Long userId) {
+        return shoppingListService.getHistory(userId).stream().map(ShoppingListHistoryMapper::toResponse).toList();
     }
 
     @GetMapping("/{id}")

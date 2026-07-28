@@ -7,6 +7,9 @@ import com.needforfood.dto.request.RecipeIngredientRequest;
 import com.needforfood.dto.request.RecipeRequest;
 import com.needforfood.dto.request.RegisterRequest;
 import com.needforfood.dto.request.UserPreferenceRequest;
+import com.needforfood.model.document.RecipeSearchIndex;
+import com.needforfood.repository.nosql.RecipeSearchIndexRepository;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -37,6 +40,14 @@ class RecipeFlowIntegrationTest {
 
     @Autowired
     private ObjectMapper objectMapper;
+
+    @Autowired
+    private RecipeSearchIndexRepository recipeSearchIndexRepository;
+
+    @AfterEach
+    void cleanUpMongo() {
+        recipeSearchIndexRepository.deleteAll();
+    }
 
     private String registerAndLogin(String emailPrefix) throws Exception {
         RegisterRequest register = new RegisterRequest();
@@ -332,5 +343,47 @@ class RecipeFlowIntegrationTest {
         assertThat(veganIndex).isGreaterThanOrEqualTo(0);
         assertThat(plainIndex).isGreaterThanOrEqualTo(0);
         assertThat(veganIndex).isLessThan(plainIndex);
+    }
+
+    @Test
+    void creatingRecipeSyncsRecipeSearchIndex() throws Exception {
+        String token = registerAndLogin("search-index-create");
+        long recipeId = createRecipe(token, samplePestoRecipe());
+
+        RecipeSearchIndex index = recipeSearchIndexRepository.findByRecipeId(recipeId).orElseThrow();
+        assertThat(index.getTitle()).isEqualTo("Pâtes au pesto");
+        assertThat(index.getType()).isEqualTo("plat");
+        assertThat(index.getDiet()).isEqualTo("vegetarien");
+        assertThat(index.getIngredients()).contains("Basilic");
+    }
+
+    @Test
+    void updatingRecipeSyncsRecipeSearchIndex() throws Exception {
+        String token = registerAndLogin("search-index-update");
+        long recipeId = createRecipe(token, samplePestoRecipe());
+
+        RecipeRequest updateBody = samplePestoRecipe();
+        updateBody.setTitle("Pâtes au pesto (v2)");
+
+        mockMvc.perform(put("/api/recipes/" + recipeId)
+                        .header("Authorization", "Bearer " + token)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(updateBody)))
+                .andExpect(status().isOk());
+
+        RecipeSearchIndex index = recipeSearchIndexRepository.findByRecipeId(recipeId).orElseThrow();
+        assertThat(index.getTitle()).isEqualTo("Pâtes au pesto (v2)");
+    }
+
+    @Test
+    void deletingRecipeRemovesItFromRecipeSearchIndex() throws Exception {
+        String token = registerAndLogin("search-index-delete");
+        long recipeId = createRecipe(token, samplePestoRecipe());
+
+        mockMvc.perform(delete("/api/recipes/" + recipeId)
+                        .header("Authorization", "Bearer " + token))
+                .andExpect(status().isNoContent());
+
+        assertThat(recipeSearchIndexRepository.findByRecipeId(recipeId)).isEmpty();
     }
 }
