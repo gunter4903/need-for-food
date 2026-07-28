@@ -21,6 +21,7 @@ import NewsRow from '../../components/home/NewsRow';
 import BottomNav from '../../components/common/BottomNav';
 import { useAuth } from '../../context/AuthContext';
 import * as recipeApi from '../../api/recipeApi';
+import { filterByTitle, filterByCategory } from '../../utils/recipeFilters';
 
 const CATEGORIES = [
     { key: 'populaire', label: 'Populaire', emoji: '🔥' },
@@ -97,17 +98,7 @@ export default function HomeScreen({ navigation }) {
         }, [token])
     );
 
-    const filteredSuggestions = suggestions
-        .filter((recipe) => recipe.title.toLowerCase().includes(search.toLowerCase()))
-        .filter((recipe) => {
-            if (activeCategory === 'vegetarien') {
-                return (recipe.diet || '').toLowerCase() === 'végétarien';
-            }
-            if (activeCategory === 'rapide') {
-                return recipe.preparationTime != null && recipe.preparationTime <= 20;
-            }
-            return true;
-        });
+    const filteredSuggestions = filterByCategory(filterByTitle(suggestions, search), activeCategory);
 
     const [featuredRecipe, ...otherSuggestions] = filteredSuggestions;
 

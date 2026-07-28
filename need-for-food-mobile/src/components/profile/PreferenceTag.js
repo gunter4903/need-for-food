@@ -9,7 +9,11 @@ export default function PreferenceTag({ label, icon, onRemove }) {
             {icon ? <Text style={styles.icon}>{icon}</Text> : null}
             <Text style={styles.label}>{label}</Text>
             {onRemove ? (
-                <TouchableOpacity onPress={onRemove} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
+                <TouchableOpacity
+                    testID="preference-tag-remove"
+                    onPress={onRemove}
+                    hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+                >
                     <Icon name="x" size={12} color={colors.textOnDark} style={styles.removeIcon} />
                 </TouchableOpacity>
             ) : null}

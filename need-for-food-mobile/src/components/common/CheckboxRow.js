@@ -29,7 +29,11 @@ export default function CheckboxRow({
             </TouchableOpacity>
 
             {onDelete ? (
-                <TouchableOpacity onPress={onDelete} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
+                <TouchableOpacity
+                    testID="checkbox-row-delete"
+                    onPress={onDelete}
+                    hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+                >
                     <Icon name="x" size={18} color={colors.textSecondary} />
                 </TouchableOpacity>
             ) : tag ? (
