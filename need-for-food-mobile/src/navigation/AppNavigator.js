@@ -30,6 +30,10 @@ import ShoppingListsOverviewScreen from '../screens/shoppingList/ShopingListsOve
 import ShoppingListScreen from '../screens/shoppingList/ShoppingListScreen';
 import CreateShoppingListScreen from '../screens/shoppingList/CreateShoppingListScreen';
 
+// Amis
+import FriendsScreen from '../screens/friends/FriendsScreen';
+import FriendProfileScreen from '../screens/friends/FriendProfileScreen';
+
 const Stack = createNativeStackNavigator();
 
 export default function AppNavigator() {
@@ -74,6 +78,10 @@ export default function AppNavigator() {
                         {/* Courses */}
                         <Stack.Screen name="ListeCourses" component={ShoppingListScreen} />
                         <Stack.Screen name="CreerListeCourses" component={CreateShoppingListScreen} />
+
+                        {/* Amis */}
+                        <Stack.Screen name="Amis" component={FriendsScreen} />
+                        <Stack.Screen name="ProfilAmi" component={FriendProfileScreen} />
                     </>
                 ) : (
                     <>

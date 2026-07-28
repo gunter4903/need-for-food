@@ -12,15 +12,12 @@ public interface RecipeRepository extends JpaRepository<Recipe, Long> {
 
     List<Recipe> findByUserId(Long userId);
 
-    // Charge en une requête les ingrédients (et leur Ingredient associé) pour éviter le
-    // LazyInitializationException lors du mappage vers RecipeResponse dans le contrôleur
-    // (la session Hibernate est fermée à ce moment-là, spring.jpa.open-in-view=false).
-    @Query("SELECT DISTINCT r FROM Recipe r LEFT JOIN FETCH r.ingredients ri LEFT JOIN FETCH ri.ingredient WHERE r.id = :id")
+    @Query("SELECT DISTINCT r FROM Recipe r LEFT JOIN FETCH r.ingredients ri LEFT JOIN FETCH ri.ingredient LEFT JOIN FETCH r.user WHERE r.id = :id")
     Optional<Recipe> findDetailedById(@Param("id") Long id);
 
-    @Query("SELECT DISTINCT r FROM Recipe r LEFT JOIN FETCH r.ingredients ri LEFT JOIN FETCH ri.ingredient WHERE r.user.id = :userId")
+    @Query("SELECT DISTINCT r FROM Recipe r LEFT JOIN FETCH r.ingredients ri LEFT JOIN FETCH ri.ingredient LEFT JOIN FETCH r.user WHERE r.user.id = :userId")
     List<Recipe> findDetailedByUserId(@Param("userId") Long userId);
 
-    @Query("SELECT DISTINCT r FROM Recipe r LEFT JOIN FETCH r.ingredients ri LEFT JOIN FETCH ri.ingredient")
+    @Query("SELECT DISTINCT r FROM Recipe r LEFT JOIN FETCH r.ingredients ri LEFT JOIN FETCH ri.ingredient LEFT JOIN FETCH r.user")
     List<Recipe> findAllDetailed();
 }

@@ -42,8 +42,8 @@ public class RecipeController {
     }
 
     @GetMapping
-    public List<RecipeResponse> getAll() {
-        return recipeService.getAll().stream().map(RecipeMapper::toResponse).toList();
+    public List<RecipeResponse> getAll(@AuthenticationPrincipal Long userId) {
+        return recipeService.getAll(userId).stream().map(RecipeMapper::toResponse).toList();
     }
 
     @GetMapping("/search")
@@ -82,13 +82,18 @@ public class RecipeController {
     }
 
     @GetMapping("/{id}")
-    public RecipeResponse getById(@PathVariable Long id) {
-        return RecipeMapper.toResponse(recipeService.getById(id));
+    public RecipeResponse getById(@PathVariable Long id, @AuthenticationPrincipal Long userId) {
+        return RecipeMapper.toResponse(recipeService.getById(id, userId));
     }
 
     @GetMapping("/mine")
     public List<RecipeResponse> getMine(@AuthenticationPrincipal Long userId) {
         return recipeService.getByUser(userId).stream().map(RecipeMapper::toResponse).toList();
+    }
+
+    @GetMapping("/user/{userId}")
+    public List<RecipeResponse> getByUser(@PathVariable Long userId, @AuthenticationPrincipal Long requesterId) {
+        return recipeService.getByUser(userId, requesterId).stream().map(RecipeMapper::toResponse).toList();
     }
 
     @PutMapping("/{id}")

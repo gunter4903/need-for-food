@@ -17,8 +17,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -30,6 +33,7 @@ public class RecipeService {
     private final IngredientService ingredientService;
     private final UserRepository userRepository;
     private final RecipeSearchIndexRepository recipeSearchIndexRepository;
+    private final FriendshipService friendshipService;
 
     @Transactional
     public Recipe createRecipe(Long userId, Recipe recipe) {
@@ -49,9 +53,17 @@ public class RecipeService {
     public Recipe getById(Long id) {
         Recipe recipe = recipeRepository.findDetailedById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Recette introuvable: " + id));
-        // ingredients est chargé via JOIN FETCH ; steps est initialisé séparément car
-        // Hibernate ne permet pas de JOIN FETCH deux collections (bags) à la fois.
         Hibernate.initialize(recipe.getSteps());
+        return recipe;
+    }
+
+    @Transactional(readOnly = true)
+    public Recipe getById(Long id, Long requesterId) {
+        Recipe recipe = getById(id);
+        if (!recipe.getUser().getId().equals(requesterId)
+                && !friendshipService.areFriends(requesterId, recipe.getUser().getId())) {
+            throw new AccessDeniedException("Vous ne pouvez consulter que vos recettes ou celles de vos amis");
+        }
         return recipe;
     }
 
@@ -63,10 +75,67 @@ public class RecipeService {
     }
 
     @Transactional(readOnly = true)
-    public List<Recipe> getAll() {
-        List<Recipe> recipes = recipeRepository.findAllDetailed();
+    public List<Recipe> getByUser(Long userId, Long requesterId) {
+        if (!userId.equals(requesterId) && !friendshipService.areFriends(requesterId, userId)) {
+            throw new AccessDeniedException("Vous ne pouvez consulter que vos recettes ou celles de vos amis");
+        }
+        return getByUser(userId);
+    }
+
+    @Transactional(readOnly = true)
+    public List<Recipe> getAll(Long userId) {
+        Set<Long> visibleUserIds = friendshipService.getFriendIds(userId);
+        visibleUserIds.add(userId);
+
+        List<Recipe> recipes = recipeRepository.findAllDetailed().stream()
+                .filter(recipe -> visibleUserIds.contains(recipe.getUser().getId()))
+                .toList();
         recipes.forEach(recipe -> Hibernate.initialize(recipe.getSteps()));
-        return recipes;
+        return deduplicate(recipes, userId);
+    }
+
+    private List<Recipe> deduplicate(List<Recipe> recipes, Long userId) {
+        Map<String, Recipe> bestByFingerprint = new LinkedHashMap<>();
+
+        for (Recipe recipe : recipes) {
+            String fingerprint = fingerprint(recipe);
+            Recipe current = bestByFingerprint.get(fingerprint);
+
+            if (current == null
+                    || (!current.getUser().getId().equals(userId) && recipe.getUser().getId().equals(userId))
+                    || (!current.getUser().getId().equals(userId) && recipe.getId() < current.getId())) {
+                bestByFingerprint.put(fingerprint, recipe);
+            }
+        }
+
+        return new ArrayList<>(bestByFingerprint.values());
+    }
+
+    private String fingerprint(Recipe recipe) {
+        String ingredientsPart = recipe.getIngredients().stream()
+                .map(ri -> normalize(ri.getIngredient().getName()) + ":" + ri.getQuantity()
+                        + ":" + normalize(ri.getIngredient().getUnit()))
+                .sorted()
+                .collect(Collectors.joining("|"));
+
+        String stepsPart = recipe.getSteps().stream()
+                .sorted(Comparator.comparing(PreparationStep::getStepNumber))
+                .map(step -> normalize(step.getDescription()))
+                .collect(Collectors.joining("|"));
+
+        return String.join("::",
+                normalize(recipe.getTitle()),
+                normalize(recipe.getDescription()),
+                normalize(recipe.getType()),
+                normalize(recipe.getDiet()),
+                normalize(recipe.getDifficulty()),
+                String.valueOf(recipe.getPreparationTime()),
+                ingredientsPart,
+                stepsPart);
+    }
+
+    private String normalize(String value) {
+        return value == null ? "" : value.trim().toLowerCase();
     }
 
     @Transactional(readOnly = true)
@@ -76,7 +145,7 @@ public class RecipeService {
                 .map(String::toLowerCase)
                 .collect(Collectors.toSet());
 
-        return getByUser(userId).stream()
+        return getAll(userId).stream()
                 .filter(recipe -> respectsConstraints(recipe, excludedIngredients, maxPreparationTime))
                 .map(recipe -> {
                     int total = recipe.getIngredients().size();
@@ -93,7 +162,7 @@ public class RecipeService {
     @Transactional(readOnly = true)
     public List<Recipe> getSuggestions(Long userId, List<String> excludedIngredients, Integer maxPreparationTime,
                                         List<String> preferredDiets, List<String> preferredTypes) {
-        List<Recipe> recipes = getByUser(userId).stream()
+        List<Recipe> recipes = getAll(userId).stream()
                 .filter(recipe -> respectsConstraints(recipe, excludedIngredients, maxPreparationTime))
                 .collect(Collectors.toList());
 
@@ -137,10 +206,6 @@ public class RecipeService {
         recipe.setImageUrl(updates.getImageUrl());
         recipe.setPreparationTime(updates.getPreparationTime());
 
-        // On vide puis on force l'exécution des DELETE (flush) avant de recréer les lignes :
-        // dans un même flush, Hibernate exécute les INSERT/UPDATE avant les DELETE, ce qui viole
-        // la contrainte d'unicité (recipe_id, step_number) et déclenche le garde-fou "deleted
-        // object would be re-saved by cascade" sur les RecipeIngredient (clé composite @MapsId).
         recipe.getIngredients().clear();
         recipe.getSteps().clear();
         recipeRepository.flush();
@@ -163,11 +228,6 @@ public class RecipeService {
         recipeSearchIndexRepository.deleteByRecipeId(recipeId);
     }
 
-    /**
-     * Maintient recipe_search_index (Mongo) à jour à partir de l'entité PostgreSQL (fonctionnalité
-     * 7.2.2 du dossier) — dénormalisation, pas encore consommée par une recherche réelle (voir
-     * AVANCEMENT.md).
-     */
     private void syncSearchIndex(Recipe recipe) {
         List<String> ingredientNames = recipe.getIngredients().stream()
                 .map(ri -> ri.getIngredient().getName())

@@ -2,8 +2,12 @@ package com.needforfood.controller;
 
 import com.needforfood.dto.request.ChangePasswordRequest;
 import com.needforfood.dto.request.UpdateProfileRequest;
+import com.needforfood.dto.response.PublicProfileResponse;
 import com.needforfood.dto.response.UserResponse;
+import com.needforfood.dto.response.UserSearchResultResponse;
+import com.needforfood.mapper.FriendshipMapper;
 import com.needforfood.mapper.UserMapper;
+import com.needforfood.service.FriendshipService;
 import com.needforfood.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -11,11 +15,15 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/users")
@@ -23,6 +31,14 @@ import org.springframework.web.bind.annotation.RestController;
 public class UserController {
 
     private final UserService userService;
+    private final FriendshipService friendshipService;
+
+    @GetMapping("/search")
+    public List<UserSearchResultResponse> search(@AuthenticationPrincipal Long userId, @RequestParam String q) {
+        return userService.search(userId, q).stream()
+                .map(user -> FriendshipMapper.toSearchResult(user, friendshipService.getStatusBetween(userId, user.getId())))
+                .toList();
+    }
 
     @GetMapping("/me")
     public UserResponse me(@AuthenticationPrincipal Long userId) {
@@ -45,5 +61,10 @@ public class UserController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void changePassword(@AuthenticationPrincipal Long userId, @Valid @RequestBody ChangePasswordRequest request) {
         userService.changePassword(userId, request.getCurrentPassword(), request.getNewPassword());
+    }
+
+    @GetMapping("/{id}")
+    public PublicProfileResponse getPublicProfile(@PathVariable Long id) {
+        return UserMapper.toPublicProfile(userService.getById(id));
     }
 }

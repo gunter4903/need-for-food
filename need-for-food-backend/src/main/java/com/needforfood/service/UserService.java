@@ -15,6 +15,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -127,6 +131,21 @@ public class UserService {
         }
 
         user.setPasswordHash(passwordEncoder.encode(newPassword));
+    }
+
+    @Transactional(readOnly = true)
+    public List<User> search(Long requesterId, String query) {
+        Map<Long, User> results = new LinkedHashMap<>();
+        userRepository.findTop20ByUsernameContainingIgnoreCaseAndIdNot(query, requesterId)
+                .forEach(user -> results.put(user.getId(), user));
+
+        if (query.contains("@")) {
+            userRepository.findByEmail(query)
+                    .filter(user -> !user.getId().equals(requesterId))
+                    .ifPresent(user -> results.put(user.getId(), user));
+        }
+
+        return new ArrayList<>(results.values());
     }
 
     @Transactional

@@ -5,9 +5,10 @@ import Icon from 'react-native-vector-icons/Feather';
 import { colors, spacing } from '../../constants/theme';
 
 const TABS = [
-    { key: 'Accueil', icon: 'home', route: 'Accueil' },
-    { key: 'Recettes', icon: 'search', route: 'ChercherRecettes' },
     { key: 'Courses', icon: 'shopping-cart', route: 'MesListesCourses' },
+    { key: 'Recettes', icon: 'search', route: 'ChercherRecettes' },
+    { key: 'Accueil', icon: 'home', route: 'Accueil' },
+    { key: 'Amis', icon: 'users', route: 'Amis' },
     { key: 'Profil', icon: 'user', route: 'Profil' },
 ];
 
@@ -20,6 +21,7 @@ const ROUTE_TO_TAB = {
     MesListesCourses: 'Courses',
     ListeCourses: 'Courses',
     CreerListeCourses: 'Courses',
+    Amis: 'Amis',
     Profil: 'Profil',
     ModifierProfil: 'Profil',
 };

@@ -226,18 +226,49 @@ class RecipeFlowIntegrationTest {
     }
 
     @Test
-    void listAllRecipesIncludesRecipesFromAnyUser() throws Exception {
-        String ownerToken = registerAndLogin("global-list-owner");
-        String otherToken = registerAndLogin("global-list-reader");
+    void listAndDetailOnlyShowOwnAndFriendsRecipesNotStrangers() throws Exception {
+        String ownerToken = registerAndLogin("visibility-owner");
+        String friendToken = registerAndLogin("visibility-friend");
+        String strangerToken = registerAndLogin("visibility-stranger");
 
-        long recipeId = createRecipe(ownerToken, samplePestoRecipe());
+        String createResponse = mockMvc.perform(post("/api/recipes")
+                        .header("Authorization", "Bearer " + ownerToken)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(samplePestoRecipe())))
+                .andExpect(status().isCreated())
+                .andReturn().getResponse().getContentAsString();
+        long recipeId = objectMapper.readTree(createResponse).get("id").asLong();
+        long ownerId = objectMapper.readTree(createResponse).get("userId").asLong();
 
-        // /api/recipes (sans /mine ni /search) est volontairement global : consulté avec le
-        // token d'un AUTRE utilisateur, il doit quand même remonter la recette.
         mockMvc.perform(get("/api/recipes")
-                        .header("Authorization", "Bearer " + otherToken))
+                        .header("Authorization", "Bearer " + strangerToken))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[?(@.id == " + recipeId + ")]").isEmpty());
+
+        mockMvc.perform(get("/api/recipes/" + recipeId)
+                        .header("Authorization", "Bearer " + strangerToken))
+                .andExpect(status().isForbidden());
+
+        String requestResponse = mockMvc.perform(post("/api/friends/requests")
+                        .header("Authorization", "Bearer " + friendToken)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"userId\":" + ownerId + "}"))
+                .andExpect(status().isCreated())
+                .andReturn().getResponse().getContentAsString();
+        long friendshipId = objectMapper.readTree(requestResponse).get("id").asLong();
+
+        mockMvc.perform(put("/api/friends/requests/" + friendshipId + "/accept")
+                        .header("Authorization", "Bearer " + ownerToken))
+                .andExpect(status().isOk());
+
+        mockMvc.perform(get("/api/recipes")
+                        .header("Authorization", "Bearer " + friendToken))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[?(@.id == " + recipeId + ")]").isNotEmpty());
+
+        mockMvc.perform(get("/api/recipes/" + recipeId)
+                        .header("Authorization", "Bearer " + friendToken))
+                .andExpect(status().isOk());
     }
 
     @Test
@@ -261,6 +292,168 @@ class RecipeFlowIntegrationTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[?(@.recipe.id == " + recipe1Id + ")]").isNotEmpty())
                 .andExpect(jsonPath("$[?(@.recipe.id == " + recipe2Id + ")]").isEmpty());
+    }
+
+    @Test
+    void searchAndSuggestionsIncludeFriendsRecipesOnceAccepted() throws Exception {
+        String ownerToken = registerAndLogin("search-friend-owner");
+        String friendToken = registerAndLogin("search-friend-friend");
+
+        RecipeRequest mangoRecipe = samplePestoRecipe();
+        mangoRecipe.setTitle("Salade de mangue");
+        mangoRecipe.setIngredients(List.of(ingredient("Mangue", "g", 200f)));
+        String createResponse = mockMvc.perform(post("/api/recipes")
+                        .header("Authorization", "Bearer " + ownerToken)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(mangoRecipe)))
+                .andExpect(status().isCreated())
+                .andReturn().getResponse().getContentAsString();
+        long recipeId = objectMapper.readTree(createResponse).get("id").asLong();
+        long ownerId = objectMapper.readTree(createResponse).get("userId").asLong();
+
+        // Avant l'amitié : ni dans /search ni dans /suggestions.
+        mockMvc.perform(get("/api/recipes/search")
+                        .header("Authorization", "Bearer " + friendToken)
+                        .param("ingredients", "Mangue"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isEmpty());
+        mockMvc.perform(get("/api/recipes/suggestions")
+                        .header("Authorization", "Bearer " + friendToken))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[?(@.id == " + recipeId + ")]").isEmpty());
+
+        String requestResponse = mockMvc.perform(post("/api/friends/requests")
+                        .header("Authorization", "Bearer " + friendToken)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"userId\":" + ownerId + "}"))
+                .andExpect(status().isCreated())
+                .andReturn().getResponse().getContentAsString();
+        long friendshipId = objectMapper.readTree(requestResponse).get("id").asLong();
+        mockMvc.perform(put("/api/friends/requests/" + friendshipId + "/accept")
+                        .header("Authorization", "Bearer " + ownerToken))
+                .andExpect(status().isOk());
+
+        // Après l'amitié : présente dans les deux, avec le nom du créateur.
+        mockMvc.perform(get("/api/recipes/search")
+                        .header("Authorization", "Bearer " + friendToken)
+                        .param("ingredients", "Mangue"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].recipe.id").value(recipeId))
+                .andExpect(jsonPath("$[0].recipe.username").value("search-friend-owner"));
+        mockMvc.perform(get("/api/recipes/suggestions")
+                        .header("Authorization", "Bearer " + friendToken))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[?(@.id == " + recipeId + ")]").isNotEmpty());
+    }
+
+    @Test
+    void listDeduplicatesIdenticalRecipesPreferringViewersOwnCopy() throws Exception {
+        String ownerToken = registerAndLogin("dedup-owner");
+        String friendToken = registerAndLogin("dedup-friend");
+
+        String ownerCreateResponse = mockMvc.perform(post("/api/recipes")
+                        .header("Authorization", "Bearer " + ownerToken)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(samplePestoRecipe())))
+                .andExpect(status().isCreated())
+                .andReturn().getResponse().getContentAsString();
+        long ownerRecipeId = objectMapper.readTree(ownerCreateResponse).get("id").asLong();
+        long ownerId = objectMapper.readTree(ownerCreateResponse).get("userId").asLong();
+
+        String friendCreateResponse = mockMvc.perform(post("/api/recipes")
+                        .header("Authorization", "Bearer " + friendToken)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(samplePestoRecipe())))
+                .andExpect(status().isCreated())
+                .andReturn().getResponse().getContentAsString();
+        long friendRecipeId = objectMapper.readTree(friendCreateResponse).get("id").asLong();
+        long friendId = objectMapper.readTree(friendCreateResponse).get("userId").asLong();
+
+        String requestResponse = mockMvc.perform(post("/api/friends/requests")
+                        .header("Authorization", "Bearer " + friendToken)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"userId\":" + ownerId + "}"))
+                .andExpect(status().isCreated())
+                .andReturn().getResponse().getContentAsString();
+        long friendshipId = objectMapper.readTree(requestResponse).get("id").asLong();
+
+        mockMvc.perform(put("/api/friends/requests/" + friendshipId + "/accept")
+                        .header("Authorization", "Bearer " + ownerToken))
+                .andExpect(status().isOk());
+
+        // Chaque compte possède aussi une recette de bienvenue auto-générée, strictement
+        // identique pour tous les utilisateurs : elle doit fusionner de la même façon que la
+        // recette de pesto ci-dessus. Dans les deux cas, le viewer ne doit voir QUE sa propre
+        // copie, jamais celle de son ami avec l'id/userId de ce dernier.
+        String ownerList = mockMvc.perform(get("/api/recipes")
+                        .header("Authorization", "Bearer " + ownerToken))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[?(@.id == " + ownerRecipeId + ")]").isNotEmpty())
+                .andExpect(jsonPath("$[?(@.id == " + friendRecipeId + ")]").isEmpty())
+                .andReturn().getResponse().getContentAsString();
+        JsonNode ownerResults = objectMapper.readTree(ownerList);
+        for (JsonNode recipe : ownerResults) {
+            assertThat(recipe.get("userId").asLong()).isEqualTo(ownerId);
+        }
+
+        String friendList = mockMvc.perform(get("/api/recipes")
+                        .header("Authorization", "Bearer " + friendToken))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[?(@.id == " + friendRecipeId + ")]").isNotEmpty())
+                .andExpect(jsonPath("$[?(@.id == " + ownerRecipeId + ")]").isEmpty())
+                .andReturn().getResponse().getContentAsString();
+        JsonNode friendResults = objectMapper.readTree(friendList);
+        for (JsonNode recipe : friendResults) {
+            assertThat(recipe.get("userId").asLong()).isEqualTo(friendId);
+        }
+    }
+
+    @Test
+    void getByUserReturnsFullListEvenWhenIdenticalToViewersOwnRecipe() throws Exception {
+        String ownerToken = registerAndLogin("byuser-owner");
+        String friendToken = registerAndLogin("byuser-friend");
+        String strangerToken = registerAndLogin("byuser-stranger");
+
+        String ownerCreateResponse = mockMvc.perform(post("/api/recipes")
+                        .header("Authorization", "Bearer " + ownerToken)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(samplePestoRecipe())))
+                .andExpect(status().isCreated())
+                .andReturn().getResponse().getContentAsString();
+        long ownerRecipeId = objectMapper.readTree(ownerCreateResponse).get("id").asLong();
+        long ownerId = objectMapper.readTree(ownerCreateResponse).get("userId").asLong();
+
+        // Le viewer a lui aussi une copie strictement identique : sur GET /api/recipes (getAll),
+        // ceci fusionnerait les deux (voir listDeduplicatesIdenticalRecipesPreferringViewersOwnCopy).
+        // GET /api/recipes/user/{id} ne doit PAS appliquer cette déduplication : on demande
+        // explicitement la liste de CETTE personne, elle doit rester complète.
+        createRecipe(friendToken, samplePestoRecipe());
+
+        String requestResponse = mockMvc.perform(post("/api/friends/requests")
+                        .header("Authorization", "Bearer " + friendToken)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"userId\":" + ownerId + "}"))
+                .andExpect(status().isCreated())
+                .andReturn().getResponse().getContentAsString();
+        long friendshipId = objectMapper.readTree(requestResponse).get("id").asLong();
+        mockMvc.perform(put("/api/friends/requests/" + friendshipId + "/accept")
+                        .header("Authorization", "Bearer " + ownerToken))
+                .andExpect(status().isOk());
+
+        mockMvc.perform(get("/api/recipes/user/" + ownerId)
+                        .header("Authorization", "Bearer " + friendToken))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[?(@.id == " + ownerRecipeId + ")]").isNotEmpty())
+                .andExpect(jsonPath("$[?(@.userId == " + ownerId + ")]").isNotEmpty());
+
+        mockMvc.perform(get("/api/recipes/user/" + ownerId)
+                        .header("Authorization", "Bearer " + ownerToken))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[?(@.id == " + ownerRecipeId + ")]").isNotEmpty());
+
+        mockMvc.perform(get("/api/recipes/user/" + ownerId)
+                        .header("Authorization", "Bearer " + strangerToken))
+                .andExpect(status().isForbidden());
     }
 
     @Test

@@ -182,6 +182,18 @@ export default function RecipeDetailScreen({ route, navigation }) {
                     ) : null}
                     <Text style={styles.title}>{recipe.title}</Text>
 
+                    {recipe.username ? (
+                        <View style={styles.creatorRow}>
+                            <Image
+                                source={recipe.userAvatarUrl ? { uri: recipe.userAvatarUrl } : images.avatar}
+                                style={styles.creatorAvatar}
+                            />
+                            <Text style={styles.creatorText}>
+                                Créé par {recipe.userId === user?.id ? 'vous' : recipe.username}
+                            </Text>
+                        </View>
+                    ) : null}
+
                     <View style={styles.statsCard}>
                         <StatBox
                             icon="clock"
@@ -378,7 +390,22 @@ const styles = StyleSheet.create({
     title: {
         ...typography.h1,
         fontSize: 26,
+        marginBottom: spacing.xs,
+    },
+    creatorRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
         marginBottom: spacing.md,
+    },
+    creatorAvatar: {
+        width: 22,
+        height: 22,
+        borderRadius: 11,
+        marginRight: spacing.xs,
+    },
+    creatorText: {
+        fontSize: 13,
+        color: colors.textSecondary,
     },
     statsCard: {
         flexDirection: 'row',

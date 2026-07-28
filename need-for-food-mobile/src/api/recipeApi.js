@@ -8,6 +8,10 @@ export function getMine(token) {
     return apiFetch('/recipes/mine', { token });
 }
 
+export function getByUser(token, userId) {
+    return apiFetch(`/recipes/user/${userId}`, { token });
+}
+
 export function getById(token, id) {
     return apiFetch(`/recipes/${id}`, { token });
 }

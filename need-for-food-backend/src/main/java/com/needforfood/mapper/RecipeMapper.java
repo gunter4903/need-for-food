@@ -20,9 +20,6 @@ public final class RecipeMapper {
     }
 
     public static Recipe toEntity(RecipeRequest request) {
-        // Listes volontairement mutables (pas Stream.toList()) : Hibernate peut adopter
-        // directement la collection fournie comme backing store de la PersistentBag, et une
-        // liste immuable ferait échouer un futur clear()/add() (ex. RecipeService#updateRecipe).
         List<RecipeIngredient> ingredients = new ArrayList<>(request.getIngredients().stream()
                 .map(ri -> RecipeIngredient.builder()
                         .ingredient(Ingredient.builder()
@@ -75,6 +72,8 @@ public final class RecipeMapper {
                 recipe.getPreparationTime(),
                 recipe.getCreatedAt(),
                 recipe.getUser().getId(),
+                recipe.getUser().getUsername(),
+                recipe.getUser().getAvatarUrl(),
                 ingredients,
                 steps);
     }

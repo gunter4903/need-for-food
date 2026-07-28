@@ -1,6 +1,7 @@
 package com.needforfood.exception;
 
 import com.needforfood.exception.custom.DuplicateEmailException;
+import com.needforfood.exception.custom.InvalidFriendRequestException;
 import com.needforfood.exception.custom.InvalidPasswordException;
 import com.needforfood.exception.custom.InvalidVerificationCodeException;
 import com.needforfood.exception.custom.ResourceNotFoundException;
@@ -39,6 +40,11 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(InvalidVerificationCodeException.class)
     public ResponseEntity<ErrorResponse> handleInvalidVerificationCode(InvalidVerificationCodeException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ErrorResponse(ex.getMessage()));
+    }
+
+    @ExceptionHandler(InvalidFriendRequestException.class)
+    public ResponseEntity<ErrorResponse> handleInvalidFriendRequest(InvalidFriendRequestException ex) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ErrorResponse(ex.getMessage()));
     }
 
