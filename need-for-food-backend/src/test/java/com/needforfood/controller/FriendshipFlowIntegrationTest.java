@@ -239,6 +239,26 @@ class FriendshipFlowIntegrationTest {
     }
 
     @Test
+    void searchIgnoresAccentsAndCase() throws Exception {
+        Session alice = registerAndLogin("fs-search-accent-a");
+
+        RegisterRequest register = new RegisterRequest();
+        register.setEmail("fs-search-accent-target@needforfood.dev");
+        register.setUsername("ZzTestGérard");
+        register.setPassword("s3cret-pwd");
+        mockMvc.perform(post("/api/auth/register")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(register)))
+                .andExpect(status().isCreated());
+
+        mockMvc.perform(get("/api/users/search")
+                        .header("Authorization", "Bearer " + alice.token())
+                        .param("q", "zztestGE"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[?(@.user.username == 'ZzTestGérard')]").isNotEmpty());
+    }
+
+    @Test
     void requestsAndFriendsRequireAuthentication() throws Exception {
         mockMvc.perform(get("/api/friends")).andExpect(status().isUnauthorized());
         mockMvc.perform(get("/api/users/search").param("q", "x")).andExpect(status().isUnauthorized());

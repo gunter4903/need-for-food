@@ -21,6 +21,7 @@ import { useAuth } from '../../context/AuthContext';
 import * as shoppingListApi from '../../api/shoppingListApi';
 import * as recipeApi from '../../api/recipeApi';
 import { showAlert } from '../../utils/appAlert';
+import { textIncludes } from '../../utils/text';
 
 export default function ShoppingListScreen({ route, navigation }) {
     const { token } = useAuth();
@@ -86,9 +87,7 @@ export default function ShoppingListScreen({ route, navigation }) {
         };
     }, [token]);
 
-    const filteredRecipes = myRecipes.filter((recipe) =>
-        recipe.title.toLowerCase().includes(recipeSearch.toLowerCase())
-    );
+    const filteredRecipes = myRecipes.filter((recipe) => textIncludes(recipe.title, recipeSearch));
 
     const toggle = async (ingredientId, checked) => {
         try {

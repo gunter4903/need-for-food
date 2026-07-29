@@ -20,6 +20,21 @@ import BottomNav from '../../components/common/BottomNav';
 import { useAuth } from '../../context/AuthContext';
 import * as recipeApi from '../../api/recipeApi';
 import * as ingredientApi from '../../api/ingredientApi';
+import { filterByNameOrCreator, filterByType } from '../../utils/recipeFilters';
+import { textIncludes } from '../../utils/text';
+
+const TYPE_FILTERS = [
+    'Tous',
+    'Entrée',
+    'Plat',
+    'Dessert',
+    'Boisson',
+    'Apéritif',
+    'Végétarien',
+    'Végan',
+    'Sans gluten',
+    'Sans lactose',
+];
 
 function toCard(recipe, matchLabel, currentUserId) {
     return {
@@ -27,11 +42,14 @@ function toCard(recipe, matchLabel, currentUserId) {
         title: recipe.title,
         time: recipe.preparationTime != null ? `${recipe.preparationTime} min` : '—',
         difficulty: recipe.difficulty || '—',
+        type: recipe.type,
+        diet: recipe.diet,
         matchLabel,
         image: recipe.images?.[0]?.url ? { uri: recipe.images[0].url } : images.imagePlaceholder,
         favorite: !!recipe.favorite,
-        creatorUsername: recipe.userId === currentUserId ? 'Vous' : recipe.username,
+        creatorUsername: recipe.username,
         creatorAvatarUrl: recipe.userAvatarUrl,
+        isOwnRecipe: recipe.userId === currentUserId,
     };
 }
 
@@ -45,6 +63,8 @@ export default function SearchRecipesScreen({ navigation }) {
     const [searching, setSearching] = useState(false);
     const [error, setError] = useState('');
     const [hasSearched, setHasSearched] = useState(false);
+    const [resultsQuery, setResultsQuery] = useState('');
+    const [activeTypes, setActiveTypes] = useState([]);
 
     useFocusEffect(
         useCallback(() => {
@@ -99,9 +119,19 @@ export default function SearchRecipesScreen({ navigation }) {
         }
     };
 
-    const filteredChips = pantryIngredients.filter((name) =>
-        name.toLowerCase().includes(search.toLowerCase())
-    );
+    const filteredChips = pantryIngredients.filter((name) => textIncludes(name, search));
+
+    const toggleType = (type) => {
+        if (type === 'Tous') {
+            setActiveTypes([]);
+            return;
+        }
+        setActiveTypes((prev) =>
+            prev.includes(type) ? prev.filter((t) => t !== type) : [...prev, type]
+        );
+    };
+
+    const visibleResults = filterByType(filterByNameOrCreator(results, resultsQuery), activeTypes);
 
     const handleFindRecipes = async () => {
         if (selected.length === 0) {
@@ -198,14 +228,40 @@ export default function SearchRecipesScreen({ navigation }) {
                     )}
                 </TouchableOpacity>
 
+                <View style={styles.searchBar}>
+                    <Icon name="search" size={18} color={colors.textSecondary} />
+                    <TextInput
+                        style={styles.searchInput}
+                        placeholder="Rechercher par nom ou créateur..."
+                        placeholderTextColor={colors.textSecondary}
+                        value={resultsQuery}
+                        onChangeText={setResultsQuery}
+                    />
+                </View>
+
+                <ScrollView
+                    horizontal
+                    showsHorizontalScrollIndicator={false}
+                    style={styles.typeFilterRow}
+                >
+                    {TYPE_FILTERS.map((type) => (
+                        <IngredientFilterChip
+                            key={type}
+                            label={type}
+                            active={type === 'Tous' ? activeTypes.length === 0 : activeTypes.includes(type)}
+                            onPress={() => toggleType(type)}
+                        />
+                    ))}
+                </ScrollView>
+
                 <View style={styles.sectionHeaderRow}>
                     <Text style={typography.h2}>
                         {hasSearched ? 'Résultats de la recherche' : 'Suggestions pour vous'}
                     </Text>
-                    <Text style={styles.resultsCount}>{results.length} résultats</Text>
+                    <Text style={styles.resultsCount}>{visibleResults.length} résultats</Text>
                 </View>
 
-                {results.map((recipe) => (
+                {visibleResults.map((recipe) => (
                     <RecipeMatchCard
                         key={recipe.id}
                         recipe={recipe}
@@ -269,6 +325,8 @@ const styles = StyleSheet.create({
     chipsWrap: {
         flexDirection: 'row',
         flexWrap: 'wrap',
+        maxHeight: 92,
+        overflow: 'hidden',
     },
     selectionBlock: {
         backgroundColor: colors.cardMuted,
@@ -302,6 +360,9 @@ const styles = StyleSheet.create({
     },
     buttonDisabled: {
         opacity: 0.7,
+    },
+    typeFilterRow: {
+        marginBottom: spacing.md,
     },
     sectionHeaderRow: {
         flexDirection: 'row',

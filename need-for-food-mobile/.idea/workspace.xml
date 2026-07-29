@@ -5,23 +5,15 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="23d147eb-fe7c-4e75-9183-d618c3f3dcce" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/../need-for-food-backend/src/main/java/com/needforfood/repository/sql/UserRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/../need-for-food-backend/src/main/java/com/needforfood/repository/sql/UserRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../need-for-food-backend/src/test/java/com/needforfood/controller/FriendshipFlowIntegrationTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/../need-for-food-backend/src/test/java/com/needforfood/controller/FriendshipFlowIntegrationTest.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/App.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/App.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/common/RecipeCard.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/common/RecipeCard.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/home/FeaturedRecipeCard.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/home/FeaturedRecipeCard.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/home/NewsRow.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/home/NewsRow.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/components/recipe/RecipeMatchCard.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/recipe/RecipeMatchCard.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/screens/friends/FriendProfileScreen.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/screens/friends/FriendProfileScreen.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/screens/friends/FriendsScreen.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/screens/friends/FriendsScreen.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/screens/home/HomeScreen.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/screens/home/HomeScreen.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/screens/profile/EditProfileScreen.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/screens/profile/EditProfileScreen.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/screens/profile/ProfileScreen.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/screens/profile/ProfileScreen.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/screens/recipes/AddRecipeScreen.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/screens/recipes/AddRecipeScreen.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/screens/recipes/EditRecipeScreen.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/screens/recipes/EditRecipeScreen.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/screens/recipes/RecipeDetailScreen.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/screens/recipes/RecipeDetailScreen.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/screens/recipes/SearchRecipesScreen.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/screens/recipes/SearchRecipesScreen.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/screens/shoppingList/CreateShoppingListScreen.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/screens/shoppingList/CreateShoppingListScreen.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/screens/shoppingList/ShoppingListScreen.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/screens/shoppingList/ShoppingListScreen.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/utils/recipeFilters.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/utils/recipeFilters.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/utils/recipeFilters.test.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/utils/recipeFilters.test.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -64,23 +56,23 @@
   </component>
   <component name="NextEditCompletionFeaturesState">
     <decayedCancelled>
-      <entry key="MS100" value="1.0" />
-      <entry key="MS500" value="1.0" />
-      <entry key="S2" value="1.0" />
-      <entry key="S5" value="1.0" />
-      <entry key="S10" value="1.0" />
-      <entry key="S30" value="1.0" />
-      <entry key="S60" value="1.0" />
-      <entry key="M2" value="1.0" />
-      <entry key="M5" value="1.0000004016831847" />
-      <entry key="M10" value="1.0044808252158304" />
-      <entry key="M15" value="1.1001259566910102" />
-      <entry key="M30" value="3.2374366705687168" />
-      <entry key="H1" value="11.58086493406782" />
-      <entry key="H2" value="24.402395287209128" />
-      <entry key="H4" value="40.46101099022978" />
-      <entry key="D1" value="322.1070314546436" />
-      <entry key="W1" value="843.041274890774" />
+      <entry key="MS100" value="1.6360064317642027" />
+      <entry key="MS500" value="3.499466115899976" />
+      <entry key="S2" value="5.790240323749102" />
+      <entry key="S5" value="9.825723654260825" />
+      <entry key="S10" value="16.45905605278596" />
+      <entry key="S30" value="28.39257670470699" />
+      <entry key="S60" value="33.502529244820934" />
+      <entry key="M2" value="36.55399076424664" />
+      <entry key="M5" value="38.57080441613293" />
+      <entry key="M10" value="39.279553229053555" />
+      <entry key="M15" value="39.53822895327902" />
+      <entry key="M30" value="40.21939462846179" />
+      <entry key="H1" value="44.255391175986105" />
+      <entry key="H2" value="54.9414037735728" />
+      <entry key="H4" value="71.69441233498308" />
+      <entry key="D1" value="349.3050488929261" />
+      <entry key="W1" value="878.1723126037933" />
     </decayedCancelled>
     <decayedSelected>
       <entry key="MS100" value="0.0" />
@@ -91,34 +83,34 @@
       <entry key="S30" value="0.0" />
       <entry key="S60" value="0.0" />
       <entry key="M2" value="0.0" />
-      <entry key="M5" value="7.412550065667751E-141" />
-      <entry key="M10" value="2.4237333030353336E-70" />
-      <entry key="M15" value="7.943107756617974E-47" />
-      <entry key="M30" value="2.672139861997387E-23" />
-      <entry key="H1" value="1.680139013037271E-11" />
-      <entry key="H2" value="1.9889612580717755E-5" />
-      <entry key="H4" value="0.04187070750151809" />
-      <entry key="D1" value="42.62411878406768" />
-      <entry key="W1" value="151.48141137368285" />
+      <entry key="M5" value="6.301202111812842E-146" />
+      <entry key="M10" value="7.066635899715582E-73" />
+      <entry key="M15" value="1.6210971576598984E-48" />
+      <entry key="M30" value="3.817407133825184E-24" />
+      <entry key="H1" value="6.350382193841575E-12" />
+      <entry key="H2" value="1.222794981251698E-5" />
+      <entry key="H4" value="0.03283023271679394" />
+      <entry key="D1" value="40.93071743928768" />
+      <entry key="W1" value="150.6066650808644" />
     </decayedSelected>
     <decayedShown>
-      <entry key="MS100" value="0.6643429070482558" />
-      <entry key="MS500" value="0.921464186198704" />
-      <entry key="S2" value="0.9797597976233297" />
-      <entry key="S5" value="0.9918542213993645" />
-      <entry key="S10" value="0.9959187825316703" />
-      <entry key="S30" value="0.9986377392655886" />
-      <entry key="S60" value="0.9993186375053698" />
-      <entry key="M2" value="0.9996592607010499" />
-      <entry key="M5" value="0.9998640920152132" />
-      <entry key="M10" value="1.0044125921577942" />
-      <entry key="M15" value="1.1000793832852904" />
-      <entry key="M30" value="3.2374012271016666" />
-      <entry key="H1" value="11.580823430354393" />
-      <entry key="H2" value="24.402375871289507" />
-      <entry key="H4" value="40.50284371671585" />
-      <entry key="D1" value="364.73015852588117" />
-      <entry key="W1" value="994.5221810143127" />
+      <entry key="MS100" value="1.4464825367737324" />
+      <entry key="MS500" value="3.289301615919712" />
+      <entry key="S2" value="5.707594949023877" />
+      <entry key="S5" value="9.783906503572913" />
+      <entry key="S10" value="16.430298238719672" />
+      <entry key="S30" value="28.37743204297163" />
+      <entry key="S60" value="33.493671025819324" />
+      <entry key="M2" value="36.54916834049515" />
+      <entry key="M5" value="38.56877014251013" />
+      <entry key="M10" value="39.27851735249373" />
+      <entry key="M15" value="39.53753335418441" />
+      <entry key="M30" value="40.21904012286795" />
+      <entry key="H1" value="44.255200234705285" />
+      <entry key="H2" value="54.94130407598812" />
+      <entry key="H4" value="71.72716887339676" />
+      <entry key="D1" value="390.234806695213" />
+      <entry key="W1" value="1028.7784743057878" />
     </decayedShown>
   </component>
   <component name="ProjectColorInfo">{
@@ -178,7 +170,7 @@
       <updated>1784656457225</updated>
       <workItem from="1784656458434" duration="13515000" />
       <workItem from="1785139683525" duration="108000" />
-      <workItem from="1785139852619" duration="60694000" />
+      <workItem from="1785139852619" duration="61753000" />
     </task>
     <servers />
   </component>

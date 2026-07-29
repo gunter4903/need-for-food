@@ -37,7 +37,7 @@ export default function RecipeMatchCard({ recipe, onPress, onToggleFavorite }) {
                                 style={styles.creatorAvatar}
                             />
                             <Text style={styles.creatorText} numberOfLines={1}>
-                                {recipe.creatorUsername}
+                                {recipe.isOwnRecipe ? 'Vous' : recipe.creatorUsername}
                             </Text>
                         </>
                     ) : null}

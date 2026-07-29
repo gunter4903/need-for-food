@@ -21,6 +21,7 @@ import BottomNav from '../../components/common/BottomNav';
 import { useAuth } from '../../context/AuthContext';
 import * as shoppingListApi from '../../api/shoppingListApi';
 import * as recipeApi from '../../api/recipeApi';
+import { textIncludes } from '../../utils/text';
 
 let nextId = 1;
 
@@ -58,9 +59,7 @@ export default function CreateShoppingListScreen({ navigation }) {
         };
     }, [token]);
 
-    const filteredRecipes = myRecipes.filter((recipe) =>
-        recipe.title.toLowerCase().includes(recipeSearch.toLowerCase())
-    );
+    const filteredRecipes = myRecipes.filter((recipe) => textIncludes(recipe.title, recipeSearch));
 
     const toggleRecipeSelection = (recipeId) => {
         setSelectedRecipeIds((prev) =>
