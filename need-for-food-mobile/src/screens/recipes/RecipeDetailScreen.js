@@ -14,6 +14,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useFocusEffect } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/Feather';
+import HeartIcon from 'react-native-vector-icons/MaterialIcons';
 import { colors, spacing, radius, typography } from '../../constants/theme';
 import images from '../../../assets/images/temp/images';
 import StatBox from '../../components/recipe/StatBox';
@@ -40,6 +41,7 @@ export default function RecipeDetailScreen({ route, navigation }) {
     const [myLists, setMyLists] = useState([]);
     const [loadingLists, setLoadingLists] = useState(false);
     const [newListName, setNewListName] = useState('');
+    const [favorite, setFavorite] = useState(false);
 
     useFocusEffect(
         useCallback(() => {
@@ -49,7 +51,10 @@ export default function RecipeDetailScreen({ route, navigation }) {
                 setLoading(true);
                 try {
                     const data = await recipeApi.getById(token, recipeId);
-                    if (!cancelled) setRecipe(data);
+                    if (!cancelled) {
+                        setRecipe(data);
+                        setFavorite(!!data.favorite);
+                    }
                 } catch (err) {
                     if (!cancelled) setError(err.message || 'Impossible de charger la recette.');
                 } finally {
@@ -65,6 +70,20 @@ export default function RecipeDetailScreen({ route, navigation }) {
 
     const toggleIngredient = (id) => {
         setChecked((prev) => ({ ...prev, [id]: !prev[id] }));
+    };
+
+    const toggleFavorite = async () => {
+        const nextFavorite = !favorite;
+        setFavorite(nextFavorite);
+        try {
+            if (nextFavorite) {
+                await recipeApi.addFavorite(token, recipeId);
+            } else {
+                await recipeApi.removeFavorite(token, recipeId);
+            }
+        } catch {
+            setFavorite(!nextFavorite);
+        }
     };
 
     const handleOpenListPicker = async () => {
@@ -209,7 +228,20 @@ export default function RecipeDetailScreen({ route, navigation }) {
                             <Text style={styles.tagBadgeText}>{tag}</Text>
                         </View>
                     ) : null}
-                    <Text style={styles.title}>{recipe.title}</Text>
+                    <View style={styles.titleRow}>
+                        <Text style={[styles.title, styles.titleText]}>{recipe.title}</Text>
+                        <TouchableOpacity
+                            style={styles.favoriteButton}
+                            activeOpacity={0.7}
+                            onPress={toggleFavorite}
+                        >
+                            <HeartIcon
+                                name={favorite ? 'favorite' : 'favorite-border'}
+                                size={26}
+                                color={favorite ? colors.danger : colors.textSecondary}
+                            />
+                        </TouchableOpacity>
+                    </View>
 
                     {recipe.username ? (
                         <View style={styles.creatorRow}>
@@ -442,10 +474,25 @@ const styles = StyleSheet.create({
         fontSize: 12,
         fontWeight: '700',
     },
+    titleRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+    },
     title: {
         ...typography.h1,
         fontSize: 26,
         marginBottom: spacing.xs,
+    },
+    titleText: {
+        flex: 1,
+        marginRight: spacing.sm,
+    },
+    favoriteButton: {
+        width: 40,
+        height: 40,
+        alignItems: 'center',
+        justifyContent: 'center',
     },
     creatorRow: {
         flexDirection: 'row',

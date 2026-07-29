@@ -7,7 +7,6 @@ import {
     TouchableOpacity,
     StyleSheet,
     ActivityIndicator,
-    Alert,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/Feather';
@@ -18,6 +17,7 @@ import Header from '../../components/common/Header';
 import FormInput from '../../components/common/FormInput';
 import BottomNav from '../../components/common/BottomNav';
 import { useAuth } from '../../context/AuthContext';
+import { showAlert } from '../../utils/appAlert';
 
 function splitUsername(username) {
     const [firstName, ...rest] = (username || '').split(' ');
@@ -117,7 +117,7 @@ export default function EditProfileScreen({ navigation }) {
     };
 
     const handleDeleteAccount = () => {
-        Alert.alert(
+        showAlert(
             'Supprimer le compte',
             'Cette action est irréversible et supprimera toutes vos données. Confirmer ?',
             [

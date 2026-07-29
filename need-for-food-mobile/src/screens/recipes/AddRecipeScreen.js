@@ -6,7 +6,6 @@ import {
     TouchableOpacity,
     StyleSheet,
     ActivityIndicator,
-    Alert,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/Feather';
@@ -24,6 +23,7 @@ import BottomNav from '../../components/common/BottomNav';
 import { useAuth } from '../../context/AuthContext';
 import * as recipeApi from '../../api/recipeApi';
 import { copyPickedAssetsToCache } from '../../utils/imagePicker';
+import { showAlert } from '../../utils/appAlert';
 
 const DIFFICULTIES = ['Facile', 'Moyen', 'Difficile'];
 const TYPES = ['Non défini', 'Entrée', 'Plat', 'Dessert', 'Boisson', 'Apéritif'];
@@ -132,7 +132,7 @@ export default function AddRecipeScreen({ navigation }) {
                     await recipeApi.addImages(token, created.id, images);
                 } catch (imageErr) {
                     console.error('Échec de l\'envoi des photos:', imageErr);
-                    Alert.alert(
+                    showAlert(
                         'Recette créée',
                         `La recette a été créée mais l'envoi des photos a échoué : ${imageErr.message || imageErr}`
                     );

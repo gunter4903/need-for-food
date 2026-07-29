@@ -1,6 +1,7 @@
 import React from 'react';
 import { TouchableOpacity, ImageBackground, View, Text, StyleSheet } from 'react-native';
 import Icon from 'react-native-vector-icons/Feather';
+import HeartIcon from 'react-native-vector-icons/MaterialIcons';
 import { colors, spacing, radius } from '../../constants/theme';
 
 export default function FeaturedRecipeCard({ recipe, onPress }) {
@@ -16,6 +17,12 @@ export default function FeaturedRecipeCard({ recipe, onPress }) {
                 {recipe.badge ? (
                     <View style={styles.badge}>
                         <Text style={styles.badgeText}>{recipe.badge}</Text>
+                    </View>
+                ) : null}
+
+                {recipe.favorite ? (
+                    <View style={styles.favoriteBadge}>
+                        <HeartIcon name="favorite" size={16} color={colors.danger} />
                     </View>
                 ) : null}
 
@@ -62,6 +69,17 @@ const styles = StyleSheet.create({
         color: colors.textOnDark,
         fontSize: 12,
         fontWeight: '700',
+    },
+    favoriteBadge: {
+        position: 'absolute',
+        top: spacing.md,
+        right: spacing.md,
+        width: 30,
+        height: 30,
+        borderRadius: 15,
+        backgroundColor: 'rgba(255,255,255,0.85)',
+        alignItems: 'center',
+        justifyContent: 'center',
     },
     textBlock: {
         padding: spacing.md,

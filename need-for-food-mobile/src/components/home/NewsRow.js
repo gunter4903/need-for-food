@@ -1,6 +1,7 @@
 import React from 'react';
 import { TouchableOpacity, Image, View, Text, StyleSheet } from 'react-native';
 import Icon from 'react-native-vector-icons/Feather';
+import HeartIcon from 'react-native-vector-icons/MaterialIcons';
 import { colors, spacing, radius } from '../../constants/theme';
 
 export default function NewsRow({ item, onPress }) {
@@ -11,6 +12,9 @@ export default function NewsRow({ item, onPress }) {
                 <Text style={styles.title}>{item.title}</Text>
                 <Text style={styles.subtitle}>{item.subtitle}</Text>
             </View>
+            {item.favorite ? (
+                <HeartIcon name="favorite" size={16} color={colors.danger} style={{ marginRight: spacing.xs }} />
+            ) : null}
             <Icon name="chevron-right" size={20} color={colors.textSecondary} />
         </TouchableOpacity>
     );

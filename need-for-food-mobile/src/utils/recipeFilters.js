@@ -13,5 +13,8 @@ export function filterByCategory(recipes, category) {
     if (category === 'rapide') {
         return recipes.filter((recipe) => recipe.preparationTime != null && recipe.preparationTime <= 20);
     }
+    if (category === 'favoris') {
+        return recipes.filter((recipe) => !!recipe.favorite);
+    }
     return recipes;
 }

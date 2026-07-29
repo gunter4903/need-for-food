@@ -25,6 +25,7 @@ import { filterByTitle, filterByCategory } from '../../utils/recipeFilters';
 
 const CATEGORIES = [
     { key: 'populaire', label: 'Populaire', emoji: '🔥' },
+    { key: 'favoris', label: 'Favoris', emoji: '❤️' },
     { key: 'vegetarien', label: 'Végétarien', emoji: '🌱' },
     { key: 'rapide', label: 'Rapide', emoji: '⏱️' },
 ];
@@ -37,6 +38,7 @@ function toCard(recipe) {
         difficulty: recipe.difficulty || '—',
         diet: recipe.diet,
         preparationTime: recipe.preparationTime,
+        favorite: !!recipe.favorite,
         badge: 'Suggestion pour vous',
         image: recipe.images?.[0]?.url ? { uri: recipe.images[0].url } : images.imagePlaceholder,
     };
@@ -53,6 +55,7 @@ function toNewsItem(recipe) {
         title: recipe.title,
         subtitle,
         image: recipe.images?.[0]?.url ? { uri: recipe.images[0].url } : images.imagePlaceholder,
+        favorite: !!recipe.favorite,
     };
 }
 
@@ -110,11 +113,12 @@ export default function HomeScreen({ navigation }) {
             >
                 {/* Header */}
                 <View style={styles.header}>
-                    <View style={styles.headerLeft}>
+                    <View style={styles.headerSide} />
+                    <View style={styles.headerCenter}>
                         <Image source={images.appIcon} style={styles.logo}/>
                         <Text style={styles.headerTitle}>Need for Food</Text>
                     </View>
-                    <TouchableOpacity onPress={() => navigation?.navigate('Profil')}>
+                    <TouchableOpacity style={styles.headerSide} onPress={() => navigation?.navigate('Profil')}>
                         <Image
                             source={user?.avatarUrl ? { uri: user.avatarUrl } : images.avatar}
                             style={styles.avatar}
@@ -242,9 +246,15 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
         marginBottom: spacing.lg,
     },
-    headerLeft: {
+    headerSide: {
+        width: 40,
+        alignItems: 'center',
+    },
+    headerCenter: {
+        flex: 1,
         flexDirection: 'row',
         alignItems: 'center',
+        justifyContent: 'center',
     },
     headerLogoEmoji: {
         fontSize: 20,

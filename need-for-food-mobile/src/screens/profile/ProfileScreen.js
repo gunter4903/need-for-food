@@ -27,6 +27,7 @@ function toCard(recipe) {
         title: recipe.title,
         time: recipe.preparationTime != null ? `${recipe.preparationTime} min` : '—',
         image: recipe.images?.[0]?.url ? { uri: recipe.images[0].url } : images.imagePlaceholder,
+        favorite: !!recipe.favorite,
     };
 }
 

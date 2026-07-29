@@ -1,5 +1,5 @@
 import React, { useCallback, useState } from 'react';
-import { ScrollView, View, Image, Text, TouchableOpacity, StyleSheet, ActivityIndicator, Alert } from 'react-native';
+import { ScrollView, View, Image, Text, TouchableOpacity, StyleSheet, ActivityIndicator } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useFocusEffect } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/Feather';
@@ -10,6 +10,7 @@ import BottomNav from '../../components/common/BottomNav';
 import images from '../../../assets/images/temp/images';
 import { useAuth } from '../../context/AuthContext';
 import * as friendApi from '../../api/friendApi';
+import { showAlert } from '../../utils/appAlert';
 
 const STATUS_LABELS = {
     NONE: null,
@@ -129,7 +130,7 @@ export default function FriendsScreen({ navigation }) {
         });
 
     const confirmRemoveFriend = (friend) => {
-        Alert.alert(
+        showAlert(
             'Retirer cet ami',
             `Cette action est irréversible. Confirmer le retrait de ${friend.username} de vos amis ?`,
             [

@@ -21,7 +21,7 @@ import { useAuth } from '../../context/AuthContext';
 import * as recipeApi from '../../api/recipeApi';
 import * as ingredientApi from '../../api/ingredientApi';
 
-function toCard(recipe, matchLabel) {
+function toCard(recipe, matchLabel, currentUserId) {
     return {
         id: recipe.id,
         title: recipe.title,
@@ -30,11 +30,13 @@ function toCard(recipe, matchLabel) {
         matchLabel,
         image: recipe.images?.[0]?.url ? { uri: recipe.images[0].url } : images.imagePlaceholder,
         favorite: !!recipe.favorite,
+        creatorUsername: recipe.userId === currentUserId ? 'Vous' : recipe.username,
+        creatorAvatarUrl: recipe.userAvatarUrl,
     };
 }
 
 export default function SearchRecipesScreen({ navigation }) {
-    const { token } = useAuth();
+    const { user, token } = useAuth();
     const [search, setSearch] = useState('');
     const [pantryIngredients, setPantryIngredients] = useState([]);
     const [selected, setSelected] = useState([]);
@@ -58,7 +60,7 @@ export default function SearchRecipesScreen({ navigation }) {
                     if (cancelled) return;
                     setPantryIngredients(ingredients.map((i) => i.name));
                     if (!hasSearched) {
-                        setResults(recipes.map((r) => toCard(r, null)));
+                        setResults(recipes.map((r) => toCard(r, null, user?.id)));
                     }
                 } catch (err) {
                     if (!cancelled) setError(err.message || 'Impossible de charger les recettes.');
@@ -70,7 +72,7 @@ export default function SearchRecipesScreen({ navigation }) {
             return () => {
                 cancelled = true;
             };
-        }, [token, hasSearched])
+        }, [token, hasSearched, user?.id])
     );
 
     const toggleIngredient = (name) => {
@@ -111,7 +113,7 @@ export default function SearchRecipesScreen({ navigation }) {
         setHasSearched(true);
         try {
             const matches = await recipeApi.search(token, selected);
-            setResults(matches.map((m) => toCard(m.recipe, `${m.matchedCount}/${m.totalCount} correspondants`)));
+            setResults(matches.map((m) => toCard(m.recipe, `${m.matchedCount}/${m.totalCount} correspondants`, user?.id)));
         } catch (err) {
             setError(err.message || 'Impossible de rechercher des recettes.');
         } finally {

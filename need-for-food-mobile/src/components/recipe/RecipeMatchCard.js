@@ -1,7 +1,9 @@
 import React from 'react';
 import { TouchableOpacity, Image, View, Text, StyleSheet } from 'react-native';
 import Icon from 'react-native-vector-icons/Feather';
+import HeartIcon from 'react-native-vector-icons/MaterialIcons';
 import { colors, spacing, radius } from '../../constants/theme';
+import images from '../../../assets/images/temp/images';
 
 export default function RecipeMatchCard({ recipe, onPress, onToggleFavorite }) {
     return (
@@ -9,11 +11,10 @@ export default function RecipeMatchCard({ recipe, onPress, onToggleFavorite }) {
             <View style={styles.imageWrap}>
                 <Image source={recipe.image} style={styles.image} />
                 <TouchableOpacity style={styles.favoriteButton} onPress={onToggleFavorite}>
-                    <Icon
-                        name="heart"
+                    <HeartIcon
+                        name={recipe.favorite ? 'favorite' : 'favorite-border'}
                         size={16}
                         color={recipe.favorite ? colors.danger : colors.textOnDark}
-                        style={recipe.favorite ? { opacity: 1 } : { opacity: 0.9 }}
                     />
                 </TouchableOpacity>
             </View>
@@ -29,7 +30,23 @@ export default function RecipeMatchCard({ recipe, onPress, onToggleFavorite }) {
                     </View>
                 </View>
                 <View style={styles.metaRow}>
-                    <Icon name="clock" size={13} color={colors.textSecondary} />
+                    {recipe.creatorUsername ? (
+                        <>
+                            <Image
+                                source={recipe.creatorAvatarUrl ? { uri: recipe.creatorAvatarUrl } : images.avatar}
+                                style={styles.creatorAvatar}
+                            />
+                            <Text style={styles.creatorText} numberOfLines={1}>
+                                {recipe.creatorUsername}
+                            </Text>
+                        </>
+                    ) : null}
+                    <Icon
+                        name="clock"
+                        size={13}
+                        color={colors.textSecondary}
+                        style={recipe.creatorUsername ? { marginLeft: spacing.sm } : null}
+                    />
                     <Text style={styles.metaText}>{recipe.time}</Text>
                     <Icon name="bar-chart-2" size={13} color={colors.textSecondary} style={{ marginLeft: spacing.sm }} />
                     <Text style={styles.metaText}>{recipe.difficulty}</Text>
@@ -98,5 +115,16 @@ const styles = StyleSheet.create({
         fontSize: 12,
         color: colors.textSecondary,
         marginLeft: 4,
+    },
+    creatorAvatar: {
+        width: 16,
+        height: 16,
+        borderRadius: 8,
+        marginRight: 4,
+    },
+    creatorText: {
+        fontSize: 12,
+        color: colors.textSecondary,
+        flexShrink: 1,
     },
 });

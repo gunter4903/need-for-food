@@ -7,7 +7,6 @@ import {
     TouchableOpacity,
     StyleSheet,
     ActivityIndicator,
-    Alert,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useFocusEffect } from '@react-navigation/native';
@@ -21,6 +20,7 @@ import BottomNav from '../../components/common/BottomNav';
 import { useAuth } from '../../context/AuthContext';
 import * as shoppingListApi from '../../api/shoppingListApi';
 import * as recipeApi from '../../api/recipeApi';
+import { showAlert } from '../../utils/appAlert';
 
 export default function ShoppingListScreen({ route, navigation }) {
     const { token } = useAuth();
@@ -174,7 +174,7 @@ export default function ShoppingListScreen({ route, navigation }) {
     };
 
     const handleDeleteList = () => {
-        Alert.alert(
+        showAlert(
             'Supprimer la liste',
             'Cette action est irréversible. Confirmer la suppression ?',
             [
