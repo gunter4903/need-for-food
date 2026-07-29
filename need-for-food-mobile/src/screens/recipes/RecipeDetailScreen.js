@@ -1,7 +1,6 @@
 import React, { useCallback, useState } from 'react';
 import {
     ScrollView,
-    ImageBackground,
     View,
     Text,
     TextInput,
@@ -10,6 +9,7 @@ import {
     Image,
     Modal,
     ActivityIndicator,
+    useWindowDimensions,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useFocusEffect } from '@react-navigation/native';
@@ -27,11 +27,13 @@ import * as shoppingListApi from '../../api/shoppingListApi';
 export default function RecipeDetailScreen({ route, navigation }) {
     const { user, token } = useAuth();
     const recipeId = route?.params?.id;
+    const { width: windowWidth } = useWindowDimensions();
 
     const [recipe, setRecipe] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
     const [checked, setChecked] = useState({});
+    const [activeImageIndex, setActiveImageIndex] = useState(0);
     const [addingToList, setAddingToList] = useState(false);
     const [listError, setListError] = useState('');
     const [pickerVisible, setPickerVisible] = useState(false);
@@ -150,11 +152,27 @@ export default function RecipeDetailScreen({ route, navigation }) {
         <SafeAreaView style={styles.safeArea}>
             <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
                 {/* Hero */}
-                <ImageBackground
-                    source={recipe.imageUrl ? { uri: recipe.imageUrl } : images.imagePlaceholder}
-                    style={styles.hero}
-                >
-                    <View style={styles.heroHeader}>
+                <View style={styles.hero}>
+                    <ScrollView
+                        horizontal
+                        pagingEnabled
+                        showsHorizontalScrollIndicator={false}
+                        onScroll={(event) => {
+                            const index = Math.round(event.nativeEvent.contentOffset.x / windowWidth);
+                            setActiveImageIndex(index);
+                        }}
+                        scrollEventThrottle={16}
+                    >
+                        {(recipe.images.length ? recipe.images : [{ id: 'placeholder', url: null }]).map((img) => (
+                            <Image
+                                key={img.id}
+                                source={img.url ? { uri: img.url } : images.imagePlaceholder}
+                                style={{ width: windowWidth, height: 260 }}
+                            />
+                        ))}
+                    </ScrollView>
+
+                    <View style={styles.heroHeader} pointerEvents="box-none">
                         <TouchableOpacity
                             style={styles.heroIconButton}
                             onPress={() => navigation?.goBack()}
@@ -172,7 +190,18 @@ export default function RecipeDetailScreen({ route, navigation }) {
                             />
                         </TouchableOpacity>
                     </View>
-                </ImageBackground>
+
+                    {recipe.images.length > 1 ? (
+                        <View style={styles.dotsRow} pointerEvents="none">
+                            {recipe.images.map((img, idx) => (
+                                <View
+                                    key={img.id}
+                                    style={[styles.dot, idx === activeImageIndex && styles.dotActive]}
+                                />
+                            ))}
+                        </View>
+                    ) : null}
+                </View>
 
                 <View style={styles.contentBlock}>
                     {tag ? (
@@ -329,14 +358,40 @@ const styles = StyleSheet.create({
     hero: {
         width: '100%',
         height: 260,
-        justifyContent: 'flex-start',
+        position: 'relative',
     },
     heroHeader: {
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        right: 0,
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
         paddingHorizontal: spacing.lg,
         paddingTop: spacing.md,
+    },
+    dotsRow: {
+        position: 'absolute',
+        bottom: spacing.sm,
+        left: 0,
+        right: 0,
+        flexDirection: 'row',
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    dot: {
+        width: 6,
+        height: 6,
+        borderRadius: 3,
+        backgroundColor: 'rgba(255,255,255,0.6)',
+        marginHorizontal: 3,
+    },
+    dotActive: {
+        width: 8,
+        height: 8,
+        borderRadius: 4,
+        backgroundColor: colors.textOnDark,
     },
     heroIconButton: {
         width: 36,

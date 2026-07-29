@@ -3,6 +3,7 @@ package com.needforfood.service;
 import com.needforfood.model.entity.Ingredient;
 import com.needforfood.model.entity.PreparationStep;
 import com.needforfood.model.entity.Recipe;
+import com.needforfood.model.entity.RecipeImage;
 import com.needforfood.model.entity.RecipeIngredient;
 import com.needforfood.model.entity.User;
 import com.needforfood.repository.sql.UserRepository;
@@ -99,14 +100,18 @@ public class AuthService {
                 PreparationStep.builder().description("Égouttez, ajoutez le beurre, mélangez et dégustez !").build()
         ));
 
+        List<RecipeImage> images = new ArrayList<>(List.of(
+                RecipeImage.builder().url(baseUrl + WELCOME_RECIPE_IMAGE_PATH).build()
+        ));
+
         return Recipe.builder()
                 .title("Pâtes au beurre (recette de bienvenue)")
                 .description("Une recette d'exemple pour découvrir Need for Food. Modifiez-la ou supprimez-la comme vous le souhaitez !")
                 .difficulty("Facile")
-                .imageUrl(baseUrl + WELCOME_RECIPE_IMAGE_PATH)
                 .preparationTime(10)
                 .ingredients(ingredients)
                 .steps(steps)
+                .images(images)
                 .type("Plat")
                 .build();
     }

@@ -1,13 +1,18 @@
 package com.needforfood.service;
 
+import com.needforfood.exception.custom.InvalidImageFileException;
 import com.needforfood.exception.custom.ResourceNotFoundException;
+import com.needforfood.exception.custom.TooManyRecipeImagesException;
 import com.needforfood.model.document.RecipeSearchIndex;
 import com.needforfood.model.entity.Ingredient;
 import com.needforfood.model.entity.PreparationStep;
 import com.needforfood.model.entity.Recipe;
+import com.needforfood.model.entity.RecipeFavorite;
+import com.needforfood.model.entity.RecipeImage;
 import com.needforfood.model.entity.RecipeIngredient;
 import com.needforfood.model.entity.User;
 import com.needforfood.repository.nosql.RecipeSearchIndexRepository;
+import com.needforfood.repository.sql.RecipeFavoriteRepository;
 import com.needforfood.repository.sql.RecipeRepository;
 import com.needforfood.repository.sql.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -15,6 +20,7 @@ import org.hibernate.Hibernate;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -34,6 +40,10 @@ public class RecipeService {
     private final UserRepository userRepository;
     private final RecipeSearchIndexRepository recipeSearchIndexRepository;
     private final FriendshipService friendshipService;
+    private final RecipeImageStorageService recipeImageStorageService;
+    private final RecipeFavoriteRepository recipeFavoriteRepository;
+
+    private static final int MAX_IMAGES_PER_RECIPE = 5;
 
     @Transactional
     public Recipe createRecipe(Long userId, Recipe recipe) {
@@ -43,6 +53,7 @@ public class RecipeService {
         recipe.setUser(user);
         linkIngredients(recipe, recipe.getIngredients());
         numberSteps(recipe, recipe.getSteps());
+        linkImages(recipe, recipe.getImages());
 
         Recipe saved = recipeRepository.save(recipe);
         syncSearchIndex(saved);
@@ -53,7 +64,7 @@ public class RecipeService {
     public Recipe getById(Long id) {
         Recipe recipe = recipeRepository.findDetailedById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Recette introuvable: " + id));
-        Hibernate.initialize(recipe.getSteps());
+        initializeLazyCollections(recipe);
         return recipe;
     }
 
@@ -70,7 +81,7 @@ public class RecipeService {
     @Transactional(readOnly = true)
     public List<Recipe> getByUser(Long userId) {
         List<Recipe> recipes = recipeRepository.findDetailedByUserId(userId);
-        recipes.forEach(recipe -> Hibernate.initialize(recipe.getSteps()));
+        recipes.forEach(this::initializeLazyCollections);
         return recipes;
     }
 
@@ -90,8 +101,13 @@ public class RecipeService {
         List<Recipe> recipes = recipeRepository.findAllDetailed().stream()
                 .filter(recipe -> visibleUserIds.contains(recipe.getUser().getId()))
                 .toList();
-        recipes.forEach(recipe -> Hibernate.initialize(recipe.getSteps()));
+        recipes.forEach(this::initializeLazyCollections);
         return deduplicate(recipes, userId);
+    }
+
+    private void initializeLazyCollections(Recipe recipe) {
+        Hibernate.initialize(recipe.getSteps());
+        Hibernate.initialize(recipe.getImages());
     }
 
     private List<Recipe> deduplicate(List<Recipe> recipes, Long userId) {
@@ -203,7 +219,6 @@ public class RecipeService {
         recipe.setType(updates.getType());
         recipe.setDiet(updates.getDiet());
         recipe.setDifficulty(updates.getDifficulty());
-        recipe.setImageUrl(updates.getImageUrl());
         recipe.setPreparationTime(updates.getPreparationTime());
 
         recipe.getIngredients().clear();
@@ -224,8 +239,83 @@ public class RecipeService {
     public void deleteRecipe(Long recipeId, Long requesterId) {
         Recipe recipe = getById(recipeId);
         assertOwner(recipe, requesterId);
+        recipe.getImages().forEach(image -> recipeImageStorageService.delete(image.getUrl()));
         recipeRepository.delete(recipe);
         recipeSearchIndexRepository.deleteByRecipeId(recipeId);
+    }
+
+    @Transactional
+    public Recipe addImages(Long recipeId, Long requesterId, List<MultipartFile> files) {
+        Recipe recipe = getById(recipeId);
+        assertOwner(recipe, requesterId);
+
+        if (files == null || files.isEmpty()) {
+            throw new InvalidImageFileException("Aucun fichier envoyé");
+        }
+        if (recipe.getImages().size() + files.size() > MAX_IMAGES_PER_RECIPE) {
+            throw new TooManyRecipeImagesException(
+                    MAX_IMAGES_PER_RECIPE + " images maximum par recette");
+        }
+
+        int nextPosition = recipe.getImages().size();
+        for (MultipartFile file : files) {
+            String url = recipeImageStorageService.store(file);
+            recipe.getImages().add(RecipeImage.builder()
+                    .recipe(recipe)
+                    .url(url)
+                    .position(nextPosition++)
+                    .build());
+        }
+
+        return recipeRepository.save(recipe);
+    }
+
+    @Transactional
+    public void removeImage(Long recipeId, Long requesterId, Long imageId) {
+        Recipe recipe = getById(recipeId);
+        assertOwner(recipe, requesterId);
+
+        RecipeImage toRemove = recipe.getImages().stream()
+                .filter(image -> image.getId().equals(imageId))
+                .findFirst()
+                .orElseThrow(() -> new ResourceNotFoundException("Image introuvable: " + imageId));
+
+        recipe.getImages().remove(toRemove);
+        recipeImageStorageService.delete(toRemove.getUrl());
+    }
+
+    /**
+     * Réutilise getById(id, requesterId) pour la vérification de visibilité : impossible de
+     * mettre en favori une recette qu'on n'a pas le droit de voir (ni propriétaire, ni ami du
+     * propriétaire). Idempotent : ajouter un favori déjà présent ne fait rien (pas d'erreur).
+     */
+    @Transactional
+    public void addFavorite(Long userId, Long recipeId) {
+        Recipe recipe = getById(recipeId, userId);
+
+        if (recipeFavoriteRepository.existsByUserIdAndRecipeId(userId, recipeId)) {
+            return;
+        }
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("Utilisateur introuvable: " + userId));
+
+        recipeFavoriteRepository.save(RecipeFavorite.builder().user(user).recipe(recipe).build());
+    }
+
+    @Transactional
+    public void removeFavorite(Long userId, Long recipeId) {
+        recipeFavoriteRepository.deleteByUserIdAndRecipeId(userId, recipeId);
+    }
+
+    @Transactional(readOnly = true)
+    public boolean isFavorite(Long userId, Long recipeId) {
+        return recipeFavoriteRepository.existsByUserIdAndRecipeId(userId, recipeId);
+    }
+
+    @Transactional(readOnly = true)
+    public Set<Long> getFavoriteRecipeIds(Long userId) {
+        return recipeFavoriteRepository.findRecipeIdsByUserId(userId);
     }
 
     private void syncSearchIndex(Recipe recipe) {
@@ -262,6 +352,13 @@ public class RecipeService {
         for (int i = 0; i < steps.size(); i++) {
             steps.get(i).setRecipe(recipe);
             steps.get(i).setStepNumber(i + 1);
+        }
+    }
+
+    private void linkImages(Recipe recipe, List<RecipeImage> images) {
+        for (int i = 0; i < images.size(); i++) {
+            images.get(i).setRecipe(recipe);
+            images.get(i).setPosition(i);
         }
     }
 

@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,6 +25,7 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -406,6 +408,51 @@ class RecipeFlowIntegrationTest {
         for (JsonNode recipe : friendResults) {
             assertThat(recipe.get("userId").asLong()).isEqualTo(friendId);
         }
+    }
+
+    @Test
+    void dedupeIgnoresImagesEvenWhenTheyDiffer() throws Exception {
+        String ownerToken = registerAndLogin("dedup-images-owner");
+        String friendToken = registerAndLogin("dedup-images-friend");
+
+        String ownerCreateResponse = mockMvc.perform(post("/api/recipes")
+                        .header("Authorization", "Bearer " + ownerToken)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(samplePestoRecipe())))
+                .andExpect(status().isCreated())
+                .andReturn().getResponse().getContentAsString();
+        long ownerRecipeId = objectMapper.readTree(ownerCreateResponse).get("id").asLong();
+        long ownerId = objectMapper.readTree(ownerCreateResponse).get("userId").asLong();
+
+        long friendRecipeId = createRecipe(friendToken, samplePestoRecipe());
+
+        mockMvc.perform(multipart("/api/recipes/" + ownerRecipeId + "/images")
+                        .file(new MockMultipartFile("files", "owner.jpg", "image/jpeg", new byte[]{1, 2, 3}))
+                        .header("Authorization", "Bearer " + ownerToken))
+                .andExpect(status().isOk());
+        mockMvc.perform(multipart("/api/recipes/" + friendRecipeId + "/images")
+                        .file(new MockMultipartFile("files", "friend.jpg", "image/jpeg", new byte[]{4, 5, 6, 7}))
+                        .header("Authorization", "Bearer " + friendToken))
+                .andExpect(status().isOk());
+
+        String requestResponse = mockMvc.perform(post("/api/friends/requests")
+                        .header("Authorization", "Bearer " + friendToken)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"userId\":" + ownerId + "}"))
+                .andExpect(status().isCreated())
+                .andReturn().getResponse().getContentAsString();
+        long friendshipId = objectMapper.readTree(requestResponse).get("id").asLong();
+        mockMvc.perform(put("/api/friends/requests/" + friendshipId + "/accept")
+                        .header("Authorization", "Bearer " + ownerToken))
+                .andExpect(status().isOk());
+
+        // Deux recettes de contenu identique mais avec des images différentes doivent quand même
+        // fusionner : les images ne participent pas au fingerprint de dédoublonnage.
+        mockMvc.perform(get("/api/recipes")
+                        .header("Authorization", "Bearer " + ownerToken))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[?(@.id == " + ownerRecipeId + ")]").isNotEmpty())
+                .andExpect(jsonPath("$[?(@.id == " + friendRecipeId + ")]").isEmpty());
     }
 
     @Test

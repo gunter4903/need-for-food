@@ -28,8 +28,8 @@ function toCard(recipe, matchLabel) {
         time: recipe.preparationTime != null ? `${recipe.preparationTime} min` : '—',
         difficulty: recipe.difficulty || '—',
         matchLabel,
-        image: recipe.imageUrl ? { uri: recipe.imageUrl } : images.imagePlaceholder,
-        favorite: false,
+        image: recipe.images?.[0]?.url ? { uri: recipe.images[0].url } : images.imagePlaceholder,
+        favorite: !!recipe.favorite,
     };
 }
 
@@ -79,10 +79,22 @@ export default function SearchRecipesScreen({ navigation }) {
         );
     };
 
-    const toggleFavorite = (id) => {
-        setResults((prev) =>
-            prev.map((r) => (r.id === id ? { ...r, favorite: !r.favorite } : r))
-        );
+    const toggleFavorite = async (id) => {
+        const card = results.find((r) => r.id === id);
+        if (!card) return;
+
+        const nextFavorite = !card.favorite;
+        setResults((prev) => prev.map((r) => (r.id === id ? { ...r, favorite: nextFavorite } : r)));
+
+        try {
+            if (nextFavorite) {
+                await recipeApi.addFavorite(token, id);
+            } else {
+                await recipeApi.removeFavorite(token, id);
+            }
+        } catch {
+            setResults((prev) => prev.map((r) => (r.id === id ? { ...r, favorite: !nextFavorite } : r)));
+        }
     };
 
     const filteredChips = pantryIngredients.filter((name) =>

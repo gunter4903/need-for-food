@@ -6,13 +6,14 @@ import {
     TouchableOpacity,
     StyleSheet,
     ActivityIndicator,
+    Alert,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/Feather';
 import * as ImagePicker from 'expo-image-picker';
 import { colors, spacing, radius, typography } from '../../constants/theme';
 import Header from '../../components/common/Header';
-import PhotoPicker from '../../components/common/PhotoPicker';
+import MultiPhotoPicker from '../../components/common/MultiPhotoPicker';
 import FormInput from '../../components/common/FormInput';
 import SelectField from '../../components/recipe/SelectField';
 import SectionCard from '../../components/recipe/SectionCard';
@@ -22,17 +23,19 @@ import DashedButton from '../../components/recipe/DashedButton';
 import BottomNav from '../../components/common/BottomNav';
 import { useAuth } from '../../context/AuthContext';
 import * as recipeApi from '../../api/recipeApi';
+import { copyPickedAssetsToCache } from '../../utils/imagePicker';
 
 const DIFFICULTIES = ['Facile', 'Moyen', 'Difficile'];
 const TYPES = ['Non défini', 'Entrée', 'Plat', 'Dessert', 'Boisson', 'Apéritif'];
 const DIETS = ['Aucun', 'Végétarien', 'Végan', 'Sans gluten', 'Sans lactose'];
+const MAX_IMAGES = 5;
 
 let nextId = 1;
 const makeId = () => `item-${nextId++}`;
 
 export default function AddRecipeScreen({ navigation }) {
     const { token } = useAuth();
-    const [photoUri, setPhotoUri] = useState(null);
+    const [images, setImages] = useState([]);
     const [title, setTitle] = useState('');
     const [time, setTime] = useState('');
     const [difficulty, setDifficulty] = useState('Facile');
@@ -56,25 +59,36 @@ export default function AddRecipeScreen({ navigation }) {
     const removeStep = (id) =>
         setSteps((prev) => (prev.length > 1 ? prev.filter((s) => s.id !== id) : prev));
 
-    const handlePickPhoto = async () => {
+    const handlePickPhotos = async () => {
         const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
         if (!permission.granted) {
             setError("L'accès à vos photos est nécessaire pour ajouter une image.");
             return;
         }
 
+        const remaining = MAX_IMAGES - images.length;
+        if (remaining <= 0) return;
+
         const result = await ImagePicker.launchImageLibraryAsync({
             mediaTypes: ['images'],
-            base64: true,
-            quality: 0.5,
-            allowsEditing: true,
-            aspect: [4, 3],
+            allowsMultipleSelection: true,
+            allowsEditing: false,
+            selectionLimit: remaining,
+            quality: 0.7,
         });
 
         if (!result.canceled) {
-            const asset = result.assets[0];
-            setPhotoUri(`data:image/jpeg;base64,${asset.base64}`);
+            const copied = await copyPickedAssetsToCache(result.assets);
+            const picked = copied.map((asset) => ({
+                key: `new-${asset.uri}`,
+                ...asset,
+            }));
+            setImages((prev) => [...prev, ...picked].slice(0, MAX_IMAGES));
         }
+    };
+
+    const handleRemovePhoto = (key) => {
+        setImages((prev) => prev.filter((image) => image.key !== key));
     };
 
     const handleSave = async () => {
@@ -103,16 +117,28 @@ export default function AddRecipeScreen({ navigation }) {
         setError('');
         setSaving(true);
         try {
-            await recipeApi.create(token, {
+            const created = await recipeApi.create(token, {
                 title: title.trim(),
                 difficulty,
                 type: type === 'Non défini' ? null : type,
                 diet: diet === 'Aucun' ? null : diet,
-                imageUrl: photoUri,
                 preparationTime: parseInt(time, 10) || null,
                 ingredients: cleanIngredients,
                 steps: cleanSteps,
             });
+
+            if (images.length > 0) {
+                try {
+                    await recipeApi.addImages(token, created.id, images);
+                } catch (imageErr) {
+                    console.error('Échec de l\'envoi des photos:', imageErr);
+                    Alert.alert(
+                        'Recette créée',
+                        `La recette a été créée mais l'envoi des photos a échoué : ${imageErr.message || imageErr}`
+                    );
+                }
+            }
+
             navigation?.goBack();
         } catch (err) {
             setError(err.message || 'Impossible de créer la recette.');
@@ -131,7 +157,12 @@ export default function AddRecipeScreen({ navigation }) {
                     Partagez votre expertise culinaire avec la communauté.
                 </Text>
 
-                <PhotoPicker imageUri={photoUri} onPress={handlePickPhoto} />
+                <MultiPhotoPicker
+                    images={images}
+                    onAdd={handlePickPhotos}
+                    onRemove={handleRemovePhoto}
+                    maxCount={MAX_IMAGES}
+                />
 
                 <View style={styles.card}>
                     <FormInput

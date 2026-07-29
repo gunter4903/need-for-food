@@ -16,7 +16,7 @@ public class RecipeResponse {
     private String type;
     private String diet;
     private String difficulty;
-    private String imageUrl;
+    private List<RecipeImageResponse> images;
     private Integer preparationTime;
     private LocalDateTime createdAt;
     private Long userId;
@@ -24,4 +24,5 @@ public class RecipeResponse {
     private String userAvatarUrl;
     private List<RecipeIngredientResponse> ingredients;
     private List<String> steps;
+    private boolean favorite;
 }

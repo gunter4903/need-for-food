@@ -2,9 +2,11 @@ package com.needforfood.exception;
 
 import com.needforfood.exception.custom.DuplicateEmailException;
 import com.needforfood.exception.custom.InvalidFriendRequestException;
+import com.needforfood.exception.custom.InvalidImageFileException;
 import com.needforfood.exception.custom.InvalidPasswordException;
 import com.needforfood.exception.custom.InvalidVerificationCodeException;
 import com.needforfood.exception.custom.ResourceNotFoundException;
+import com.needforfood.exception.custom.TooManyRecipeImagesException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
@@ -12,6 +14,7 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
 
 import java.util.stream.Collectors;
 
@@ -46,6 +49,22 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(InvalidFriendRequestException.class)
     public ResponseEntity<ErrorResponse> handleInvalidFriendRequest(InvalidFriendRequestException ex) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ErrorResponse(ex.getMessage()));
+    }
+
+    @ExceptionHandler(TooManyRecipeImagesException.class)
+    public ResponseEntity<ErrorResponse> handleTooManyRecipeImages(TooManyRecipeImagesException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ErrorResponse(ex.getMessage()));
+    }
+
+    @ExceptionHandler(InvalidImageFileException.class)
+    public ResponseEntity<ErrorResponse> handleInvalidImageFile(InvalidImageFileException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ErrorResponse(ex.getMessage()));
+    }
+
+    @ExceptionHandler(MaxUploadSizeExceededException.class)
+    public ResponseEntity<ErrorResponse> handleMaxUploadSizeExceeded(MaxUploadSizeExceededException ex) {
+        return ResponseEntity.status(HttpStatus.PAYLOAD_TOO_LARGE)
+                .body(new ErrorResponse("Fichier trop volumineux (5 Mo maximum par image)."));
     }
 
     @ExceptionHandler(AccessDeniedException.class)

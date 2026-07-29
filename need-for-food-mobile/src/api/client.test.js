@@ -70,6 +70,17 @@ describe('apiFetch', () => {
         });
     });
 
+    it('does not set Content-Type and passes the body untouched when isMultipart is true', async () => {
+        mockFetchOnce({ body: { ok: true } });
+        const formData = { append: jest.fn() }; // simple stand-in, pas un vrai FormData en environnement de test
+
+        await apiFetch('/recipes/1/images', { method: 'POST', token: 'abc', body: formData, isMultipart: true });
+
+        const [, options] = global.fetch.mock.calls[0];
+        expect(options.headers['Content-Type']).toBeUndefined();
+        expect(options.body).toBe(formData);
+    });
+
     it('throws an ApiError with status 0 when the network request itself fails', async () => {
         global.fetch = jest.fn().mockRejectedValue(new TypeError('Network request failed'));
 

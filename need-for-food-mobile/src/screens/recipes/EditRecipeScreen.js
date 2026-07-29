@@ -13,7 +13,7 @@ import Icon from 'react-native-vector-icons/Feather';
 import * as ImagePicker from 'expo-image-picker';
 import { colors, spacing, radius, typography } from '../../constants/theme';
 import Header from '../../components/common/Header';
-import PhotoPicker from '../../components/common/PhotoPicker';
+import MultiPhotoPicker from '../../components/common/MultiPhotoPicker';
 import FormInput from '../../components/common/FormInput';
 import SelectField from '../../components/recipe/SelectField';
 import SectionCard from '../../components/recipe/SectionCard';
@@ -23,10 +23,12 @@ import DashedButton from '../../components/recipe/DashedButton';
 import BottomNav from '../../components/common/BottomNav';
 import { useAuth } from '../../context/AuthContext';
 import * as recipeApi from '../../api/recipeApi';
+import { copyPickedAssetsToCache } from '../../utils/imagePicker';
 
 const DIFFICULTIES = ['Facile', 'Moyen', 'Difficile'];
 const TYPES = ['Non défini', 'Entrée', 'Plat', 'Dessert', 'Boisson', 'Apéritif'];
 const DIETS = ['Aucun', 'Végétarien', 'Végan', 'Sans gluten', 'Sans lactose'];
+const MAX_IMAGES = 5;
 
 let nextId = 1;
 const makeId = () => `edit-item-${nextId++}`;
@@ -38,7 +40,8 @@ export default function EditRecipeScreen({ route, navigation }) {
     const [loading, setLoading] = useState(true);
     const [loadError, setLoadError] = useState('');
 
-    const [photoUri, setPhotoUri] = useState(null);
+    const [images, setImages] = useState([]);
+    const [originalImageIds, setOriginalImageIds] = useState([]);
     const [name, setName] = useState('');
     const [time, setTime] = useState('');
     const [difficulty, setDifficulty] = useState('Facile');
@@ -59,7 +62,14 @@ export default function EditRecipeScreen({ route, navigation }) {
                 const recipe = await recipeApi.getById(token, recipeId);
                 if (cancelled) return;
 
-                setPhotoUri(recipe.imageUrl || null);
+                const existingImages = recipe.images.map((img) => ({
+                    key: `existing-${img.id}`,
+                    uri: img.url,
+                    isNew: false,
+                    id: img.id,
+                }));
+                setImages(existingImages);
+                setOriginalImageIds(existingImages.map((img) => img.id));
                 setName(recipe.title);
                 setTime(recipe.preparationTime != null ? String(recipe.preparationTime) : '');
                 setDifficulty(recipe.difficulty || 'Facile');
@@ -99,25 +109,37 @@ export default function EditRecipeScreen({ route, navigation }) {
     const removeStep = (id) =>
         setSteps((prev) => (prev.length > 1 ? prev.filter((s) => s.id !== id) : prev));
 
-    const handlePickPhoto = async () => {
+    const handlePickPhotos = async () => {
         const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
         if (!permission.granted) {
-            setError("L'accès à vos photos est nécessaire pour changer l'image.");
+            setError("L'accès à vos photos est nécessaire pour ajouter une image.");
             return;
         }
 
+        const remaining = MAX_IMAGES - images.length;
+        if (remaining <= 0) return;
+
         const result = await ImagePicker.launchImageLibraryAsync({
             mediaTypes: ['images'],
-            base64: true,
-            quality: 0.5,
-            allowsEditing: true,
-            aspect: [4, 3],
+            allowsMultipleSelection: true,
+            allowsEditing: false,
+            selectionLimit: remaining,
+            quality: 0.7,
         });
 
         if (!result.canceled) {
-            const asset = result.assets[0];
-            setPhotoUri(`data:image/jpeg;base64,${asset.base64}`);
+            const copied = await copyPickedAssetsToCache(result.assets);
+            const picked = copied.map((asset) => ({
+                key: `new-${asset.uri}`,
+                ...asset,
+                isNew: true,
+            }));
+            setImages((prev) => [...prev, ...picked].slice(0, MAX_IMAGES));
         }
+    };
+
+    const handleRemovePhoto = (key) => {
+        setImages((prev) => prev.filter((image) => image.key !== key));
     };
 
     const handleUpdate = async () => {
@@ -151,11 +173,30 @@ export default function EditRecipeScreen({ route, navigation }) {
                 difficulty,
                 type: type === 'Non défini' ? null : type,
                 diet: diet === 'Aucun' ? null : diet,
-                imageUrl: photoUri,
                 preparationTime: parseInt(time, 10) || null,
                 ingredients: cleanIngredients,
                 steps: cleanSteps,
             });
+
+            const remainingExistingIds = images.filter((image) => !image.isNew).map((image) => image.id);
+            const removedIds = originalImageIds.filter((id) => !remainingExistingIds.includes(id));
+            const newlyPicked = images.filter((image) => image.isNew);
+
+            try {
+                for (const imageId of removedIds) {
+                    await recipeApi.removeImage(token, recipeId, imageId);
+                }
+                if (newlyPicked.length > 0) {
+                    await recipeApi.addImages(token, recipeId, newlyPicked);
+                }
+            } catch (imageErr) {
+                console.error('Échec de la synchronisation des photos:', imageErr);
+                Alert.alert(
+                    'Recette mise à jour',
+                    `La recette a été mise à jour mais la synchronisation des photos a échoué : ${imageErr.message || imageErr}`
+                );
+            }
+
             navigation?.goBack();
         } catch (err) {
             setError(err.message || 'Impossible de mettre à jour la recette.');
@@ -219,7 +260,12 @@ export default function EditRecipeScreen({ route, navigation }) {
                 <Text style={typography.h1}>{name}</Text>
 
                 <View style={styles.photoBlock}>
-                    <PhotoPicker imageUri={photoUri} onPress={handlePickPhoto} label="Changer la photo" />
+                    <MultiPhotoPicker
+                        images={images}
+                        onAdd={handlePickPhotos}
+                        onRemove={handleRemovePhoto}
+                        maxCount={MAX_IMAGES}
+                    />
                 </View>
 
                 <SectionCard icon="info" title="Informations">

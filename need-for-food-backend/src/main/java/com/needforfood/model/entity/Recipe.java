@@ -53,9 +53,6 @@ public class Recipe {
 
     private String difficulty;
 
-    @Column(name = "image_url", columnDefinition = "TEXT")
-    private String imageUrl;
-
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
@@ -67,6 +64,10 @@ public class Recipe {
     @Builder.Default
     @OneToMany(mappedBy = "recipe", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<PreparationStep> steps = new ArrayList<>();
+
+    @Builder.Default
+    @OneToMany(mappedBy = "recipe", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<RecipeImage> images = new ArrayList<>();
 
     @PrePersist
     protected void onCreate() {

@@ -1,4 +1,4 @@
-import { apiFetch } from './client';
+import { apiFetch, uploadFile } from './client';
 
 export function getAll(token) {
     return apiFetch('/recipes', { token });
@@ -35,4 +35,29 @@ export function update(token, id, recipe) {
 
 export function remove(token, id) {
     return apiFetch(`/recipes/${id}`, { method: 'DELETE', token });
+}
+
+export async function addImages(token, id, files) {
+    let recipe;
+    for (const file of files) {
+        recipe = await uploadFile(`/recipes/${id}/images`, {
+            token,
+            uri: file.uri,
+            fieldName: 'files',
+            mimeType: file.mimeType || 'image/jpeg',
+        });
+    }
+    return recipe;
+}
+
+export function removeImage(token, id, imageId) {
+    return apiFetch(`/recipes/${id}/images/${imageId}`, { method: 'DELETE', token });
+}
+
+export function addFavorite(token, id) {
+    return apiFetch(`/recipes/${id}/favorite`, { method: 'POST', token });
+}
+
+export function removeFavorite(token, id) {
+    return apiFetch(`/recipes/${id}/favorite`, { method: 'DELETE', token });
 }

@@ -1,12 +1,14 @@
 package com.needforfood.mapper;
 
 import com.needforfood.dto.request.RecipeRequest;
+import com.needforfood.dto.response.RecipeImageResponse;
 import com.needforfood.dto.response.RecipeIngredientResponse;
 import com.needforfood.dto.response.RecipeMatchResponse;
 import com.needforfood.dto.response.RecipeResponse;
 import com.needforfood.model.entity.Ingredient;
 import com.needforfood.model.entity.PreparationStep;
 import com.needforfood.model.entity.Recipe;
+import com.needforfood.model.entity.RecipeImage;
 import com.needforfood.model.entity.RecipeIngredient;
 import com.needforfood.service.RecipeMatch;
 
@@ -40,7 +42,6 @@ public final class RecipeMapper {
                 .type(request.getType())
                 .diet(request.getDiet())
                 .difficulty(request.getDifficulty())
-                .imageUrl(request.getImageUrl())
                 .preparationTime(request.getPreparationTime())
                 .ingredients(ingredients)
                 .steps(steps)
@@ -48,6 +49,10 @@ public final class RecipeMapper {
     }
 
     public static RecipeResponse toResponse(Recipe recipe) {
+        return toResponse(recipe, false);
+    }
+
+    public static RecipeResponse toResponse(Recipe recipe, boolean favorite) {
         List<RecipeIngredientResponse> ingredients = recipe.getIngredients().stream()
                 .map(ri -> new RecipeIngredientResponse(
                         ri.getIngredient().getId(),
@@ -61,6 +66,11 @@ public final class RecipeMapper {
                 .map(PreparationStep::getDescription)
                 .toList();
 
+        List<RecipeImageResponse> images = recipe.getImages().stream()
+                .sorted(Comparator.comparing(RecipeImage::getPosition))
+                .map(img -> new RecipeImageResponse(img.getId(), img.getUrl(), img.getPosition()))
+                .toList();
+
         return new RecipeResponse(
                 recipe.getId(),
                 recipe.getTitle(),
@@ -68,17 +78,18 @@ public final class RecipeMapper {
                 recipe.getType(),
                 recipe.getDiet(),
                 recipe.getDifficulty(),
-                recipe.getImageUrl(),
+                images,
                 recipe.getPreparationTime(),
                 recipe.getCreatedAt(),
                 recipe.getUser().getId(),
                 recipe.getUser().getUsername(),
                 recipe.getUser().getAvatarUrl(),
                 ingredients,
-                steps);
+                steps,
+                favorite);
     }
 
-    public static RecipeMatchResponse toMatchResponse(RecipeMatch match) {
-        return new RecipeMatchResponse(toResponse(match.recipe()), match.matchedCount(), match.totalCount());
+    public static RecipeMatchResponse toMatchResponse(RecipeMatch match, boolean favorite) {
+        return new RecipeMatchResponse(toResponse(match.recipe(), favorite), match.matchedCount(), match.totalCount());
     }
 }
