@@ -1,10 +1,15 @@
-import React from 'react';
-import { ScrollView, View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import React, { useState } from 'react';
+import { ScrollView, View, Text, TouchableOpacity, StyleSheet, ActivityIndicator } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { File, Paths } from 'expo-file-system';
+import * as Sharing from 'expo-sharing';
 import Icon from 'react-native-vector-icons/Feather';
 import { colors, spacing, radius, typography } from '../../constants/theme';
 import Header from '../../components/common/Header';
 import BottomNav from '../../components/common/BottomNav';
+import { useAuth } from '../../context/AuthContext';
+import * as userApi from '../../api/userApi';
+import { showAlert } from '../../utils/appAlert';
 
 function Section({ icon, title, children }) {
     return (
@@ -19,6 +24,59 @@ function Section({ icon, title, children }) {
 }
 
 export default function PrivacyScreen({ navigation }) {
+    const { token } = useAuth();
+    const [exporting, setExporting] = useState(false);
+    const [importing, setImporting] = useState(false);
+
+    const handleExport = async () => {
+        setExporting(true);
+        try {
+            const data = await userApi.exportData(token);
+            const file = new File(Paths.cache, `need-for-food-export-${Date.now()}.json`);
+            file.create();
+            file.write(JSON.stringify(data, null, 2));
+
+            if (await Sharing.isAvailableAsync()) {
+                await Sharing.shareAsync(file.uri, {
+                    mimeType: 'application/json',
+                    dialogTitle: 'Exporter mes données Need for Food',
+                });
+            } else {
+                showAlert('Export terminé', `Fichier enregistré : ${file.uri}`);
+            }
+        } catch (err) {
+            showAlert('Erreur', err.message || "Impossible d'exporter vos données.");
+        } finally {
+            setExporting(false);
+        }
+    };
+
+    const handleImport = async () => {
+        const picked = await File.pickFileAsync({ mimeTypes: 'application/json' });
+        if (picked.canceled) {
+            return;
+        }
+
+        setImporting(true);
+        try {
+            const payload = await picked.result.json();
+            const summary = await userApi.importData(token, payload);
+
+            showAlert(
+                'Import terminé',
+                `Recettes : ${summary.recipesImported} ajoutée(s), ${summary.recipesSkipped} déjà présente(s).\n` +
+                    `Favoris restaurés : ${summary.favoritesImported}.\n` +
+                    `Listes de courses : ${summary.shoppingListsImported} ajoutée(s), ${summary.shoppingListsSkipped} déjà présente(s).` +
+                    (summary.preferencesImported ? '\nPréférences mises à jour.' : '') +
+                    (summary.profileUpdated ? '\nProfil mis à jour.' : '')
+            );
+        } catch (err) {
+            showAlert('Erreur', err.message || "Impossible d'importer ce fichier. Vérifiez qu'il s'agit bien d'un export Need for Food.");
+        } finally {
+            setImporting(false);
+        }
+    };
+
     return (
         <SafeAreaView style={styles.safeArea}>
             <Header onBack={() => navigation?.goBack()} onAvatarPress={() => navigation?.navigate('Profil')} />
@@ -61,6 +119,46 @@ export default function PrivacyScreen({ navigation }) {
                     action est irréversible et supprime immédiatement votre profil, vos recettes, vos
                     listes de courses et vos préférences alimentaires.
                 </Section>
+
+                <Section icon="download" title="Exporter / importer vos données">
+                    Téléchargez une copie complète de vos données (profil, recettes, favoris, listes de
+                    courses, préférences) au format JSON. Vous pouvez ensuite réimporter ce fichier dans
+                    votre compte, par exemple après une suppression accidentelle — les recettes déjà
+                    présentes ne sont jamais dupliquées. Les photos de recette ne sont pas incluses dans
+                    l'export.
+                </Section>
+
+                <TouchableOpacity
+                    style={[styles.dataButton, exporting && styles.buttonDisabled]}
+                    activeOpacity={0.85}
+                    onPress={handleExport}
+                    disabled={exporting || importing}
+                >
+                    {exporting ? (
+                        <ActivityIndicator color={colors.textOnDark} />
+                    ) : (
+                        <>
+                            <Icon name="download" size={16} color={colors.textOnDark} style={{ marginRight: 8 }} />
+                            <Text style={typography.button}>Exporter mes données</Text>
+                        </>
+                    )}
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                    style={[styles.dataButtonSecondary, importing && styles.buttonDisabled]}
+                    activeOpacity={0.85}
+                    onPress={handleImport}
+                    disabled={exporting || importing}
+                >
+                    {importing ? (
+                        <ActivityIndicator color={colors.primaryDark} />
+                    ) : (
+                        <>
+                            <Icon name="upload" size={16} color={colors.primaryDark} style={{ marginRight: 8 }} />
+                            <Text style={styles.dataButtonSecondaryLabel}>Importer mes données</Text>
+                        </>
+                    )}
+                </TouchableOpacity>
 
                 <TouchableOpacity
                     style={styles.manageButton}
@@ -124,5 +222,31 @@ const styles = StyleSheet.create({
         borderRadius: radius.pill,
         height: 52,
         marginTop: spacing.sm,
+    },
+    dataButton: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        backgroundColor: colors.primary,
+        borderRadius: radius.pill,
+        height: 52,
+        marginBottom: spacing.sm,
+    },
+    dataButtonSecondary: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        backgroundColor: colors.cardMuted,
+        borderRadius: radius.pill,
+        height: 52,
+        marginBottom: spacing.md,
+    },
+    dataButtonSecondaryLabel: {
+        fontSize: 16,
+        fontWeight: '700',
+        color: colors.primaryDark,
+    },
+    buttonDisabled: {
+        opacity: 0.7,
     },
 });

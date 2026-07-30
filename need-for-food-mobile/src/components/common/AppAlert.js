@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Modal, View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { Modal, View, Text, TouchableOpacity, ScrollView, StyleSheet } from 'react-native';
 import { colors, spacing, radius, typography } from '../../constants/theme';
 import { registerAlertListener } from '../../utils/appAlert';
 
@@ -25,7 +25,11 @@ export default function AppAlert() {
             <View style={styles.backdrop}>
                 <View style={styles.card}>
                     <Text style={typography.h3}>{alert.title}</Text>
-                    {!!alert.message && <Text style={styles.message}>{alert.message}</Text>}
+                    {!!alert.message && (
+                        <ScrollView style={styles.messageScroll} showsVerticalScrollIndicator={false}>
+                            <Text style={styles.message}>{alert.message}</Text>
+                        </ScrollView>
+                    )}
 
                     <View style={buttons.length > 1 ? styles.buttonRow : styles.buttonColumn}>
                         {buttons.map((button, index) => (
@@ -34,6 +38,7 @@ export default function AppAlert() {
                                 activeOpacity={0.85}
                                 style={[
                                     styles.button,
+                                    buttons.length > 1 ? styles.buttonFlex : styles.buttonFull,
                                     buttonStyle(button.style),
                                     buttons.length > 1 && index > 0 && styles.buttonSpacing,
                                 ]}
@@ -76,6 +81,7 @@ const styles = StyleSheet.create({
     card: {
         width: '100%',
         maxWidth: 340,
+        maxHeight: '85%',
         backgroundColor: colors.card,
         borderRadius: radius.lg,
         padding: spacing.lg,
@@ -84,6 +90,9 @@ const styles = StyleSheet.create({
         shadowRadius: 12,
         shadowOffset: { width: 0, height: 6 },
         elevation: 6,
+    },
+    messageScroll: {
+        maxHeight: 280,
     },
     message: {
         ...typography.body,
@@ -99,11 +108,16 @@ const styles = StyleSheet.create({
         marginTop: spacing.md,
     },
     button: {
-        flex: 1,
         height: 46,
         borderRadius: radius.pill,
         alignItems: 'center',
         justifyContent: 'center',
+    },
+    buttonFlex: {
+        flex: 1,
+    },
+    buttonFull: {
+        alignSelf: 'stretch',
     },
     buttonSpacing: {
         marginLeft: spacing.sm,

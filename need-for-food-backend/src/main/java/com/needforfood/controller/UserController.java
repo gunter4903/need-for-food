@@ -1,13 +1,16 @@
 package com.needforfood.controller;
 
+import com.needforfood.dto.UserDataPayload;
 import com.needforfood.dto.request.ChangePasswordRequest;
 import com.needforfood.dto.request.UpdateProfileRequest;
+import com.needforfood.dto.response.ImportSummaryResponse;
 import com.needforfood.dto.response.PublicProfileResponse;
 import com.needforfood.dto.response.UserResponse;
 import com.needforfood.dto.response.UserSearchResultResponse;
 import com.needforfood.mapper.FriendshipMapper;
 import com.needforfood.mapper.UserMapper;
 import com.needforfood.service.FriendshipService;
+import com.needforfood.service.UserDataTransferService;
 import com.needforfood.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -16,6 +19,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -32,6 +36,7 @@ public class UserController {
 
     private final UserService userService;
     private final FriendshipService friendshipService;
+    private final UserDataTransferService userDataTransferService;
 
     @GetMapping("/search")
     public List<UserSearchResultResponse> search(@AuthenticationPrincipal Long userId, @RequestParam String q) {
@@ -66,5 +71,16 @@ public class UserController {
     @GetMapping("/{id}")
     public PublicProfileResponse getPublicProfile(@PathVariable Long id) {
         return UserMapper.toPublicProfile(userService.getById(id));
+    }
+
+    @GetMapping("/me/export")
+    public UserDataPayload exportMyData(@AuthenticationPrincipal Long userId) {
+        return userDataTransferService.exportData(userId);
+    }
+
+    @PostMapping("/me/import")
+    public ImportSummaryResponse importMyData(@AuthenticationPrincipal Long userId,
+                                               @RequestBody UserDataPayload payload) {
+        return userDataTransferService.importData(userId, payload);
     }
 }

@@ -1,20 +1,20 @@
 {
   "expo": {
-    "name": "need-for-food-mobile",
+    "name": "Need for Food",
     "slug": "need-for-food-mobile",
-    "version": "1.0.0",
+    "version": "1.0.3",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    "icon": "./assets/images/logo.png",
     "userInterfaceStyle": "light",
     "ios": {
       "supportsTablet": true
     },
     "android": {
+      "package": "com.needforfood.app",
+      "versionCode": 4,
       "adaptiveIcon": {
-        "backgroundColor": "#E6F4FE",
-        "foregroundImage": "./assets/android-icon-foreground.png",
-        "backgroundImage": "./assets/android-icon-background.png",
-        "monochromeImage": "./assets/android-icon-monochrome.png"
+        "backgroundColor": "#E67E22",
+        "foregroundImage": "./assets/images/logo-adaptive-foreground.png"
       }
     },
     "web": {
@@ -26,6 +26,15 @@
         "expo-image-picker",
         {
           "photosPermission": "Need for Food a besoin d'accéder à vos photos pour illustrer vos recettes."
+        }
+      ],
+      "expo-sharing",
+      [
+        "expo-build-properties",
+        {
+          "android": {
+            "usesCleartextTraffic": true
+          }
         }
       ]
     ]

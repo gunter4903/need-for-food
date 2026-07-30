@@ -28,6 +28,7 @@ import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -152,6 +153,31 @@ public class RecipeService {
 
     private String normalize(String value) {
         return value == null ? "" : value.trim().toLowerCase();
+    }
+
+    public record ImportResult(Recipe recipe, boolean created) {
+    }
+
+    @Transactional
+    public ImportResult createRecipeIfNotDuplicate(Long userId, Recipe candidate) {
+        String candidateFingerprint = fingerprint(candidate);
+        Optional<Recipe> existing = getByUser(userId).stream()
+                .filter(recipe -> fingerprint(recipe).equals(candidateFingerprint))
+                .findFirst();
+
+        if (existing.isPresent()) {
+            return new ImportResult(existing.get(), false);
+        }
+        return new ImportResult(createRecipe(userId, candidate), true);
+    }
+
+    @Transactional(readOnly = true)
+    public Optional<Long> findVisibleRecipeIdByFingerprint(Long userId, Recipe candidate) {
+        String candidateFingerprint = fingerprint(candidate);
+        return getAll(userId).stream()
+                .filter(recipe -> fingerprint(recipe).equals(candidateFingerprint))
+                .map(Recipe::getId)
+                .findFirst();
     }
 
     @Transactional(readOnly = true)

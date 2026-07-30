@@ -41,6 +41,13 @@ yarn-error.*
 /ios
 /android
 
+# clé de signature de release (jamais commitée : voir need-for-food-mobile/keystore/README.md)
+/keystore
+
+# APK générés (voir BUILD.md pour la procédure de build)
+/build-output
+BUILD.md
+
 # others
 structure sugérée.txt
 AVANCEMENT.md

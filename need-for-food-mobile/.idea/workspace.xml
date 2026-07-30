@@ -5,15 +5,19 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="23d147eb-fe7c-4e75-9183-d618c3f3dcce" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/../need-for-food-backend/src/main/java/com/needforfood/repository/sql/UserRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/../need-for-food-backend/src/main/java/com/needforfood/repository/sql/UserRepository.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../need-for-food-backend/src/test/java/com/needforfood/controller/FriendshipFlowIntegrationTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/../need-for-food-backend/src/test/java/com/needforfood/controller/FriendshipFlowIntegrationTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../need-for-food-backend/src/main/java/com/needforfood/controller/UserController.java" beforeDir="false" afterPath="$PROJECT_DIR$/../need-for-food-backend/src/main/java/com/needforfood/controller/UserController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../need-for-food-backend/src/main/java/com/needforfood/service/RecipeService.java" beforeDir="false" afterPath="$PROJECT_DIR$/../need-for-food-backend/src/main/java/com/needforfood/service/RecipeService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/recipe/RecipeMatchCard.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/recipe/RecipeMatchCard.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app.json" beforeDir="false" afterPath="$PROJECT_DIR$/app.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/images/temp/img-placeholder.png" beforeDir="false" afterPath="$PROJECT_DIR$/assets/images/temp/img-placeholder.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/package-lock.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/api/userApi.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/api/userApi.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/common/AppAlert.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/common/AppAlert.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/screens/home/HomeScreen.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/screens/home/HomeScreen.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/screens/profile/PrivacyScreen.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/screens/profile/PrivacyScreen.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/screens/recipes/SearchRecipesScreen.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/screens/recipes/SearchRecipesScreen.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/screens/shoppingList/CreateShoppingListScreen.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/screens/shoppingList/CreateShoppingListScreen.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/screens/shoppingList/ShoppingListScreen.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/screens/shoppingList/ShoppingListScreen.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/utils/recipeFilters.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/utils/recipeFilters.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/utils/recipeFilters.test.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/utils/recipeFilters.test.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -26,7 +30,7 @@
     </execution>
   </component>
   <component name="EmbeddingIndexingInfo">
-    <option name="cachedIndexableFilesCount" value="83" />
+    <option name="cachedIndexableFilesCount" value="122" />
   </component>
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
@@ -56,25 +60,6 @@
   </component>
   <component name="NextEditCompletionFeaturesState">
     <decayedCancelled>
-      <entry key="MS100" value="1.6360064317642027" />
-      <entry key="MS500" value="3.499466115899976" />
-      <entry key="S2" value="5.790240323749102" />
-      <entry key="S5" value="9.825723654260825" />
-      <entry key="S10" value="16.45905605278596" />
-      <entry key="S30" value="28.39257670470699" />
-      <entry key="S60" value="33.502529244820934" />
-      <entry key="M2" value="36.55399076424664" />
-      <entry key="M5" value="38.57080441613293" />
-      <entry key="M10" value="39.279553229053555" />
-      <entry key="M15" value="39.53822895327902" />
-      <entry key="M30" value="40.21939462846179" />
-      <entry key="H1" value="44.255391175986105" />
-      <entry key="H2" value="54.9414037735728" />
-      <entry key="H4" value="71.69441233498308" />
-      <entry key="D1" value="349.3050488929261" />
-      <entry key="W1" value="878.1723126037933" />
-    </decayedCancelled>
-    <decayedSelected>
       <entry key="MS100" value="0.0" />
       <entry key="MS500" value="0.0" />
       <entry key="S2" value="0.0" />
@@ -82,35 +67,54 @@
       <entry key="S10" value="0.0" />
       <entry key="S30" value="0.0" />
       <entry key="S60" value="0.0" />
-      <entry key="M2" value="0.0" />
-      <entry key="M5" value="6.301202111812842E-146" />
-      <entry key="M10" value="7.066635899715582E-73" />
-      <entry key="M15" value="1.6210971576598984E-48" />
-      <entry key="M30" value="3.817407133825184E-24" />
-      <entry key="H1" value="6.350382193841575E-12" />
-      <entry key="H2" value="1.222794981251698E-5" />
-      <entry key="H4" value="0.03283023271679394" />
-      <entry key="D1" value="40.93071743928768" />
-      <entry key="W1" value="150.6066650808644" />
+      <entry key="M2" value="4.568877451046438E-203" />
+      <entry key="M5" value="1.0752577805369087E-80" />
+      <entry key="M10" value="6.653269192504844E-40" />
+      <entry key="M15" value="2.6667154452443603E-26" />
+      <entry key="M30" value="1.1690119920593765E-12" />
+      <entry key="H1" value="9.054121574158225E-6" />
+      <entry key="H2" value="0.02949516937497995" />
+      <entry key="H4" value="1.927687253451169" />
+      <entry key="D1" value="195.7126825881342" />
+      <entry key="W1" value="832.5412451466715" />
+    </decayedCancelled>
+    <decayedSelected>
+      <entry key="MS100" value="1.0" />
+      <entry key="MS500" value="1.0" />
+      <entry key="S2" value="1.0" />
+      <entry key="S5" value="1.0" />
+      <entry key="S10" value="1.0" />
+      <entry key="S30" value="1.0" />
+      <entry key="S60" value="1.0" />
+      <entry key="M2" value="1.0" />
+      <entry key="M5" value="1.0" />
+      <entry key="M10" value="1.0" />
+      <entry key="M15" value="1.0" />
+      <entry key="M30" value="1.0" />
+      <entry key="H1" value="1.0" />
+      <entry key="H2" value="1.0000000029252647" />
+      <entry key="H4" value="1.00050778482368" />
+      <entry key="D1" value="21.430718955255895" />
+      <entry key="W1" value="137.37501305527576" />
     </decayedSelected>
     <decayedShown>
-      <entry key="MS100" value="1.4464825367737324" />
-      <entry key="MS500" value="3.289301615919712" />
-      <entry key="S2" value="5.707594949023877" />
-      <entry key="S5" value="9.783906503572913" />
-      <entry key="S10" value="16.430298238719672" />
-      <entry key="S30" value="28.37743204297163" />
-      <entry key="S60" value="33.493671025819324" />
-      <entry key="M2" value="36.54916834049515" />
-      <entry key="M5" value="38.56877014251013" />
-      <entry key="M10" value="39.27851735249373" />
-      <entry key="M15" value="39.53753335418441" />
-      <entry key="M30" value="40.21904012286795" />
-      <entry key="H1" value="44.255200234705285" />
-      <entry key="H2" value="54.94130407598812" />
-      <entry key="H4" value="71.72716887339676" />
-      <entry key="D1" value="390.234806695213" />
-      <entry key="W1" value="1028.7784743057878" />
+      <entry key="MS100" value="0.002137292385274882" />
+      <entry key="MS500" value="0.29239691601298684" />
+      <entry key="S2" value="0.7353484763986453" />
+      <entry key="S5" value="0.8842952226432717" />
+      <entry key="S10" value="0.9403697265667752" />
+      <entry key="S30" value="0.9797145241532871" />
+      <entry key="S60" value="0.9898052960826624" />
+      <entry key="M2" value="0.9948895898956137" />
+      <entry key="M5" value="0.9979526934330374" />
+      <entry key="M10" value="0.9989758222464833" />
+      <entry key="M15" value="0.9993170982290085" />
+      <entry key="M30" value="0.9996584908014063" />
+      <entry key="H1" value="0.9998382848413794" />
+      <entry key="H2" value="1.029409646612049" />
+      <entry key="H4" value="2.9281484331871535" />
+      <entry key="D1" value="217.1429033816206" />
+      <entry key="W1" value="969.9157983654414" />
     </decayedShown>
   </component>
   <component name="ProjectColorInfo">{
@@ -128,6 +132,7 @@
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.git.unshallow": "true",
     "RunOnceActivity.typescript.service.memoryLimit.init": "true",
+    "bazel.project.detector.is.bazel.project": "true",
     "codeWithMe.voiceChat.enabledByDefault": "false",
     "git-widget-placeholder": "main",
     "last_opened_file_path": "C:/Users/antoi/Documents/01. Bachelor Concepteur Developpeur d Applications/99. Projet Fil Rouge/need-for-food/need-for-food-mobile/assets",
@@ -170,7 +175,8 @@
       <updated>1784656457225</updated>
       <workItem from="1784656458434" duration="13515000" />
       <workItem from="1785139683525" duration="108000" />
-      <workItem from="1785139852619" duration="61753000" />
+      <workItem from="1785139852619" duration="64406000" />
+      <workItem from="1785347860913" duration="9400000" />
     </task>
     <servers />
   </component>

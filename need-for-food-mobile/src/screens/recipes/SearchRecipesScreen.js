@@ -65,6 +65,7 @@ export default function SearchRecipesScreen({ navigation }) {
     const [hasSearched, setHasSearched] = useState(false);
     const [resultsQuery, setResultsQuery] = useState('');
     const [activeTypes, setActiveTypes] = useState([]);
+    const [pickerExpanded, setPickerExpanded] = useState(true);
 
     useFocusEffect(
         useCallback(() => {
@@ -144,11 +145,19 @@ export default function SearchRecipesScreen({ navigation }) {
         try {
             const matches = await recipeApi.search(token, selected);
             setResults(matches.map((m) => toCard(m.recipe, `${m.matchedCount}/${m.totalCount} correspondants`, user?.id)));
+            setPickerExpanded(false);
         } catch (err) {
             setError(err.message || 'Impossible de rechercher des recettes.');
         } finally {
             setSearching(false);
         }
+    };
+
+    const handleResetIngredientSearch = () => {
+        setSelected([]);
+        setHasSearched(false);
+        setError('');
+        setPickerExpanded(true);
     };
 
     return (
@@ -163,70 +172,119 @@ export default function SearchRecipesScreen({ navigation }) {
                 <Text style={styles.subtitle}>
                     Sélectionnez les ingrédients que vous avez pour trouver la recette parfaite.
                 </Text>
-                <TouchableOpacity onPress={() => navigation?.navigate('Preferences')}>
-                    <Text style={styles.preferencesHint}>
-                        Recettes filtrées selon vos préférences · Modifier
-                    </Text>
-                </TouchableOpacity>
 
-                <View style={styles.searchBar}>
-                    <Icon name="search" size={18} color={colors.textSecondary} />
-                    <TextInput
-                        style={styles.searchInput}
-                        placeholder="Rechercher des ingrédients..."
-                        placeholderTextColor={colors.textSecondary}
-                        value={search}
-                        onChangeText={setSearch}
-                    />
-                </View>
-
-                {loading ? (
-                    <ActivityIndicator color={colors.primary} style={{ marginVertical: spacing.md }} />
-                ) : (
-                    <View style={styles.chipsWrap}>
-                        {filteredChips.map((ingredient) => (
-                            <IngredientFilterChip
-                                key={ingredient}
-                                label={ingredient}
-                                active={selected.includes(ingredient)}
-                                onPress={() => toggleIngredient(ingredient)}
+                {/* Section 1 : sélection d'ingrédients, regroupée dans une carte pour se distinguer des résultats */}
+                <View style={styles.pickerCard}>
+                    <View style={styles.pickerHeader}>
+                        <TouchableOpacity
+                            style={styles.pickerHeaderToggle}
+                            activeOpacity={0.7}
+                            onPress={() => setPickerExpanded((v) => !v)}
+                        >
+                            <Icon name="filter" size={16} color={colors.primaryDark} />
+                            <Text style={styles.pickerHeaderText}>
+                                Ingrédients{selected.length > 0 ? ` (${selected.length})` : ''}
+                            </Text>
+                            <Icon
+                                name={pickerExpanded ? 'chevron-up' : 'chevron-down'}
+                                size={18}
+                                color={colors.textSecondary}
+                                style={{ marginLeft: 6 }}
                             />
-                        ))}
+                        </TouchableOpacity>
+
+                        {(hasSearched || selected.length > 0) && (
+                            <TouchableOpacity
+                                style={styles.resetLink}
+                                activeOpacity={0.7}
+                                onPress={handleResetIngredientSearch}
+                                hitSlop={8}
+                            >
+                                <Icon name="rotate-ccw" size={13} color={colors.danger} />
+                                <Text style={styles.resetLinkText}>Réinitialiser</Text>
+                            </TouchableOpacity>
+                        )}
                     </View>
-                )}
 
-                {selected.length > 0 ? (
-                    <View style={styles.selectionBlock}>
-                        <Text style={styles.selectionLabel}>Sélection :</Text>
-                        <View style={styles.selectionTags}>
-                            {selected.map((name) => (
-                                <SelectionTag
-                                    key={name}
-                                    label={name}
-                                    onRemove={() => toggleIngredient(name)}
-                                />
-                            ))}
-                        </View>
-                    </View>
-                ) : null}
-
-                {!!error && <Text style={styles.errorText}>{error}</Text>}
-
-                <TouchableOpacity
-                    style={[styles.findButton, searching && styles.buttonDisabled]}
-                    activeOpacity={0.85}
-                    onPress={handleFindRecipes}
-                    disabled={searching}
-                >
-                    {searching ? (
-                        <ActivityIndicator color={colors.textOnDark} />
-                    ) : (
+                    {pickerExpanded && (
                         <>
-                            <Icon name="star" size={16} color={colors.textOnDark} style={{ marginRight: 8 }} />
-                            <Text style={typography.button}>Trouver des recettes</Text>
+                            <TouchableOpacity onPress={() => navigation?.navigate('Preferences')}>
+                                <Text style={styles.preferencesHint}>
+                                    Recettes filtrées selon vos préférences · Modifier
+                                </Text>
+                            </TouchableOpacity>
+
+                            <View style={styles.searchBar}>
+                                <Icon name="search" size={18} color={colors.textSecondary} />
+                                <TextInput
+                                    style={styles.searchInput}
+                                    placeholder="Rechercher des ingrédients..."
+                                    placeholderTextColor={colors.textSecondary}
+                                    value={search}
+                                    onChangeText={setSearch}
+                                />
+                                {!!search && (
+                                    <TouchableOpacity onPress={() => setSearch('')} hitSlop={8}>
+                                        <Icon name="x-circle" size={16} color={colors.textSecondary} />
+                                    </TouchableOpacity>
+                                )}
+                            </View>
+
+                            {loading ? (
+                                <ActivityIndicator color={colors.primary} style={{ marginVertical: spacing.md }} />
+                            ) : (
+                                <View style={styles.chipsWrap}>
+                                    {filteredChips.map((ingredient) => (
+                                        <IngredientFilterChip
+                                            key={ingredient}
+                                            label={ingredient}
+                                            active={selected.includes(ingredient)}
+                                            onPress={() => toggleIngredient(ingredient)}
+                                        />
+                                    ))}
+                                </View>
+                            )}
+
+                            {selected.length > 0 ? (
+                                <View style={styles.selectionBlock}>
+                                    <Text style={styles.selectionLabel}>Sélection :</Text>
+                                    <View style={styles.selectionTags}>
+                                        {selected.map((name) => (
+                                            <SelectionTag
+                                                key={name}
+                                                label={name}
+                                                onRemove={() => toggleIngredient(name)}
+                                            />
+                                        ))}
+                                    </View>
+                                </View>
+                            ) : null}
+
+                            {!!error && <Text style={styles.errorText}>{error}</Text>}
+
+                            <TouchableOpacity
+                                style={[styles.findButton, searching && styles.buttonDisabled]}
+                                activeOpacity={0.85}
+                                onPress={handleFindRecipes}
+                                disabled={searching}
+                            >
+                                {searching ? (
+                                    <ActivityIndicator color={colors.textOnDark} />
+                                ) : (
+                                    <>
+                                        <Icon name="star" size={16} color={colors.textOnDark} style={{ marginRight: 8 }} />
+                                        <Text style={typography.button}>Trouver des recettes</Text>
+                                    </>
+                                )}
+                            </TouchableOpacity>
                         </>
                     )}
-                </TouchableOpacity>
+                </View>
+
+                {/* Section 2 : résultats, avec ses propres filtres (nom/créateur, type) */}
+                <Text style={styles.resultsSectionTitle}>
+                    {hasSearched ? 'Résultats de la recherche' : 'Suggestions pour vous'}
+                </Text>
 
                 <View style={styles.searchBar}>
                     <Icon name="search" size={18} color={colors.textSecondary} />
@@ -237,6 +295,11 @@ export default function SearchRecipesScreen({ navigation }) {
                         value={resultsQuery}
                         onChangeText={setResultsQuery}
                     />
+                    {!!resultsQuery && (
+                        <TouchableOpacity onPress={() => setResultsQuery('')} hitSlop={8}>
+                            <Icon name="x-circle" size={16} color={colors.textSecondary} />
+                        </TouchableOpacity>
+                    )}
                 </View>
 
                 <ScrollView
@@ -254,12 +317,7 @@ export default function SearchRecipesScreen({ navigation }) {
                     ))}
                 </ScrollView>
 
-                <View style={styles.sectionHeaderRow}>
-                    <Text style={typography.h2}>
-                        {hasSearched ? 'Résultats de la recherche' : 'Suggestions pour vous'}
-                    </Text>
-                    <Text style={styles.resultsCount}>{visibleResults.length} résultats</Text>
-                </View>
+                <Text style={styles.resultsCount}>{visibleResults.length} résultats</Text>
 
                 {visibleResults.map((recipe) => (
                     <RecipeMatchCard
@@ -271,6 +329,9 @@ export default function SearchRecipesScreen({ navigation }) {
                 ))}
             </ScrollView>
 
+            <BottomNav />
+
+            {/* Bouton flottant d'ajout — rendu après BottomNav pour toujours rester au-dessus */}
             <TouchableOpacity
                 style={styles.fab}
                 activeOpacity={0.85}
@@ -278,8 +339,6 @@ export default function SearchRecipesScreen({ navigation }) {
             >
                 <Icon name="plus" size={26} color={colors.textOnDark} />
             </TouchableOpacity>
-
-            <BottomNav />
         </SafeAreaView>
     );
 }
@@ -299,11 +358,48 @@ const styles = StyleSheet.create({
         marginTop: spacing.xs,
         marginBottom: spacing.md,
     },
+    pickerCard: {
+        backgroundColor: colors.card,
+        borderRadius: radius.lg,
+        padding: spacing.md,
+        marginBottom: spacing.lg,
+    },
+    pickerHeader: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        marginBottom: spacing.sm,
+    },
+    pickerHeaderToggle: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        flexShrink: 1,
+    },
+    pickerHeaderText: {
+        fontSize: 15,
+        fontWeight: '700',
+        color: colors.textPrimary,
+        marginLeft: 6,
+    },
+    resetLink: {
+        flexDirection: 'row',
+        alignItems: 'center',
+    },
+    resetLinkText: {
+        fontSize: 12,
+        fontWeight: '700',
+        color: colors.danger,
+        marginLeft: 4,
+    },
     preferencesHint: {
         fontSize: 12,
         fontWeight: '600',
         color: colors.primary,
         marginBottom: spacing.md,
+    },
+    resultsSectionTitle: {
+        ...typography.h2,
+        marginBottom: spacing.sm,
     },
     searchBar: {
         flexDirection: 'row',
@@ -362,23 +458,18 @@ const styles = StyleSheet.create({
         opacity: 0.7,
     },
     typeFilterRow: {
-        marginBottom: spacing.md,
-    },
-    sectionHeaderRow: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
         marginBottom: spacing.sm,
     },
     resultsCount: {
         fontSize: 13,
         fontWeight: '600',
         color: colors.primary,
+        marginBottom: spacing.sm,
     },
     fab: {
         position: 'absolute',
         right: spacing.lg,
-        bottom: 90,
+        bottom: 110,
         width: 56,
         height: 56,
         borderRadius: 28,
@@ -386,9 +477,10 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
         shadowColor: '#000',
-        shadowOpacity: 0.2,
+        shadowOpacity: 0.3,
         shadowRadius: 8,
         shadowOffset: { width: 0, height: 4 },
-        elevation: 4,
+        elevation: 8,
+        zIndex: 20,
     },
 });

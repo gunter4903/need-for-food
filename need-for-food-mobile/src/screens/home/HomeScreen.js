@@ -216,7 +216,9 @@ export default function HomeScreen({ navigation }) {
                 )}
             </ScrollView>
 
-            {/* Bouton flottant d'ajout */}
+            <BottomNav />
+
+            {/* Bouton flottant d'ajout — rendu après BottomNav pour toujours rester au-dessus */}
             <TouchableOpacity
                 style={styles.fab}
                 activeOpacity={0.85}
@@ -224,8 +226,6 @@ export default function HomeScreen({ navigation }) {
             >
                 <Icon name="plus" size={26} color={colors.textOnDark} />
             </TouchableOpacity>
-
-            <BottomNav />
         </SafeAreaView>
     );
 }
@@ -350,7 +350,7 @@ const styles = StyleSheet.create({
     fab: {
         position: 'absolute',
         right: spacing.lg,
-        bottom: 90,
+        bottom: 110,
         width: 56,
         height: 56,
         borderRadius: 28,
@@ -358,10 +358,11 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
         shadowColor: '#000',
-        shadowOpacity: 0.2,
+        shadowOpacity: 0.3,
         shadowRadius: 8,
         shadowOffset: { width: 0, height: 4 },
-        elevation: 4,
+        elevation: 8,
+        zIndex: 20,
     },
     logo: {
         width: 36,
