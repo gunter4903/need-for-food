@@ -85,7 +85,20 @@ if ($needsInstall) {
 }
 
 Write-Host ""
-Write-Host "=== 3/6 : expo prebuild --platform android ===" -ForegroundColor Cyan
+Write-Host "=== 3/7 : nettoyage du cache Metro (TEMP) ===" -ForegroundColor Cyan
+# Metro persiste son cache de bundles transformes dans le dossier TEMP de Windows, en dehors du
+# projet - le robocopy /MIR ci-dessus ne le touche jamais. Un changement dans .env (ex:
+# EXPO_PUBLIC_API_URL) ne fait pas partie de la cle de cache par defaut : sans ce nettoyage, un
+# nouveau build peut reutiliser un bundle deja transforme avec l'ancienne valeur, produisant un
+# APK qui semble a jour (nouvelle version, nouveau code) mais qui contacte encore l'ancien
+# serveur. Bug reel rencontre en pratique (v1.0.4 avait garde l'URL de dev apres un changement de
+# .env vers l'URL de production).
+Remove-Item -Recurse -Force "$env:TEMP\metro-cache" -ErrorAction SilentlyContinue
+Remove-Item -Force "$env:TEMP\metro-file-map-*" -ErrorAction SilentlyContinue
+Remove-Item -Force "$env:TEMP\haste-map-*" -ErrorAction SilentlyContinue
+
+Write-Host ""
+Write-Host "=== 4/7 : expo prebuild --platform android ===" -ForegroundColor Cyan
 Push-Location $BuildWorkspace
 npx expo prebuild --platform android
 $prebuildExitCode = $LASTEXITCODE
@@ -95,7 +108,7 @@ if ($prebuildExitCode -ne 0) {
 }
 
 Write-Host ""
-Write-Host "=== 4/6 : reinjection de la configuration de signature release ===" -ForegroundColor Cyan
+Write-Host "=== 5/7 : reinjection de la configuration de signature release ===" -ForegroundColor Cyan
 $keystorePathForward = $KeystoreFile -replace '\\', '/'
 $password = (Get-Content $PasswordFile -Raw -ErrorAction Stop).Trim()
 $keystorePropsLines = @(
@@ -111,7 +124,7 @@ $template = $template.Replace("__VERSION_CODE__", $versionCode).Replace("__VERSI
 Set-Content -Path (Join-Path $BuildWorkspace "android\app\build.gradle") -Value $template -Encoding ascii -NoNewline
 
 Write-Host ""
-Write-Host "=== 5/6 : gradlew assembleRelease ===" -ForegroundColor Cyan
+Write-Host "=== 6/7 : gradlew assembleRelease ===" -ForegroundColor Cyan
 $env:JAVA_HOME = "C:\Program Files\Android\Android Studio\jbr"
 $env:ANDROID_HOME = "$env:LOCALAPPDATA\Android\Sdk"
 $env:Path = "$env:JAVA_HOME\bin;$env:ANDROID_HOME\platform-tools;" + $env:Path
@@ -131,7 +144,7 @@ if ($gradleExitCode -ne 0) {
 }
 
 Write-Host ""
-Write-Host "=== 6/6 : copie de l'APK signe ===" -ForegroundColor Cyan
+Write-Host "=== 7/7 : copie de l'APK signe ===" -ForegroundColor Cyan
 $builtApk = Join-Path $BuildWorkspace "android\app\build\outputs\apk\release\app-release.apk"
 $outputDir = Join-Path $MobileRepo "build-output"
 New-Item -ItemType Directory -Force -Path $outputDir | Out-Null
