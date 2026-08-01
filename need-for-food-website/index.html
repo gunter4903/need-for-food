@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Need for Food — Téléchargez l'application</title>
+<style>
+  :root {
+    --primary: #F48A1F;
+    --primary-dark: #D9720F;
+    --secondary: #F6A649;
+    --background: #FAF2E6;
+    --text-primary: #2E2E2E;
+    --text-secondary: #777777;
+    --card: #FFFFFF;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background: var(--background);
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    padding: 24px;
+  }
+  .card {
+    background: var(--card);
+    border-radius: 24px;
+    padding: 48px 40px;
+    max-width: 440px;
+    width: 100%;
+    text-align: center;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
+  }
+  .logo {
+    width: 96px;
+    height: 96px;
+    border-radius: 50%;
+    margin-bottom: 20px;
+  }
+  h1 {
+    font-size: 28px;
+    margin: 0 0 8px;
+    color: var(--primary-dark);
+  }
+  p.tagline {
+    color: var(--text-secondary);
+    font-size: 16px;
+    line-height: 1.5;
+    margin: 0 0 32px;
+  }
+  .download-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    width: 100%;
+    padding: 16px 24px;
+    background: var(--primary);
+    color: #fff;
+    font-size: 17px;
+    font-weight: 700;
+    text-decoration: none;
+    border-radius: 999px;
+    transition: background 0.15s ease;
+  }
+  .download-btn:hover {
+    background: var(--primary-dark);
+  }
+  .meta {
+    margin-top: 16px;
+    font-size: 13px;
+    color: var(--text-secondary);
+    line-height: 1.6;
+  }
+  footer {
+    margin-top: 32px;
+    font-size: 12px;
+    color: var(--text-secondary);
+  }
+</style>
+</head>
+<body>
+  <div class="card">
+    <img src="/logo.png" alt="Need for Food" class="logo">
+    <h1>Need for Food</h1>
+    <p class="tagline">Organisez vos recettes, générez vos listes de courses et cuisinez avec vos proches.</p>
+
+    <a class="download-btn" href="/downloads/need-for-food-latest.apk" download>
+      ⬇ Télécharger l'application (Android)
+    </a>
+
+    <p class="meta">
+      APK signé, à installer manuellement (autoriser les sources inconnues lors de l'installation).<br>
+      Non disponible sur le Play Store pour le moment.
+    </p>
+  </div>
+</body>
+</html>

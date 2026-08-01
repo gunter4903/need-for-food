@@ -1,3 +1,8 @@
 api.needforfood.fr {
 	reverse_proxy backend:8080
 }
+
+needforfood.fr, www.needforfood.fr {
+	root * /srv/website
+	file_server
+}
