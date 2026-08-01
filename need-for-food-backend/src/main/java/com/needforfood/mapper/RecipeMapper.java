@@ -43,6 +43,7 @@ public final class RecipeMapper {
                 .diet(request.getDiet())
                 .difficulty(request.getDifficulty())
                 .preparationTime(request.getPreparationTime())
+                .servings(request.getServings())
                 .ingredients(ingredients)
                 .steps(steps)
                 .build();
@@ -80,6 +81,7 @@ public final class RecipeMapper {
                 recipe.getDifficulty(),
                 images,
                 recipe.getPreparationTime(),
+                recipe.getServings(),
                 recipe.getCreatedAt(),
                 recipe.getUser().getId(),
                 recipe.getUser().getUsername(),

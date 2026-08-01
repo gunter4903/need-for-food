@@ -194,6 +194,7 @@ public class UserDataTransferService {
                 .diet(recipe.getDiet())
                 .difficulty(recipe.getDifficulty())
                 .preparationTime(recipe.getPreparationTime())
+                .servings(recipe.getServings())
                 .ingredients(ingredients)
                 .steps(steps)
                 .imageUrls(imageUrls)
@@ -244,6 +245,7 @@ public class UserDataTransferService {
                 .diet(data.getDiet())
                 .difficulty(data.getDifficulty())
                 .preparationTime(data.getPreparationTime())
+                .servings(data.getServings())
                 .ingredients(ingredients)
                 .steps(steps)
                 .build();

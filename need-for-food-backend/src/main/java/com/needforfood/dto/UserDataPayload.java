@@ -60,6 +60,7 @@ public class UserDataPayload {
         private String diet;
         private String difficulty;
         private Integer preparationTime;
+        private Integer servings;
         private List<IngredientData> ingredients;
         private List<String> steps;
         private List<String> imageUrls;

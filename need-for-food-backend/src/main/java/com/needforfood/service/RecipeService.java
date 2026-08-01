@@ -147,6 +147,7 @@ public class RecipeService {
                 normalize(recipe.getDiet()),
                 normalize(recipe.getDifficulty()),
                 String.valueOf(recipe.getPreparationTime()),
+                String.valueOf(recipe.getServings()),
                 ingredientsPart,
                 stepsPart);
     }
@@ -246,6 +247,7 @@ public class RecipeService {
         recipe.setDiet(updates.getDiet());
         recipe.setDifficulty(updates.getDifficulty());
         recipe.setPreparationTime(updates.getPreparationTime());
+        recipe.setServings(updates.getServings());
 
         recipe.getIngredients().clear();
         recipe.getSteps().clear();

@@ -44,6 +44,7 @@ export default function EditRecipeScreen({ route, navigation }) {
     const [originalImageIds, setOriginalImageIds] = useState([]);
     const [name, setName] = useState('');
     const [time, setTime] = useState('');
+    const [servings, setServings] = useState('');
     const [difficulty, setDifficulty] = useState('Facile');
     const [type, setType] = useState('Non défini');
     const [diet, setDiet] = useState('Aucun');
@@ -72,6 +73,7 @@ export default function EditRecipeScreen({ route, navigation }) {
                 setOriginalImageIds(existingImages.map((img) => img.id));
                 setName(recipe.title);
                 setTime(recipe.preparationTime != null ? String(recipe.preparationTime) : '');
+                setServings(recipe.servings != null ? String(recipe.servings) : '');
                 setDifficulty(recipe.difficulty || 'Facile');
                 setType(recipe.type || 'Non défini');
                 setDiet(recipe.diet || 'Aucun');
@@ -174,6 +176,7 @@ export default function EditRecipeScreen({ route, navigation }) {
                 type: type === 'Non défini' ? null : type,
                 diet: diet === 'Aucun' ? null : diet,
                 preparationTime: parseInt(time, 10) || null,
+                servings: parseInt(servings, 10) || null,
                 ingredients: cleanIngredients,
                 steps: cleanSteps,
             });
@@ -278,6 +281,16 @@ export default function EditRecipeScreen({ route, navigation }) {
                             onChangeText={setTime}
                             containerStyle={styles.halfField}
                         />
+                        <FormInput
+                            label="Nombre de personnes"
+                            icon="users"
+                            keyboardType="number-pad"
+                            value={servings}
+                            onChangeText={setServings}
+                            containerStyle={styles.halfField}
+                        />
+                    </View>
+                    <View style={styles.row}>
                         <SelectField
                             label="Difficulté"
                             value={difficulty}
@@ -285,8 +298,6 @@ export default function EditRecipeScreen({ route, navigation }) {
                             onSelect={setDifficulty}
                             containerStyle={styles.halfField}
                         />
-                    </View>
-                    <View style={styles.row}>
                         <SelectField
                             label="Type"
                             value={type}
@@ -294,14 +305,8 @@ export default function EditRecipeScreen({ route, navigation }) {
                             onSelect={setType}
                             containerStyle={styles.halfField}
                         />
-                        <SelectField
-                            label="Régime"
-                            value={diet}
-                            options={DIETS}
-                            onSelect={setDiet}
-                            containerStyle={styles.halfField}
-                        />
                     </View>
+                    <SelectField label="Régime" value={diet} options={DIETS} onSelect={setDiet} />
                 </SectionCard>
 
                 <SectionCard icon="scissors" title="Ingrédients" onAdd={addIngredient}>

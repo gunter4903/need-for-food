@@ -24,6 +24,8 @@ import BottomNav from '../../components/common/BottomNav';
 import { useAuth } from '../../context/AuthContext';
 import * as recipeApi from '../../api/recipeApi';
 import * as shoppingListApi from '../../api/shoppingListApi';
+import { printRecipe } from '../../utils/recipePrint';
+import { showAlert } from '../../utils/appAlert';
 
 export default function RecipeDetailScreen({ route, navigation }) {
     const { user, token } = useAuth();
@@ -42,6 +44,7 @@ export default function RecipeDetailScreen({ route, navigation }) {
     const [loadingLists, setLoadingLists] = useState(false);
     const [newListName, setNewListName] = useState('');
     const [favorite, setFavorite] = useState(false);
+    const [printing, setPrinting] = useState(false);
 
     useFocusEffect(
         useCallback(() => {
@@ -67,6 +70,18 @@ export default function RecipeDetailScreen({ route, navigation }) {
             };
         }, [recipeId, token])
     );
+
+    const handlePrint = async () => {
+        if (printing) return;
+        setPrinting(true);
+        try {
+            await printRecipe(recipe);
+        } catch (err) {
+            showAlert('Impression impossible', err.message || "Une erreur est survenue pendant la préparation de l'impression.");
+        } finally {
+            setPrinting(false);
+        }
+    };
 
     const toggleIngredient = (id) => {
         setChecked((prev) => ({ ...prev, [id]: !prev[id] }));
@@ -233,6 +248,18 @@ export default function RecipeDetailScreen({ route, navigation }) {
                         <TouchableOpacity
                             style={styles.favoriteButton}
                             activeOpacity={0.7}
+                            onPress={handlePrint}
+                            disabled={printing}
+                        >
+                            {printing ? (
+                                <ActivityIndicator size="small" color={colors.textSecondary} />
+                            ) : (
+                                <Icon name="printer" size={22} color={colors.textSecondary} />
+                            )}
+                        </TouchableOpacity>
+                        <TouchableOpacity
+                            style={styles.favoriteButton}
+                            activeOpacity={0.7}
                             onPress={toggleFavorite}
                         >
                             <HeartIcon
@@ -262,7 +289,15 @@ export default function RecipeDetailScreen({ route, navigation }) {
                             value={recipe.preparationTime != null ? `${recipe.preparationTime} min` : '—'}
                         />
                         <StatBox icon="bar-chart-2" label="DIFFICULTÉ" value={recipe.difficulty || '—'} />
-                        <StatBox icon="list" label="INGRÉDIENTS" value={String(recipe.ingredients.length)} isLast />
+                        <StatBox
+                            icon="list"
+                            label="INGRÉDIENTS"
+                            value={String(recipe.ingredients.length)}
+                            isLast={recipe.servings == null}
+                        />
+                        {recipe.servings != null ? (
+                            <StatBox icon="users" label="PERSONNES" value={String(recipe.servings)} isLast />
+                        ) : null}
                     </View>
 
                     <View style={styles.sectionHeaderRow}>

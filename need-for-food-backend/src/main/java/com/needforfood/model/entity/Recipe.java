@@ -48,6 +48,8 @@ public class Recipe {
     @Column(name = "preparation_time")
     private Integer preparationTime;
 
+    private Integer servings;
+
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 

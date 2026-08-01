@@ -18,6 +18,7 @@ public class RecipeResponse {
     private String difficulty;
     private List<RecipeImageResponse> images;
     private Integer preparationTime;
+    private Integer servings;
     private LocalDateTime createdAt;
     private Long userId;
     private String username;

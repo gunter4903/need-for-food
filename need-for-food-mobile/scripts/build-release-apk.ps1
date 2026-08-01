@@ -26,8 +26,10 @@
     que de s'arreter au premier flux stderr.
 
 .PARAMETER CleanInstall
-    Force un `npm install` complet dans la copie de travail meme si node_modules y existe deja
-    (a utiliser apres avoir change package.json).
+    `npm install` s'execute a chaque build (rapide et sans effet si rien n'a change). Ce switch
+    supprime en plus le node_modules du workspace de build avant, pour une reinstallation
+    totalement propre (utile en cas de doute sur l'etat du workspace, pas necessaire pour un
+    ajout de dependance normal).
 
 .PARAMETER SkipPublish
     N'envoie pas l'APK sur needforfood.fr a la fin du build (utile pour un build de test local,
@@ -80,18 +82,16 @@ if ($LASTEXITCODE -ge 8) {
     Fail "robocopy a echoue (code $LASTEXITCODE)."
 }
 
-$needsInstall = $CleanInstall -or -not (Test-Path (Join-Path $BuildWorkspace "node_modules"))
-if ($needsInstall) {
-    Write-Host "Installation des dependances (npm install) dans la copie de travail..."
-    Push-Location $BuildWorkspace
-    npm install
-    $npmExitCode = $LASTEXITCODE
-    Pop-Location
-    if ($npmExitCode -ne 0) {
-        Fail "npm install a echoue (code $npmExitCode)."
-    }
-} else {
-    Write-Host "node_modules deja present dans la copie de travail (utiliser -CleanInstall pour forcer une reinstallation)."
+Write-Host "Installation des dependances (npm install) dans la copie de travail..."
+if ($CleanInstall) {
+    Remove-Item -Recurse -Force (Join-Path $BuildWorkspace "node_modules") -ErrorAction SilentlyContinue
+}
+Push-Location $BuildWorkspace
+npm install
+$npmExitCode = $LASTEXITCODE
+Pop-Location
+if ($npmExitCode -ne 0) {
+    Fail "npm install a echoue (code $npmExitCode)."
 }
 
 Write-Host ""

@@ -27,6 +27,9 @@ public class RecipeRequest {
     @PositiveOrZero
     private Integer preparationTime;
 
+    @PositiveOrZero
+    private Integer servings;
+
     @Valid
     @NotEmpty
     private List<RecipeIngredientRequest> ingredients;
