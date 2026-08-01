@@ -5,9 +5,6 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="23d147eb-fe7c-4e75-9183-d618c3f3dcce" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/../need-for-food-backend/docker-compose.prod.yml" beforeDir="false" afterPath="$PROJECT_DIR$/../need-for-food-backend/docker-compose.prod.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app.json" beforeDir="false" afterPath="$PROJECT_DIR$/app.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/scripts/build-release-apk.ps1" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/build-release-apk.ps1" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -167,7 +164,7 @@
       <workItem from="1784656458434" duration="13515000" />
       <workItem from="1785139683525" duration="108000" />
       <workItem from="1785139852619" duration="64406000" />
-      <workItem from="1785347860913" duration="12621000" />
+      <workItem from="1785347860913" duration="13226000" />
     </task>
     <servers />
   </component>

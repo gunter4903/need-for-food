@@ -8,13 +8,17 @@
       1. Copie le projet vers un chemin COURT (C:\nff-build\...) : le build natif Android
          (CMake/NDK/lld) echoue sur le chemin reel de ce depot, trop profond/trop long pour les
          outils Win32 (limite ~250-260 caracteres par chemin de fichier objet).
-      2. `expo prebuild` regenere le dossier android/ (jamais commite, voir .gitignore) a partir
+      2. Nettoie le cache Metro (TEMP Windows) - sinon un changement de .env (URL de backend) peut
+         etre ignore silencieusement par un rebuild, voir le commentaire de l'etape correspondante.
+      3. `expo prebuild` regenere le dossier android/ (jamais commite, voir .gitignore) a partir
          de app.json.
-      3. Reinjecte la config de signature release (keystore.properties + app/build.gradle patche)
+      4. Reinjecte la config de signature release (keystore.properties + app/build.gradle patche)
          depuis need-for-food-mobile/keystore/ (jamais commite) et
          need-for-food-mobile/android-release-config/ (commite, sans secret).
-      4. Lance `gradlew assembleRelease` avec le JDK embarque dans Android Studio.
-      5. Copie l'APK signe dans need-for-food-mobile/build-output/.
+      5. Lance `gradlew assembleRelease` avec le JDK embarque dans Android Studio.
+      6. Copie l'APK signe dans need-for-food-mobile/build-output/.
+      7. Publie l'APK et sa date de version sur needforfood.fr (VPS, via scp/SSH par cle) - peut
+         etre desactive avec -SkipPublish.
 
     Note : les outils npx/npm ecrivent parfois des avertissements benins sur stderr, que
     PowerShell peut afficher en rouge sans que la commande ait reellement echoue - c'est pour
@@ -25,12 +29,18 @@
     Force un `npm install` complet dans la copie de travail meme si node_modules y existe deja
     (a utiliser apres avoir change package.json).
 
+.PARAMETER SkipPublish
+    N'envoie pas l'APK sur needforfood.fr a la fin du build (utile pour un build de test local,
+    ou si le VPS est injoignable). Par defaut, la publication est automatique.
+
 .EXAMPLE
     .\scripts\build-release-apk.ps1
     .\scripts\build-release-apk.ps1 -CleanInstall
+    .\scripts\build-release-apk.ps1 -SkipPublish
 #>
 param(
-    [switch]$CleanInstall
+    [switch]$CleanInstall,
+    [switch]$SkipPublish
 )
 
 $MobileRepo = Split-Path -Parent $PSScriptRoot
@@ -44,7 +54,7 @@ function Fail($message) {
     exit 1
 }
 
-Write-Host "=== 1/6 : lecture de la version depuis app.json ===" -ForegroundColor Cyan
+Write-Host "=== 1/8 : lecture de la version depuis app.json ===" -ForegroundColor Cyan
 $appJson = Get-Content (Join-Path $MobileRepo "app.json") -Raw -ErrorAction Stop | ConvertFrom-Json -ErrorAction Stop
 $versionName = $appJson.expo.version
 $versionCode = $appJson.expo.android.versionCode
@@ -61,7 +71,7 @@ if (-not (Test-Path $PasswordFile)) {
 }
 
 Write-Host ""
-Write-Host "=== 2/6 : synchronisation vers un chemin court ($BuildWorkspace) ===" -ForegroundColor Cyan
+Write-Host "=== 2/8 : synchronisation vers un chemin court ($BuildWorkspace) ===" -ForegroundColor Cyan
 New-Item -ItemType Directory -Force -Path (Split-Path -Parent $BuildWorkspace) | Out-Null
 robocopy $MobileRepo $BuildWorkspace /MIR `
     /XD ".git" "android" ".expo" "dist" "build-output" "keystore" "node_modules" `
@@ -85,7 +95,7 @@ if ($needsInstall) {
 }
 
 Write-Host ""
-Write-Host "=== 3/7 : nettoyage du cache Metro (TEMP) ===" -ForegroundColor Cyan
+Write-Host "=== 3/8 : nettoyage du cache Metro (TEMP) ===" -ForegroundColor Cyan
 # Metro persiste son cache de bundles transformes dans le dossier TEMP de Windows, en dehors du
 # projet - le robocopy /MIR ci-dessus ne le touche jamais. Un changement dans .env (ex:
 # EXPO_PUBLIC_API_URL) ne fait pas partie de la cle de cache par defaut : sans ce nettoyage, un
@@ -98,7 +108,7 @@ Remove-Item -Force "$env:TEMP\metro-file-map-*" -ErrorAction SilentlyContinue
 Remove-Item -Force "$env:TEMP\haste-map-*" -ErrorAction SilentlyContinue
 
 Write-Host ""
-Write-Host "=== 4/7 : expo prebuild --platform android ===" -ForegroundColor Cyan
+Write-Host "=== 4/8 : expo prebuild --platform android ===" -ForegroundColor Cyan
 Push-Location $BuildWorkspace
 npx expo prebuild --platform android
 $prebuildExitCode = $LASTEXITCODE
@@ -108,7 +118,7 @@ if ($prebuildExitCode -ne 0) {
 }
 
 Write-Host ""
-Write-Host "=== 5/7 : reinjection de la configuration de signature release ===" -ForegroundColor Cyan
+Write-Host "=== 5/8 : reinjection de la configuration de signature release ===" -ForegroundColor Cyan
 $keystorePathForward = $KeystoreFile -replace '\\', '/'
 $password = (Get-Content $PasswordFile -Raw -ErrorAction Stop).Trim()
 $keystorePropsLines = @(
@@ -124,7 +134,7 @@ $template = $template.Replace("__VERSION_CODE__", $versionCode).Replace("__VERSI
 Set-Content -Path (Join-Path $BuildWorkspace "android\app\build.gradle") -Value $template -Encoding ascii -NoNewline
 
 Write-Host ""
-Write-Host "=== 6/7 : gradlew assembleRelease ===" -ForegroundColor Cyan
+Write-Host "=== 6/8 : gradlew assembleRelease ===" -ForegroundColor Cyan
 $env:JAVA_HOME = "C:\Program Files\Android\Android Studio\jbr"
 $env:ANDROID_HOME = "$env:LOCALAPPDATA\Android\Sdk"
 $env:Path = "$env:JAVA_HOME\bin;$env:ANDROID_HOME\platform-tools;" + $env:Path
@@ -144,7 +154,7 @@ if ($gradleExitCode -ne 0) {
 }
 
 Write-Host ""
-Write-Host "=== 7/7 : copie de l'APK signe ===" -ForegroundColor Cyan
+Write-Host "=== 7/8 : copie de l'APK signe ===" -ForegroundColor Cyan
 $builtApk = Join-Path $BuildWorkspace "android\app\build\outputs\apk\release\app-release.apk"
 $outputDir = Join-Path $MobileRepo "build-output"
 New-Item -ItemType Directory -Force -Path $outputDir | Out-Null
@@ -154,5 +164,31 @@ Copy-Item $builtApk $finalApk -Force -ErrorAction Stop
 Write-Host ""
 Write-Host "APK genere : $finalApk" -ForegroundColor Green
 Get-Item $finalApk | Select-Object Name, Length, LastWriteTime
+
+Write-Host ""
+Write-Host "=== 8/8 : publication sur needforfood.fr ===" -ForegroundColor Cyan
+if ($SkipPublish) {
+    Write-Host "Ignoree (-SkipPublish)." -ForegroundColor Yellow
+} else {
+    $VpsHost = "ubuntu@193.70.40.165"
+    $VpsDownloadsDir = "~/need-for-food/need-for-food-website/downloads"
+    $versionJsonPath = Join-Path $outputDir "version.json"
+    $releaseDate = (Get-Date).ToString("yyyy-MM-dd")
+    "{`"version`":`"$versionName`",`"date`":`"$releaseDate`"}" |
+        Out-File -FilePath $versionJsonPath -Encoding utf8 -NoNewline
+
+    scp $finalApk "${VpsHost}:${VpsDownloadsDir}/need-for-food-latest.apk"
+    $scpApkExit = $LASTEXITCODE
+    scp $versionJsonPath "${VpsHost}:${VpsDownloadsDir}/version.json"
+    $scpJsonExit = $LASTEXITCODE
+
+    if ($scpApkExit -ne 0 -or $scpJsonExit -ne 0) {
+        Write-Host "Avertissement : l'envoi vers le VPS a echoue (code apk=$scpApkExit, version.json=$scpJsonExit)." -ForegroundColor Yellow
+        Write-Host "L'APK reste disponible localement dans build-output/, mais needforfood.fr n'a pas ete mis a jour - relancer avec .\scripts\build-release-apk.ps1 -SkipPublish puis publier manuellement, ou corriger l'acces SSH et relancer ce script." -ForegroundColor Yellow
+    } else {
+        Write-Host "Publie sur https://needforfood.fr (APK + version $versionName du $releaseDate)." -ForegroundColor Green
+    }
+}
+
 Write-Host ""
 Write-Host "Rappel : la cle de signature ($KeystoreFile) doit etre sauvegardee ailleurs que sur cette machine (voir keystore/README.md)." -ForegroundColor Yellow

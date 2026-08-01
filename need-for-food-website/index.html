@@ -76,6 +76,11 @@
     color: var(--text-secondary);
     line-height: 1.6;
   }
+  .version-info {
+    margin-top: 12px;
+    font-size: 12px;
+    color: var(--text-secondary);
+  }
   footer {
     margin-top: 32px;
     font-size: 12px;
@@ -97,6 +102,21 @@
       APK signé, à installer manuellement (autoriser les sources inconnues lors de l'installation).<br>
       Non disponible sur le Play Store pour le moment.
     </p>
+
+    <p class="version-info" id="versionInfo"></p>
   </div>
+
+  <script>
+    fetch('/downloads/version.json', { cache: 'no-store' })
+      .then((res) => res.json())
+      .then((data) => {
+        const date = new Date(data.date).toLocaleDateString('fr-FR', {
+          day: 'numeric', month: 'long', year: 'numeric',
+        });
+        document.getElementById('versionInfo').textContent =
+          `Version ${data.version} — publiée le ${date}`;
+      })
+      .catch(() => {});
+  </script>
 </body>
 </html>
