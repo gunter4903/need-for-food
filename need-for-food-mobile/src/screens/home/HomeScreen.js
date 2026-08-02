@@ -19,6 +19,7 @@ import FeaturedRecipeCard from '../../components/home/FeaturedRecipeCard';
 import RecipeCard from '../../components/common/RecipeCard';
 import NewsRow from '../../components/home/NewsRow';
 import BottomNav from '../../components/common/BottomNav';
+import UpdateBanner from '../../components/common/UpdateBanner';
 import { useAuth } from '../../context/AuthContext';
 import * as recipeApi from '../../api/recipeApi';
 import { filterByTitle, filterByCategory } from '../../utils/recipeFilters';
@@ -125,6 +126,8 @@ export default function HomeScreen({ navigation }) {
                         />
                     </TouchableOpacity>
                 </View>
+
+                <UpdateBanner />
 
                 {/* Salutation */}
                 <Text style={styles.eyebrow}>Bon appétit !</Text>

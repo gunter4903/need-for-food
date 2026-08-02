@@ -1,12 +1,5 @@
 import * as Print from 'expo-print';
-
-function escapeHtml(value) {
-    return String(value ?? '')
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;');
-}
+import { escapeHtml } from './html';
 
 export function buildRecipeHtml(recipe) {
     const heroImage = recipe.images?.[0]?.url;

@@ -22,6 +22,7 @@ import * as shoppingListApi from '../../api/shoppingListApi';
 import * as recipeApi from '../../api/recipeApi';
 import { showAlert } from '../../utils/appAlert';
 import { textIncludes } from '../../utils/text';
+import { printShoppingList } from '../../utils/shoppingListPrint';
 
 export default function ShoppingListScreen({ route, navigation }) {
     const { token } = useAuth();
@@ -32,6 +33,7 @@ export default function ShoppingListScreen({ route, navigation }) {
     const [error, setError] = useState('');
     const [clearing, setClearing] = useState(false);
     const [deleting, setDeleting] = useState(false);
+    const [printing, setPrinting] = useState(false);
 
     const [recipeSearch, setRecipeSearch] = useState('');
     const [myRecipes, setMyRecipes] = useState([]);
@@ -172,6 +174,18 @@ export default function ShoppingListScreen({ route, navigation }) {
         }
     };
 
+    const handlePrint = async () => {
+        if (printing) return;
+        setPrinting(true);
+        try {
+            await printShoppingList(list);
+        } catch (err) {
+            showAlert('Impression impossible', err.message || "Une erreur est survenue pendant la préparation de l'impression.");
+        } finally {
+            setPrinting(false);
+        }
+    };
+
     const handleDeleteList = () => {
         showAlert(
             'Supprimer la liste',
@@ -223,7 +237,21 @@ export default function ShoppingListScreen({ route, navigation }) {
             <Header onBack={() => navigation?.goBack()} onAvatarPress={() => navigation?.navigate('Profil')} />
 
             <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
-                <Text style={typography.h1}>{list.name}</Text>
+                <View style={styles.titleRow}>
+                    <Text style={[typography.h1, styles.titleText]}>{list.name}</Text>
+                    <TouchableOpacity
+                        style={styles.printButton}
+                        activeOpacity={0.7}
+                        onPress={handlePrint}
+                        disabled={printing}
+                    >
+                        {printing ? (
+                            <ActivityIndicator size="small" color={colors.textSecondary} />
+                        ) : (
+                            <Icon name="printer" size={22} color={colors.textSecondary} />
+                        )}
+                    </TouchableOpacity>
+                </View>
                 <Text style={styles.subtitle}>
                     {list.items.filter((i) => i.checked).length} / {list.items.length} articles cochés
                 </Text>
@@ -386,6 +414,21 @@ const styles = StyleSheet.create({
     scrollContent: {
         paddingHorizontal: spacing.lg,
         paddingBottom: spacing.xl,
+    },
+    titleRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+    },
+    titleText: {
+        flex: 1,
+        marginRight: spacing.sm,
+    },
+    printButton: {
+        width: 40,
+        height: 40,
+        alignItems: 'center',
+        justifyContent: 'center',
     },
     subtitle: {
         ...typography.body,

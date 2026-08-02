@@ -174,8 +174,12 @@ if ($SkipPublish) {
     $VpsDownloadsDir = "~/need-for-food/need-for-food-website/downloads"
     $versionJsonPath = Join-Path $outputDir "version.json"
     $releaseDate = (Get-Date).ToString("yyyy-MM-dd")
+    # -Encoding utf8 ajoute toujours un BOM sous Windows PowerShell : Android/React Native ne le
+    # tolere pas dans JSON.parse (echec silencieux, avale par le try/catch de updateCheck.js), ce
+    # qui rendait le bandeau de mise a jour invisible en permanence, meme quand une version plus
+    # recente etait disponible. Le contenu est du pur ASCII, donc -Encoding ascii evite le BOM.
     "{`"version`":`"$versionName`",`"date`":`"$releaseDate`"}" |
-        Out-File -FilePath $versionJsonPath -Encoding utf8 -NoNewline
+        Out-File -FilePath $versionJsonPath -Encoding ascii -NoNewline
 
     scp $finalApk "${VpsHost}:${VpsDownloadsDir}/need-for-food-latest.apk"
     $scpApkExit = $LASTEXITCODE

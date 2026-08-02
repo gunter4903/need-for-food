@@ -5,15 +5,16 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="23d147eb-fe7c-4e75-9183-d618c3f3dcce" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/../need-for-food-backend/src/main/java/com/needforfood/service/RecipeService.java" beforeDir="false" afterPath="$PROJECT_DIR$/../need-for-food-backend/src/main/java/com/needforfood/service/RecipeService.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app.json" beforeDir="false" afterPath="$PROJECT_DIR$/app.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/package-lock.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/scripts/build-release-apk.ps1" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/build-release-apk.ps1" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/screens/home/HomeScreen.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/screens/home/HomeScreen.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/screens/recipes/AddRecipeScreen.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/screens/recipes/AddRecipeScreen.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/screens/recipes/EditRecipeScreen.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/screens/recipes/EditRecipeScreen.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/screens/recipes/RecipeDetailScreen.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/screens/recipes/RecipeDetailScreen.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/screens/shoppingList/ShoppingListScreen.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/screens/shoppingList/ShoppingListScreen.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/utils/recipePrint.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/utils/recipePrint.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/utils/recipeScan.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/utils/recipeScan.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/utils/recipeScan.test.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/utils/recipeScan.test.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -173,7 +174,7 @@
       <workItem from="1785139683525" duration="108000" />
       <workItem from="1785139852619" duration="64406000" />
       <workItem from="1785347860913" duration="14450000" />
-      <workItem from="1785593389256" duration="2660000" />
+      <workItem from="1785593389256" duration="7109000" />
     </task>
     <servers />
   </component>

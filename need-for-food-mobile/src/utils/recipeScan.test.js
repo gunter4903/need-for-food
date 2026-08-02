@@ -42,6 +42,43 @@ describe('parseRecipeText', () => {
         expect(result.steps).toEqual(['Étape une', 'Étape deux', 'Étape trois']);
     });
 
+    it('merges OCR line-wraps of the same sentence into a single step', () => {
+        const text = [
+            'Gâteau',
+            'Étapes',
+            'Mélanger la farine, le sucre',
+            'et les oeufs dans un grand',
+            'saladier propre.',
+            'Verser la pâte dans un moule',
+            'et enfourner pendant 30 minutes.',
+        ].join('\n');
+
+        const result = parseRecipeText(text);
+
+        expect(result.steps).toEqual([
+            'Mélanger la farine, le sucre et les oeufs dans un grand saladier propre.',
+            'Verser la pâte dans un moule et enfourner pendant 30 minutes.',
+        ]);
+    });
+
+    it('merges line-wraps inside a numbered step but still splits on the next number', () => {
+        const text = [
+            'Gâteau',
+            'Étapes',
+            '1. Mélanger la farine, le sucre',
+            'et les oeufs dans un bol.',
+            '2. Enfourner pendant 30 minutes',
+            'à 180°C.',
+        ].join('\n');
+
+        const result = parseRecipeText(text);
+
+        expect(result.steps).toEqual([
+            'Mélanger la farine, le sucre et les oeufs dans un bol.',
+            'Enfourner pendant 30 minutes à 180°C.',
+        ]);
+    });
+
     it('returns empty arrays for empty input', () => {
         expect(parseRecipeText('')).toEqual({ title: '', servings: '', ingredients: [], steps: [] });
         expect(parseRecipeText(null)).toEqual({ title: '', servings: '', ingredients: [], steps: [] });
@@ -93,6 +130,102 @@ describe('parseRecipeText', () => {
         const result = parseRecipeText(text);
 
         expect(result.steps).toEqual(['Préchauffer le four']);
+    });
+
+    it('rescues quantity-led lines into ingredients when only the steps header is found', () => {
+        const text = [
+            'Gâteau',
+            '85 g de beurre',
+            '100 g de sucre',
+            '1càc de vanille',
+            'Étapes',
+            'Préchauffer le four',
+            'Mélanger les ingrédients',
+        ].join('\n');
+
+        const result = parseRecipeText(text);
+
+        expect(result.ingredients).toEqual([
+            { name: 'beurre', quantity: '85', unit: 'g' },
+            { name: 'sucre', quantity: '100', unit: 'g' },
+            { name: 'vanille', quantity: '1', unit: 'càc' },
+        ]);
+        expect(result.steps).toEqual(['Préchauffer le four', 'Mélanger les ingrédients']);
+    });
+
+    it('does not mistake a numbered step without punctuation for an ingredient quantity', () => {
+        const text = [
+            'Gâteau',
+            'Ingrédients',
+            '75 g de chocolat',
+            '75 g de beurre',
+            '4 Ajoutez le sucre et les jaunes d\'oeufs au chocolat fondu',
+            'Étapes',
+            'Préchauffer le four',
+        ].join('\n');
+
+        const result = parseRecipeText(text);
+
+        expect(result.ingredients).toEqual([
+            { name: 'chocolat', quantity: '75', unit: 'g' },
+            { name: 'beurre', quantity: '75', unit: 'g' },
+        ]);
+        expect(result.steps).toEqual([
+            "4 Ajoutez le sucre et les jaunes d'oeufs au chocolat fondu",
+            'Préchauffer le four',
+        ]);
+    });
+
+    it('rescues quantity-led lines into ingredients when only the ingredients header is found', () => {
+        const text = [
+            'Gâteau',
+            'Ingrédients',
+            '85 g de beurre',
+            '100 g de sucre',
+            'Préchauffer le four',
+            'Mélanger les ingrédients',
+        ].join('\n');
+
+        const result = parseRecipeText(text);
+
+        expect(result.ingredients).toEqual([
+            { name: 'beurre', quantity: '85', unit: 'g' },
+            { name: 'sucre', quantity: '100', unit: 'g' },
+        ]);
+        expect(result.steps).toEqual(['Préchauffer le four', 'Mélanger les ingrédients']);
+    });
+
+    describe('multi-word units', () => {
+        it('recognizes "cuillère(s) à soupe/café" as a single unit', () => {
+            const text = ['Vinaigrette', 'Ingrédients', '2 cuillères à soupe de vinaigre', '1 cuillère à café de moutarde'].join('\n');
+
+            const result = parseRecipeText(text);
+
+            expect(result.ingredients).toEqual([
+                { name: 'vinaigre', quantity: '2', unit: 'cuillères à soupe' },
+                { name: 'moutarde', quantity: '1', unit: 'cuillère à café' },
+            ]);
+        });
+
+        it('recognizes common French cooking units (pincée, gousse, boîte...)', () => {
+            const text = [
+                'Curry',
+                'Ingrédients',
+                '2 gousses d\'ail',
+                '1 pincée de sel',
+                '1 boîte de tomates',
+                '3 tranches de jambon',
+            ].join('\n');
+
+            const result = parseRecipeText(text);
+
+            expect(result.ingredients).toEqual([
+                { name: 'ail', quantity: '2', unit: 'gousses' },
+                { name: 'sel', quantity: '1', unit: 'pincée' },
+                { name: 'tomates', quantity: '1', unit: 'boîte' },
+                { name: 'jambon', quantity: '3', unit: 'tranches' },
+            ]);
+        });
     });
 
     describe('with scope "ingredients"', () => {

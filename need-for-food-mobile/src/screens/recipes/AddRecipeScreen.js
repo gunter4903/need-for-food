@@ -170,11 +170,15 @@ export default function AddRecipeScreen({ navigation }) {
     };
 
     const handleScanRecipe = () => {
-        showAlert('Scanner une recette', 'Prendre une photo ou choisir une image existante ?', [
-            { text: 'Annuler', style: 'cancel' },
-            { text: 'Galerie', onPress: () => runScan('library') },
-            { text: 'Appareil photo', onPress: () => runScan('camera') },
-        ]);
+        showAlert(
+            'Scanner une recette',
+            "Prendre une photo ou choisir une image existante ? Fonctionne mieux sur du texte imprimé (site, livre) que sur de l'écriture manuscrite.",
+            [
+                { text: 'Annuler', style: 'cancel' },
+                { text: 'Galerie', onPress: () => runScan('library') },
+                { text: 'Appareil photo', onPress: () => runScan('camera') },
+            ]
+        );
     };
 
     const handleConfirmScanReview = () => {
@@ -385,39 +389,48 @@ export default function AddRecipeScreen({ navigation }) {
                 <View style={styles.overlay}>
                     <View style={styles.reviewCard}>
                         <Text style={styles.pickerTitle}>Texte reconnu</Text>
-                        <Text style={styles.reviewHint}>
-                            Supprimez les lignes qui ne font pas partie de la recette (menus, publicités, boutons...)
-                            avant de continuer.
-                        </Text>
 
-                        <Text style={styles.scopeLabel}>Cette photo contient :</Text>
-                        <View style={styles.scopeRow}>
-                            {SCAN_SCOPES.map((option) => (
-                                <TouchableOpacity
-                                    key={option.value}
-                                    style={[styles.scopeChip, scanScope === option.value && styles.scopeChipActive]}
-                                    activeOpacity={0.8}
-                                    onPress={() => setScanScope(option.value)}
-                                >
-                                    <Text
-                                        style={[
-                                            styles.scopeChipText,
-                                            scanScope === option.value && styles.scopeChipTextActive,
-                                        ]}
+                        <ScrollView
+                            style={styles.reviewScroll}
+                            nestedScrollEnabled
+                            keyboardShouldPersistTaps="handled"
+                            showsVerticalScrollIndicator={false}
+                        >
+                            <Text style={styles.reviewHint}>
+                                Supprimez les lignes qui ne font pas partie de la recette (menus, publicités,
+                                boutons...) avant de continuer.
+                            </Text>
+
+                            <Text style={styles.scopeLabel}>Cette photo contient :</Text>
+                            <View style={styles.scopeRow}>
+                                {SCAN_SCOPES.map((option) => (
+                                    <TouchableOpacity
+                                        key={option.value}
+                                        style={[styles.scopeChip, scanScope === option.value && styles.scopeChipActive]}
+                                        activeOpacity={0.8}
+                                        onPress={() => setScanScope(option.value)}
                                     >
-                                        {option.label}
-                                    </Text>
-                                </TouchableOpacity>
-                            ))}
-                        </View>
+                                        <Text
+                                            style={[
+                                                styles.scopeChipText,
+                                                scanScope === option.value && styles.scopeChipTextActive,
+                                            ]}
+                                        >
+                                            {option.label}
+                                        </Text>
+                                    </TouchableOpacity>
+                                ))}
+                            </View>
 
-                        <TextInput
-                            style={styles.reviewInput}
-                            multiline
-                            textAlignVertical="top"
-                            value={scanReviewText}
-                            onChangeText={setScanReviewText}
-                        />
+                            <TextInput
+                                style={styles.reviewInput}
+                                multiline
+                                textAlignVertical="top"
+                                value={scanReviewText}
+                                onChangeText={setScanReviewText}
+                            />
+                        </ScrollView>
+
                         <View style={styles.reviewButtonRow}>
                             <TouchableOpacity
                                 style={[styles.reviewButton, styles.reviewButtonSecondary]}
@@ -522,6 +535,9 @@ const styles = StyleSheet.create({
     pickerTitle: {
         ...typography.h2,
         marginBottom: spacing.xs,
+    },
+    reviewScroll: {
+        flex: 1,
     },
     reviewHint: {
         fontSize: 13,
