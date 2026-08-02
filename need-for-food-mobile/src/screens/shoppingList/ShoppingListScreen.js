@@ -23,6 +23,7 @@ import * as recipeApi from '../../api/recipeApi';
 import { showAlert } from '../../utils/appAlert';
 import { textIncludes } from '../../utils/text';
 import { printShoppingList } from '../../utils/shoppingListPrint';
+import { scaleIngredients } from '../../utils/servingsScale';
 
 export default function ShoppingListScreen({ route, navigation }) {
     const { token } = useAuth();
@@ -36,10 +37,11 @@ export default function ShoppingListScreen({ route, navigation }) {
     const [printing, setPrinting] = useState(false);
 
     const [recipeSearch, setRecipeSearch] = useState('');
-    const [myRecipes, setMyRecipes] = useState([]);
+    const [availableRecipes, setMyRecipes] = useState([]);
     const [loadingRecipes, setLoadingRecipes] = useState(true);
     const [addingRecipeId, setAddingRecipeId] = useState(null);
     const [addedRecipeIds, setAddedRecipeIds] = useState(new Set());
+    const [recipeServings, setRecipeServings] = useState({});
 
     const [draftName, setDraftName] = useState('');
     const [draftQuantity, setDraftQuantity] = useState('');
@@ -75,7 +77,7 @@ export default function ShoppingListScreen({ route, navigation }) {
 
         (async () => {
             try {
-                const recipes = await recipeApi.getMine(token);
+                const recipes = await recipeApi.getAll(token);
                 if (!cancelled) setMyRecipes(recipes);
             } catch {
                 // silencieux : la section recettes reste vide en cas d'erreur
@@ -89,7 +91,7 @@ export default function ShoppingListScreen({ route, navigation }) {
         };
     }, [token]);
 
-    const filteredRecipes = myRecipes.filter((recipe) => textIncludes(recipe.title, recipeSearch));
+    const filteredRecipes = availableRecipes.filter((recipe) => textIncludes(recipe.title, recipeSearch));
 
     const toggle = async (ingredientId, checked) => {
         try {
@@ -109,12 +111,18 @@ export default function ShoppingListScreen({ route, navigation }) {
         }
     };
 
+    const setRecipeServingsValue = (recipeId, value) => {
+        setRecipeServings((prev) => ({ ...prev, [recipeId]: value }));
+    };
+
     const handleAddRecipeIngredients = async (recipe) => {
         setAddingRecipeId(recipe.id);
         setError('');
         try {
+            const target = recipeServings[recipe.id] ?? recipe.servings;
+            const scaled = scaleIngredients(recipe.ingredients, recipe.servings, target);
             let updated = list;
-            for (const ingredient of recipe.ingredients) {
+            for (const ingredient of scaled) {
                 updated = await shoppingListApi.addItem(token, listId, {
                     ingredientName: ingredient.name,
                     unit: ingredient.unit,
@@ -335,6 +343,9 @@ export default function ShoppingListScreen({ route, navigation }) {
                                         selected={addedRecipeIds.has(recipe.id)}
                                         busy={addingRecipeId === recipe.id}
                                         onPress={() => handleAddRecipeIngredients(recipe)}
+                                        servings={recipeServings[recipe.id]}
+                                        onServingsChange={(value) => setRecipeServingsValue(recipe.id, value)}
+                                        servingsEditable={!addedRecipeIds.has(recipe.id)}
                                     />
                                 ))}
                             </ScrollView>

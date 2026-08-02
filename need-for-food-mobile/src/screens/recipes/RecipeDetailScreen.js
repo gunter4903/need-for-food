@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import {
     ScrollView,
     View,
@@ -26,6 +26,7 @@ import * as recipeApi from '../../api/recipeApi';
 import * as shoppingListApi from '../../api/shoppingListApi';
 import { printRecipe } from '../../utils/recipePrint';
 import { showAlert } from '../../utils/appAlert';
+import { scaleIngredients } from '../../utils/servingsScale';
 
 export default function RecipeDetailScreen({ route, navigation }) {
     const { user, token } = useAuth();
@@ -45,6 +46,11 @@ export default function RecipeDetailScreen({ route, navigation }) {
     const [newListName, setNewListName] = useState('');
     const [favorite, setFavorite] = useState(false);
     const [printing, setPrinting] = useState(false);
+    const [portions, setPortions] = useState(null);
+
+    useEffect(() => {
+        if (recipe?.servings != null) setPortions(recipe.servings);
+    }, [recipe?.id, recipe?.servings]);
 
     useFocusEffect(
         useCallback(() => {
@@ -71,11 +77,15 @@ export default function RecipeDetailScreen({ route, navigation }) {
         }, [recipeId, token])
     );
 
+    const scaledIngredients = recipe
+        ? scaleIngredients(recipe.ingredients, recipe.servings, portions ?? recipe.servings)
+        : [];
+
     const handlePrint = async () => {
         if (printing) return;
         setPrinting(true);
         try {
-            await printRecipe(recipe);
+            await printRecipe({ ...recipe, ingredients: scaledIngredients, servings: portions ?? recipe.servings });
         } catch (err) {
             showAlert('Impression impossible', err.message || "Une erreur est survenue pendant la préparation de l'impression.");
         } finally {
@@ -125,7 +135,7 @@ export default function RecipeDetailScreen({ route, navigation }) {
         setListError('');
         setAddingToList(true);
         try {
-            for (const ingredient of recipe.ingredients) {
+            for (const ingredient of scaledIngredients) {
                 await shoppingListApi.addItem(token, list.id, {
                     ingredientName: ingredient.name,
                     unit: ingredient.unit,
@@ -149,7 +159,14 @@ export default function RecipeDetailScreen({ route, navigation }) {
         setListError('');
         setAddingToList(true);
         try {
-            const list = await shoppingListApi.generate(token, newListName.trim(), [recipe.id]);
+            const list = await shoppingListApi.create(token, newListName.trim());
+            for (const ingredient of scaledIngredients) {
+                await shoppingListApi.addItem(token, list.id, {
+                    ingredientName: ingredient.name,
+                    unit: ingredient.unit,
+                    quantity: ingredient.quantity,
+                });
+            }
             setPickerVisible(false);
             setNewListName('');
             navigation?.navigate('ListeCourses', { id: list.id });
@@ -300,10 +317,41 @@ export default function RecipeDetailScreen({ route, navigation }) {
                         ) : null}
                     </View>
 
+                    {recipe.servings != null && recipe.servings > 0 ? (
+                        <View style={styles.servingsRow}>
+                            <Text style={styles.servingsLabel}>
+                                {portions > 1 ? `Pour ${portions} personnes` : 'Pour 1 personne'}
+                            </Text>
+                            <View style={styles.servingsStepper}>
+                                <TouchableOpacity
+                                    style={styles.servingsStepButton}
+                                    activeOpacity={0.7}
+                                    disabled={portions <= 1}
+                                    onPress={() => setPortions((p) => Math.max(1, (p ?? recipe.servings) - 1))}
+                                >
+                                    <Icon name="minus" size={16} color={portions <= 1 ? colors.border : colors.primary} />
+                                </TouchableOpacity>
+                                <Text style={styles.servingsStepValue}>{portions}</Text>
+                                <TouchableOpacity
+                                    style={styles.servingsStepButton}
+                                    activeOpacity={0.7}
+                                    onPress={() => setPortions((p) => (p ?? recipe.servings) + 1)}
+                                >
+                                    <Icon name="plus" size={16} color={colors.primary} />
+                                </TouchableOpacity>
+                            </View>
+                            {portions !== recipe.servings ? (
+                                <TouchableOpacity activeOpacity={0.7} onPress={() => setPortions(recipe.servings)}>
+                                    <Text style={styles.servingsResetText}>Recette d'origine : {recipe.servings}</Text>
+                                </TouchableOpacity>
+                            ) : null}
+                        </View>
+                    ) : null}
+
                     <View style={styles.sectionHeaderRow}>
                         <Text style={typography.h2}>Ingrédients</Text>
                     </View>
-                    {recipe.ingredients.map((ingredient) => (
+                    {scaledIngredients.map((ingredient) => (
                         <CheckboxRow
                             key={ingredient.ingredientId}
                             label={`${ingredient.quantity}${ingredient.unit} de ${ingredient.name}`}
@@ -348,6 +396,11 @@ export default function RecipeDetailScreen({ route, navigation }) {
                 <TouchableOpacity style={styles.overlay} activeOpacity={1} onPress={closeListPicker}>
                     <TouchableOpacity activeOpacity={1} style={styles.pickerCard} onPress={() => {}}>
                         <Text style={styles.pickerTitle}>Ajouter à une liste</Text>
+                        {recipe.servings != null && recipe.servings > 0 ? (
+                            <Text style={styles.pickerServingsHint}>
+                                Ingrédients ajoutés pour {portions} {portions > 1 ? 'personnes' : 'personne'}
+                            </Text>
+                        ) : null}
 
                         {loadingLists ? (
                             <ActivityIndicator color={colors.primary} style={{ marginVertical: spacing.md }} />
@@ -555,6 +608,48 @@ const styles = StyleSheet.create({
         shadowOffset: { width: 0, height: 2 },
         elevation: 2,
     },
+    servingsRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        backgroundColor: colors.card,
+        borderRadius: radius.md,
+        paddingVertical: spacing.sm,
+        paddingHorizontal: spacing.md,
+        marginBottom: spacing.md,
+    },
+    servingsLabel: {
+        fontSize: 14,
+        fontWeight: '700',
+        color: colors.textPrimary,
+    },
+    servingsStepper: {
+        flexDirection: 'row',
+        alignItems: 'center',
+    },
+    servingsStepButton: {
+        width: 30,
+        height: 30,
+        borderRadius: 15,
+        borderWidth: 1,
+        borderColor: colors.border,
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    servingsStepValue: {
+        minWidth: 28,
+        textAlign: 'center',
+        fontSize: 15,
+        fontWeight: '700',
+        color: colors.textPrimary,
+        marginHorizontal: spacing.xs,
+    },
+    servingsResetText: {
+        fontSize: 12,
+        color: colors.primary,
+        fontWeight: '600',
+        marginLeft: spacing.sm,
+    },
     sectionHeaderRow: {
         flexDirection: 'row',
         justifyContent: 'space-between',
@@ -588,6 +683,12 @@ const styles = StyleSheet.create({
     },
     pickerTitle: {
         ...typography.h2,
+        marginBottom: spacing.sm,
+    },
+    pickerServingsHint: {
+        fontSize: 12,
+        color: colors.textSecondary,
+        marginTop: -spacing.xs,
         marginBottom: spacing.sm,
     },
     pickerListScroll: {

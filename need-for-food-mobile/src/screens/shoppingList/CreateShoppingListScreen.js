@@ -22,6 +22,7 @@ import { useAuth } from '../../context/AuthContext';
 import * as shoppingListApi from '../../api/shoppingListApi';
 import * as recipeApi from '../../api/recipeApi';
 import { textIncludes } from '../../utils/text';
+import { scaleIngredients } from '../../utils/servingsScale';
 
 let nextId = 1;
 
@@ -36,16 +37,17 @@ export default function CreateShoppingListScreen({ navigation }) {
     const [saving, setSaving] = useState(false);
 
     const [recipeSearch, setRecipeSearch] = useState('');
-    const [myRecipes, setMyRecipes] = useState([]);
+    const [availableRecipes, setMyRecipes] = useState([]);
     const [loadingRecipes, setLoadingRecipes] = useState(true);
     const [selectedRecipeIds, setSelectedRecipeIds] = useState([]);
+    const [recipeServings, setRecipeServings] = useState({});
 
     useEffect(() => {
         let cancelled = false;
 
         (async () => {
             try {
-                const recipes = await recipeApi.getMine(token);
+                const recipes = await recipeApi.getAll(token);
                 if (!cancelled) setMyRecipes(recipes);
             } catch {
                 // silencieux : la section recettes reste vide en cas d'erreur
@@ -59,12 +61,21 @@ export default function CreateShoppingListScreen({ navigation }) {
         };
     }, [token]);
 
-    const filteredRecipes = myRecipes.filter((recipe) => textIncludes(recipe.title, recipeSearch));
+    const filteredRecipes = availableRecipes.filter((recipe) => textIncludes(recipe.title, recipeSearch));
 
     const toggleRecipeSelection = (recipeId) => {
         setSelectedRecipeIds((prev) =>
             prev.includes(recipeId) ? prev.filter((id) => id !== recipeId) : [...prev, recipeId]
         );
+        setRecipeServings((prev) => {
+            const next = { ...prev };
+            delete next[recipeId];
+            return next;
+        });
+    };
+
+    const setRecipeServingsValue = (recipeId, value) => {
+        setRecipeServings((prev) => ({ ...prev, [recipeId]: value }));
     };
 
     const handleAddItem = () => {
@@ -97,9 +108,21 @@ export default function CreateShoppingListScreen({ navigation }) {
         setError('');
         setSaving(true);
         try {
-            const list = selectedRecipeIds.length > 0
-                ? await shoppingListApi.generate(token, listName.trim(), selectedRecipeIds)
-                : await shoppingListApi.create(token, listName.trim());
+            const list = await shoppingListApi.create(token, listName.trim());
+
+            for (const recipeId of selectedRecipeIds) {
+                const recipe = availableRecipes.find((r) => r.id === recipeId);
+                if (!recipe) continue;
+                const target = recipeServings[recipeId] ?? recipe.servings;
+                const scaled = scaleIngredients(recipe.ingredients, recipe.servings, target);
+                for (const ingredient of scaled) {
+                    await shoppingListApi.addItem(token, list.id, {
+                        ingredientName: ingredient.name,
+                        unit: ingredient.unit,
+                        quantity: ingredient.quantity,
+                    });
+                }
+            }
 
             for (const item of items) {
                 await shoppingListApi.addItem(token, list.id, {
@@ -162,6 +185,9 @@ export default function CreateShoppingListScreen({ navigation }) {
                                     recipe={recipe}
                                     selected={selectedRecipeIds.includes(recipe.id)}
                                     onPress={() => toggleRecipeSelection(recipe.id)}
+                                    servings={recipeServings[recipe.id]}
+                                    onServingsChange={(value) => setRecipeServingsValue(recipe.id, value)}
+                                    servingsEditable={selectedRecipeIds.includes(recipe.id)}
                                 />
                             ))}
                         </ScrollView>
