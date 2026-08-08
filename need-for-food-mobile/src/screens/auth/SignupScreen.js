@@ -14,6 +14,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { colors, spacing, radius, typography } from '../../constants/theme';
 import FormInput from '../../components/common/FormInput';
 import { useAuth } from '../../context/AuthContext';
+import { showAlert } from '../../utils/appAlert';
 
 export default function SignupScreen({ navigation }) {
     const { register } = useAuth();
@@ -149,7 +150,11 @@ export default function SignupScreen({ navigation }) {
                             <View style={styles.dividerLine} />
                         </View>
 
-                        <TouchableOpacity style={styles.googleButton} activeOpacity={0.85}>
+                        <TouchableOpacity
+                            style={styles.googleButton}
+                            activeOpacity={0.85}
+                            onPress={() => showAlert('Google', "Cette fonctionnalité n'est pas encore disponible.")}
+                        >
                             <Image
                                 source={require('../../../assets/images/google-icon.png')}
                                 style={styles.googleIcon}

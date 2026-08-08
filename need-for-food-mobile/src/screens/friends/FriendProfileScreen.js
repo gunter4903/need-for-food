@@ -10,6 +10,14 @@ import { useAuth } from '../../context/AuthContext';
 import * as userApi from '../../api/userApi';
 import * as recipeApi from '../../api/recipeApi';
 
+function chunkPairs(items) {
+    const pairs = [];
+    for (let i = 0; i < items.length; i += 2) {
+        pairs.push(items.slice(i, i + 2));
+    }
+    return pairs;
+}
+
 function toCard(recipe) {
     return {
         id: recipe.id,
@@ -87,13 +95,17 @@ export default function FriendProfileScreen({ route, navigation }) {
                                 <Text style={styles.emptyText}>Aucune recette pour l'instant.</Text>
                             ) : (
                                 <View style={styles.recipesGrid}>
-                                    {recipes.map((recipe) => (
-                                        <RecipeCard
-                                            key={recipe.id}
-                                            recipe={toCard(recipe)}
-                                            style={styles.recipeCard}
-                                            onPress={() => navigation?.navigate('DetailsRecette', { id: recipe.id })}
-                                        />
+                                    {chunkPairs(recipes).map((pair, index) => (
+                                        <View key={index} style={styles.recipeRow}>
+                                            {pair.map((recipe) => (
+                                                <RecipeCard
+                                                    key={recipe.id}
+                                                    recipe={toCard(recipe)}
+                                                    style={styles.recipeCard}
+                                                    onPress={() => navigation?.navigate('DetailsRecette', { id: recipe.id })}
+                                                />
+                                            ))}
+                                        </View>
                                     ))}
                                 </View>
                             )}
@@ -171,12 +183,15 @@ const styles = StyleSheet.create({
         color: colors.textSecondary,
     },
     recipesGrid: {
-        flexDirection: 'row',
-        flexWrap: 'wrap',
         gap: spacing.sm,
     },
+    recipeRow: {
+        flexDirection: 'row',
+        gap: spacing.sm,
+        marginBottom: spacing.sm,
+    },
     recipeCard: {
-        width: '47%',
+        flex: 1,
         height: 160,
     },
 });

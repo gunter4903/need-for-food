@@ -15,6 +15,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/Feather';
 import { colors, spacing, radius, typography } from '../../constants/theme';
 import { useAuth } from '../../context/AuthContext';
+import { showAlert } from '../../utils/appAlert';
 
 export default function LoginScreen({ navigation }) {
     const { login } = useAuth();
@@ -123,7 +124,11 @@ export default function LoginScreen({ navigation }) {
                             <View style={styles.dividerLine} />
                         </View>
 
-                        <TouchableOpacity style={styles.googleButton} activeOpacity={0.85}>
+                        <TouchableOpacity
+                            style={styles.googleButton}
+                            activeOpacity={0.85}
+                            onPress={() => showAlert('Google', "Cette fonctionnalité n'est pas encore disponible.")}
+                        >
                             <Image
                                 source={require('../../../assets/images/google-icon.png')}
                                 style={styles.googleIcon}
